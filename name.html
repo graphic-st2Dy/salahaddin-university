@@ -91,6 +91,30 @@
 
     <!-- Active Form (Hidden if already submitted) -->
     <form id="submissionForm" class="space-y-6 relative z-10">
+      
+      <!-- Option Switch Button (A / B) -->
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2 text-center" style="font-size: 1.5rem; margin-bottom: 1rem;">
+       گرووپ
+        </label>
+        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-200 rounded-md max-w-xs mx-auto">
+          <button 
+            type="button" 
+            id="optionA" 
+            class="py-2 text-sm font-semibold rounded-md transition-all shadow-sm bg-slateCustom text-white"
+          >
+             A
+          </button>
+          <button 
+            type="button" 
+            id="optionB" 
+            class="py-2 text-sm font-semibold rounded-md transition-all text-gray-600 hover:text-gray-900"
+          >
+             B 
+          </button>
+        </div>
+      </div>
+
       <div>
         <label for="fullName" class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2" style="direction: rtl;">
           ناوی سییانی <span class="text-red-600">*</span>
@@ -159,6 +183,25 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
+    // Track selected option (default 'A')
+    let selectedOption = 'A';
+
+    // Switch Option UI toggle handlers
+    const optionABtn = document.getElementById('optionA');
+    const optionBBtn = document.getElementById('optionB');
+
+    optionABtn.addEventListener('click', () => {
+      selectedOption = 'A';
+      optionABtn.className = "py-2 text-sm font-semibold rounded-md transition-all shadow-sm bg-slateCustom text-white";
+      optionBBtn.className = "py-2 text-sm font-semibold rounded-md transition-all text-gray-600 hover:text-gray-900";
+    });
+
+    optionBBtn.addEventListener('click', () => {
+      selectedOption = 'B';
+      optionBBtn.className = "py-2 text-sm font-semibold rounded-md transition-all shadow-sm bg-slateCustom text-white";
+      optionABtn.className = "py-2 text-sm font-semibold rounded-md transition-all text-gray-600 hover:text-gray-900";
+    });
+
     // DOM Elements
     const form = document.getElementById('submissionForm');
     const nameInput = document.getElementById('fullName');
@@ -170,7 +213,7 @@
     const noticeIcon = document.getElementById('noticeIcon');
     const alreadySubmittedCard = document.getElementById('alreadySubmittedCard');
 
-    const STORAGE_KEY = 'cognito_has_submitted_name';
+    const STORAGE_KEY = 'cognito_has_submitted_name5';
 
     // Check if user has already submitted on page load
     window.addEventListener('DOMContentLoaded', () => {
@@ -189,7 +232,6 @@
         lockSubmissionState();
         return;
       }
-
       const submittedName = nameInput.value.trim();
       if (!submittedName) {
         showNotice("error", "تکایە ناوێک بنووسە پێش ئەوەی پێشکەشی بکەیت");
@@ -200,24 +242,26 @@
       setLoading(true);
 
       try {
-        // Option 1: Append to list under 'submissions'
-        const submissionsRef = ref(db, 'submissions');
+        // Push under Submissions/A or Submissions/B depending on selected switch option
+        const submissionsRef = ref(db, `Submissions/${selectedOption}`);
         await push(submissionsRef, {
           name: submittedName,
           timestamp: new Date().toISOString(),
           userAgent: navigator.userAgent
         });
 
-        // Option 2: Also update/set under key 'name' as requested
+        // Set latest submission record
         const nameRef = ref(db, 'latestSubmission');
         await set(nameRef, {
           name: submittedName,
+          option: selectedOption,
           updatedAt: new Date().toISOString()
         });
 
         // Set one-time flag in local storage
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
           name: submittedName,
+          option: selectedOption,
           submittedAt: new Date().toISOString()
         }));
 
@@ -241,11 +285,13 @@
     function setLoading(isLoading) {
       submitBtn.disabled = isLoading;
       nameInput.disabled = isLoading;
+      optionABtn.disabled = isLoading;
+      optionBBtn.disabled = isLoading;
       if (isLoading) {
         btnText.textContent = "ناردن...";
         btnSpinner.classList.remove('hidden');
       } else {
-        btnText.textContent = "Submit Official Record";
+        btnText.textContent = "ناردنی ناوەکەت";
         btnSpinner.classList.add('hidden');
       }
     }
