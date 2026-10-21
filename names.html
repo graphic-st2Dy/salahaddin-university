@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ترتيب الأسماء أَبْجَدِيًّا</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font for clean modern Arabic typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-between p-4 sm:p-8">
+
+    <main class="max-w-4xl mx-auto w-full flex-grow flex flex-col justify-center">
+        <!-- Control Header & Sort Button -->
+        <div class="text-center mb-8 mt-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-6">ناوی خوێندکاران</h1>
+            <button 
+                id="sortBtn"
+                onclick="sortLists()" 
+                class="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-medium px-6 py-3 rounded-xl shadow-sm hover:shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                </svg>
+                <span>ڕیزکردن بە ئەبجەدی (أ - ي)</span>
+            </button>
+        </div>
+
+        <!-- Lists Container -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            <!-- Group A Card -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+                    <h2 class="text-xl font-bold text-slate-800">گرووپی A</h2>
+                    <span id="countA" class="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-full">21 ناو</span>
+                </div>
+                <ol id="groupA" class="space-y-2 list-decimal list-inside text-slate-700 text-base leading-relaxed">
+                    <!-- Names populated dynamically -->
+                </ol>
+            </div>
+
+            <!-- Group B Card -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+                    <h2 class="text-xl font-bold text-slate-800">گرووپی B</h2>
+                    <span id="countB" class="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-full">23 ناو</span>
+                </div>
+                <ol id="groupB" class="space-y-2 list-decimal list-inside text-slate-700 text-base leading-relaxed">
+                    <!-- Names populated dynamically -->
+                </ol>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center text-slate-400 text-xs py-6">
+        cognito
+    </footer>
+
+    <script>
+        // Array of 23 raw Arabic names for Group A
+        const listAData = [
+            "باڤیل سرتیب", "بیداء بشیر", "بەهەشت سەنگەر", "خۆزگە صديق", "دلباك مغديد",
+            "راز يونس", "رويده هاني", "رۆیا علي", "زمناکو زرار", "ژینۆ کامران",
+            "سۆما فاخر", "سیما عیسى", "سیما احمد", "لاڤین جعفر", "كارێز رمضان",
+            "مژدە سامان", "ئومێد إبراهیم",
+            "ایمان فاروق", "ناز ئاوارە", "هێور کامران" , "ئەستێرە ستار"
+        ];
+
+        // Array of 23 raw Arabic names for Group B
+        const listBData = [
+            "ایلاف عدنان", "ئاوێستە عثمان", "ایە پشتیوان", "إيمان عثمان", "دەشنى خليل",
+            "راز رفعت", "رەهێل رەشاد", "سیدرا فؤاد", "سەحەر کمال", "ڤانیا هێمن",
+            "محمد صفاء", "کانیز احمد", "هەژار خالد", "هەڤاڵ موسا", "یاد عماد",
+            "ئاڤا کاظم", "ئیلاف سلیم", "نێرگز کارزان", "سمیە ستار", "سارا مغدید",
+            "ساڤان سەرهەنگ", "ئەوین زیرەک", "لانە أمین", "هونەر یوسف"
+        ];
+
+        // Function to render an array into an HTML ordered list
+        function renderList(elementId, namesArray) {
+            const listElement = document.getElementById(elementId);
+            listElement.innerHTML = namesArray
+                .map(name => `<li class="py-1 px-2 rounded hover:bg-slate-50 transition-colors">${name}</li>`)
+                .join('');
+        }
+
+        // Sort both groups using standard Arabic locale collation
+        function sortLists() {
+            // Native JavaScript Intl.Collator tailored for Arabic ('ar')
+            const arabicCollator = new Intl.Collator('ar', { sensitivity: 'base' });
+
+            listAData.sort((a, b) => arabicCollator.compare(a, b));
+            listBData.sort((a, b) => arabicCollator.compare(a, b));
+
+            // Re-render the sorted lists
+            renderList('groupA', listAData);
+            renderList('groupB', listBData);
+        }
+
+        // Initial setup on window load
+        window.onload = function() {
+            renderList('groupA', listAData);
+            renderList('groupB', listBData);
+        };
+    </script>
+</body>
+</html>
+```
