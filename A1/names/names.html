@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ناوی خوێندکاران</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+            min-height: 100vh;
+            width: 100vw;
+            padding: 0;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Top Label Header */
+        .label {
+            display: flex;
+            align-items: center;
+            direction: rtl;
+            color: white;
+            background-color: #910D2A;
+            border-bottom: 0.2vw solid black;
+            height: 14vw;
+            padding: 0;
+            margin: 0;
+            width: 100vw;
+        }
+
+        h1 {
+            font-size: 3.5vw;
+            margin: 0;
+            padding: 0;
+        }
+
+        .logo1 {
+            height: 9vw;
+            width: 9vw;
+            margin: 0 2vw 0 2vw;
+        }
+
+        .sub-label {
+            font-size: 2.5vw;
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100vw;
+            padding-top: 4vw;
+            padding-bottom: 10vw;
+            background-color: #ffffff;
+            flex-grow: 1;
+        }
+
+        .names-container {
+            width: 90vw;
+            display: flex;
+            flex-direction: column;
+            gap: 4vw;
+        }
+
+        .page-title {
+            font-size: 4.5vw;
+            font-weight: 700;
+            color: #bf0029;
+            text-align: center;
+            margin-bottom: 1vw;
+            border-bottom: 0.3vw solid #bf0029;
+            padding-bottom: 1.5vw;
+        }
+
+        /* Sort Button Style */
+        .sort-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2vw;
+            background-color: #bf0029;
+            color: white;
+            border: none;
+            border-radius: 1vw;
+            padding: 2.5vw 4vw;
+            font-size: 3.2vw;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 0 2vw rgba(191, 0, 41, 0.3);
+            transition: all 0.2s ease;
+            margin: 0 auto;
+            width: fit-content;
+        }
+
+        .sort-btn:hover {
+            background-color: #910D2A;
+        }
+
+        .sort-btn svg {
+            width: 4.5vw;
+            height: 4.5vw;
+        }
+
+        /* Groups Layout Container */
+        .groups-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 4vw;
+        }
+
+        @media (min-width: 768px) {
+            .groups-grid {
+                flex-direction: row;
+                gap: 3vw;
+            }
+        }
+
+        .group-card {
+            flex: 1;
+            background-color: #ffffff;
+            border: 0.2vw solid #bf0029;
+            border-radius: 1vw;
+            box-shadow: 0 0 2vw rgba(0, 0, 0, 0.15);
+            padding: 4vw;
+            display: flex;
+            flex-direction: column;
+            gap: 2vw;
+        }
+
+        .group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 0.2vw solid #eeeeee;
+            padding-bottom: 2vw;
+        }
+
+        .group-title {
+            font-size: 3.8vw;
+            font-weight: 700;
+            color: #910D2A;
+            margin: 0;
+        }
+
+        .group-count {
+            background-color: #fcf8f8;
+            color: #bf0029;
+            border: 0.15vw solid #bf0029;
+            font-size: 2.5vw;
+            font-weight: 600;
+            padding: 0.8vw 2vw;
+            border-radius: 2vw;
+        }
+
+        ol {
+            margin: 0;
+            padding-right: 5vw;
+            font-size: 3.2vw;
+            color: #333333;
+            line-height: 1.8;
+            font-weight: 500;
+        }
+
+        li {
+            padding: 0.5vw 1vw;
+            border-radius: 0.5vw;
+            transition: background-color 0.15s ease;
+        }
+
+        li:hover {
+            background-color: #fcf8f8;
+            color: #bf0029;
+        }
+
+        footer {
+            text-align: center;
+            color: #777777;
+            font-size: 2.5vw;
+            padding: 4vw 0;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Header Label -->
+    <div class="label">
+        <img src="logo.png" class="logo1" alt="Logo">
+        <div class="main-label">
+            <h1>زانکۆی سەلاحەدین-هەولێر</h1>
+            <p class="sub-label">پەروەردەی ماتماتیک / قۆناغی یەکەم / گرووپی A</p>
+        </div>
+    </div>
+
+    <!-- Main Screen Content -->
+    <div class="main-screen">
+        <div class="names-container">
+            
+            <div class="page-title">ناوی خوێندکارانی بەش</div>
+
+            <!-- Sort Control Header -->
+            <div style="text-align: center;">
+                <button id="sortBtn" onclick="sortLists()" class="sort-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                    </svg>
+                    <span>ڕیزکردن بە ئەبجەدی (أ - ي)</span>
+                </button>
+            </div>
+
+            <!-- Groups Cards Grid -->
+            <div class="groups-grid">
+                <!-- Group A Card -->
+                <div class="group-card">
+                    <div class="group-header">
+                        <h2 class="group-title">گرووپی A</h2>
+                        <span id="countA" class="group-count">٢١ ناو</span>
+                    </div>
+                    <ol id="groupA">
+                        <!-- Populated dynamically -->
+                    </ol>
+                </div>
+
+                <!-- Group B Card -->
+                <div class="group-card">
+                    <div class="group-header">
+                        <h2 class="group-title">گرووپی B</h2>
+                        <span id="countB" class="group-count">٢٤ ناو</span>
+                    </div>
+                    <ol id="groupB">
+                        <!-- Populated dynamically -->
+                    </ol>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        cognito
+    </footer>
+
+    <script>
+        const listAData = [
+            "باڤیل سرتیب", "بیداء بشیر", "بەهەشت سەنگەر", "خۆزگە صديق", "دلباك مغديد",
+            "راز يونس", "رويده هاني", "رۆیا علي", "زمناکو زرار", "ژینۆ کامران",
+            "سۆما فاخر", "سیما عیسى", "سیما احمد", "لاڤین جعفر", "كارێز رمضان",
+            "مژدە سامان", "ئومێد إبراهیم",
+            "ایمان فاروق", "ناز ئاوارە", "هێور کامران", "ئەستێرە ستار"
+        ];
+
+        const listBData = [
+            "ایلاف عدنان", "ئاوێستە عثمان", "ایە پشتیوان", "إيمان عثمان", "دەشنى خليل",
+            "راز رفعت", "رەهێل رەشاد", "سیدرا فؤاد", "سەحەر کمال", "ڤانیا هێمن",
+            "محمد صفاء", "کارێز محمد", "هەژار خالد", "هەڤاڵ موسا", "یاد عماد",
+            "ئاڤا کاظم", "ئیلاف سلیم", "نێرگز کارزان", "سمیە ستار", "سارا مغدید",
+            "ساڤان سەرهەنگ", "ئەوین زیرەک", "لانە أمین", "هونەر یوسف"
+        ];
+
+        function renderList(elementId, namesArray) {
+            const listElement = document.getElementById(elementId);
+            listElement.innerHTML = namesArray
+                .map(name => `<li>${name}</li>`)
+                .join('');
+        }
+
+        function sortLists() {
+            const arabicCollator = new Intl.Collator('ar', { sensitivity: 'base' });
+            listAData.sort((a, b) => arabicCollator.compare(a, b));
+            listBData.sort((a, b) => arabicCollator.compare(a, b));
+            renderList('groupA', listAData);
+            renderList('groupB', listBData);
+        }
+
+        window.onload = function() {
+            renderList('groupA', listAData);
+            renderList('groupB', listBData);
+        };
+    </script>
+</body>
+</html>
