@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بەڕێوەبەری ئەرکی ماڵەوە</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      background-color: #ffffff;
+      min-height: 100vh;
+      width: 100vw;
+      padding: 0;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Top Label Header */
+    .label {
+      display: flex;
+      align-items: center;
+      direction: rtl;
+      color: white;
+      background-color: #910D2A;
+      border-bottom: 0.2vw solid black;
+      height: 14vw;
+      padding: 0;
+      margin: 0;
+      width: 100vw;
+    }
+
+    h1 {
+      font-size: 3.5vw;
+      margin: 0;
+      padding: 0;
+    }
+
+    .logo1 {
+      height: 9vw;
+      width: 9vw;
+      margin: 0 2vw 0 2vw;
+    }
+
+    .sub-label {
+      font-size: 2.5vw;
+      margin: 0;
+      padding: 0;
+    }
+
+    .main-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100vw;
+      padding-top: 5vw;
+      padding-bottom: 10vw;
+      background-color: #ffffff;
+    }
+
+    .pusher-container {
+      width: 90vw;
+      display: flex;
+      flex-direction: column;
+      gap: 5vw;
+    }
+
+    .page-title {
+      font-size: 4.5vw;
+      font-weight: 700;
+      color: #bf0029;
+      text-align: center;
+      margin-bottom: 1vw;
+      border-bottom: 0.3vw solid #bf0029;
+      padding-bottom: 1.5vw;
+    }
+
+    /* Form Panel */
+    .form-panel {
+      background-color: #ffffff;
+      border: 0.2vw solid #bf0029;
+      border-radius: 1vw;
+      box-shadow: 0 0 2vw rgba(0, 0, 0, 0.15);
+      padding: 4vw;
+      display: flex;
+      flex-direction: column;
+      gap: 3vw;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1vw;
+    }
+
+    label {
+      font-size: 3vw;
+      font-weight: 700;
+      color: #910D2A;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 2.5vw;
+      font-size: 3vw;
+      border: 0.2vw solid #cccccc;
+      border-radius: 0.8vw;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.2s ease;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: #bf0029;
+    }
+
+    /* Expiry Mode Switcher */
+    .mode-switcher {
+      display: flex;
+      gap: 2vw;
+      margin-bottom: 1vw;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 2vw;
+      font-size: 2.8vw;
+      font-weight: 600;
+      color: #bf0029;
+      background-color: #ffffff;
+      border: 0.2vw solid #bf0029;
+      border-radius: 0.8vw;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .mode-btn.active {
+      background-color: #bf0029;
+      color: #ffffff;
+    }
+
+    .time-mode-notice {
+      display: none;
+      padding: 2.5vw;
+      background-color: #fcf8f8;
+      border: 0.2vw dashed #bf0029;
+      border-radius: 0.8vw;
+      color: #910D2A;
+      font-size: 2.8vw;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .submit-btn {
+      display: flex;
+      height: 10vw;
+      width: 100%;
+      color: #ffffff;
+      background-color: #bf0029;
+      border: none;
+      border-radius: 0.8vw;
+      font-size: 3.5vw;
+      font-weight: 700;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 0 2vw rgba(191, 0, 41, 0.3);
+      transition: all 0.2s ease;
+      margin-top: 1vw;
+    }
+
+    .submit-btn:hover {
+      background-color: #910D2A;
+    }
+
+    /* Live Feed Section */
+    .section-subtitle {
+      font-size: 4vw;
+      font-weight: 700;
+      color: #910D2A;
+      margin-top: 3vw;
+      margin-bottom: 1vw;
+      border-bottom: 0.2vw solid #cccccc;
+      padding-bottom: 1vw;
+    }
+
+    .assignment-card {
+      background-color: #ffffff;
+      border: 0.2vw solid #bf0029;
+      border-radius: 1vw;
+      box-shadow: 0 0 2vw rgba(0, 0, 0, 0.15);
+      padding: 3vw;
+      margin-bottom: 3vw;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5vw;
+      position: relative;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .subject-tag {
+      font-size: 2.5vw;
+      font-weight: 700;
+      color: #910D2A;
+      text-transform: uppercase;
+    }
+
+    .delete-btn {
+      background-color: #ffffff;
+      color: #bf0029;
+      border: 0.15vw solid #bf0029;
+      border-radius: 0.5vw;
+      padding: 0.8vw 2vw;
+      font-size: 2.5vw;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .delete-btn:hover {
+      background-color: #bf0029;
+      color: #ffffff;
+    }
+
+    .assignment-title {
+      font-size: 3.5vw;
+      font-weight: 600;
+      color: #000000;
+    }
+
+    .assignment-description {
+      font-size: 3vw;
+      line-height: 1.5;
+      color: #444444;
+      white-space: pre-line;
+      background-color: #fcf8f8;
+      padding: 2vw;
+      border-radius: 0.5vw;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 2.5vw;
+      color: #666666;
+      font-weight: 500;
+      border-top: 0.1vw solid #eeeeee;
+      padding-top: 1.5vw;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #777777;
+      padding: 6vw;
+      font-size: 3.2vw;
+      font-weight: 600;
+      border: 0.2vw dashed #cccccc;
+      border-radius: 1vw;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Label -->
+  <div class="label">
+    <img src="logo.png" class="logo1" alt="Logo">
+    <div class="main-label">
+      <h1>زانکۆی سەلاحەدین-هەولێر</h1>
+      <p class="sub-label">پەروەردەی ماتماتیک / قۆناغی یەکەم / گرووپی A</p>
+    </div>
+  </div>
+
+  <div class="main-screen">
+    <div class="pusher-container">
+      
+      <div class="page-title">پەیجی زیادکردنی ئەرکی ماڵەوە (Admin)</div>
+
+      <!-- Assignment Creator Form -->
+      <form id="assignmentForm" class="form-panel">
+        
+        <!-- Subject -->
+        <div class="form-group">
+          <label for="subject">ناوی بابەت (Subject)</label>
+          <input type="text" id="subject" required placeholder="ماتماتیک, ئالجبرا..." list="subjectOptions">
+          <datalist id="subjectOptions">
+            <option value="تفاضل و تکامل (Calculus)"></option>
+            <option value="جەبری دابڕاو (Abstract Algebra)"></option>
+            <option value="جەبری هێڵی (Linear Algebra)"></option>
+            <option value="هاوکێشە دیفڕانشیاڵەکان"></option>
+          </datalist>
+        </div>
+
+        <!-- Title -->
+        <div class="form-group">
+          <label for="title">سەردێڕی ئەرک (Title)</label>
+          <input type="text" id="title" required placeholder="ڕاهێنانی بەشی دووەم...">
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="description">ڕوونکردنەوە و تێبینی (Description)</label>
+          <textarea id="description" rows="4" required placeholder="وەڵامی ڕاهێنانی لاپەڕە ٤٥ بکەنەوە..."></textarea>
+        </div>
+
+        <!-- Mode Switcher (Date Mode / Time Mode) -->
+        <div class="form-group">
+          <label>جۆری کاتی بەسەرچوون (Expiration Mode)</label>
+          <div class="mode-switcher">
+            <button type="button" id="btnDateMode" class="mode-btn active">بەپێی بەروار (Date Mode)</button>
+            <button type="button" id="btnTimeMode" class="mode-btn">وانەیەکیتر (Time Mode)</button>
+          </div>
+
+          <!-- Date Input -->
+          <div id="dateContainer">
+            <input type="date" id="expiryDate" required>
+          </div>
+
+          <!-- Time Mode Notice -->
+          <div id="timeNotice" class="time-mode-notice">
+            ئەم ئەرکە وەک "وانەیەکیتر" پیشان دەدرێت
+          </div>
+        </div>
+
+        <!-- Instructor -->
+        <div class="form-group">
+          <label for="instructor">ناوی مامۆستا / شوێنی ڕادەستکردن</label>
+          <input type="text" id="instructor" required placeholder="د. مامۆستا...">
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="submit-btn">ناردن بۆ قوتابیان (Push)</button>
+
+      </form>
+
+      <!-- Live Stream Feed -->
+      <div class="section-subtitle">ئەرکە چالاکەکانی سەر فایلی قوتابیان</div>
+      <div id="assignmentFeed" class="empty-state">چاوەڕوان بە...</div>
+
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyB-YOUR_ACTUAL_API_KEY",
+        authDomain: "cognito-f1f7b.firebaseapp.com",
+        databaseURL: "https://cognito-f1f7b-default-rtdb.firebaseio.com/",
+        projectId: "cognito-f1f7b",
+        storageBucket: "cognito-f1f7b.firebasestorage.app",
+        messagingSenderId: "506661532829",
+        appId: "1:506661532829:web:7a28aa874ba80871691074"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const assignmentsRef = ref(db, 'Salahaddin-University/Mathematics-Dipartment/A1');
+
+    // State for mode ('date' or 'time')
+    let currentMode = 'date';
+
+    // UI Elements
+    const btnDateMode = document.getElementById('btnDateMode');
+    const btnTimeMode = document.getElementById('btnTimeMode');
+    const dateContainer = document.getElementById('dateContainer');
+    const expiryDateInput = document.getElementById('expiryDate');
+    const timeNotice = document.getElementById('timeNotice');
+    const assignmentForm = document.getElementById('assignmentForm');
+    const assignmentFeed = document.getElementById('assignmentFeed');
+
+    // Default Date (7 Days ahead)
+    const defaultDate = new Date();
+    defaultDate.setDate(defaultDate.getDate() + 7);
+    expiryDateInput.value = defaultDate.toISOString().split('T')[0];
+
+    // Toggle Modes
+    btnDateMode.addEventListener('click', () => {
+      currentMode = 'date';
+      btnDateMode.classList.add('active');
+      btnTimeMode.classList.remove('active');
+      dateContainer.style.display = 'block';
+      timeNotice.style.display = 'none';
+      expiryDateInput.required = true;
+    });
+
+    btnTimeMode.addEventListener('click', () => {
+      currentMode = 'time';
+      btnTimeMode.classList.add('active');
+      btnDateMode.classList.remove('active');
+      dateContainer.style.display = 'none';
+      timeNotice.style.display = 'block';
+      expiryDateInput.required = false;
+    });
+
+    // Form Submit Logic
+    assignmentForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const subject = document.getElementById('subject').value.trim();
+      const title = document.getElementById('title').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const instructor = document.getElementById('instructor').value.trim();
+
+      // If in time mode, set expiryDate to "time", otherwise take input date
+      const expiryDate = (currentMode === 'time') ? 'time' : expiryDateInput.value;
+
+      if (!subject || !title || !description || !instructor) {
+        alert("تکایە سەرجەم خانەکان پڕبکەرەوە!");
+        return;
+      }
+
+      const newAssignment = {
+        subject,
+        title,
+        description,
+        expiryDate,
+        instructor,
+        uploadedDate: new Date().toISOString()
+      };
+
+      try {
+        await push(assignmentsRef, newAssignment);
+        alert("ئەرکەکە بە سەرکەوتوویی ڕەوانە کرا!");
+        
+        // Reset Inputs
+        document.getElementById('title').value = '';
+        document.getElementById('description').value = '';
+      } catch (err) {
+        console.error("Error:", err);
+        alert("کێشەیەک ڕوویدا لە کاتی ناردندا.");
+      }
+    });
+
+    // Listen and Display Published List
+    onValue(assignmentsRef, (snapshot) => {
+      assignmentFeed.innerHTML = '';
+
+      if (!snapshot.exists()) {
+        assignmentFeed.className = 'empty-state';
+        assignmentFeed.innerHTML = 'هیچ ئەرکێک نە نێردراوە!';
+        return;
+      }
+
+      assignmentFeed.className = '';
+      const data = snapshot.val();
+
+      Object.keys(data).reverse().forEach(id => {
+        const item = data[id];
+        
+        const card = document.createElement('div');
+        card.className = 'assignment-card';
+
+        const displayDueDate = (item.expiryDate === 'time' || !item.expiryDate) 
+          ? 'وانەیەکیتر' 
+          : item.expiryDate;
+
+        card.innerHTML = `
+          <div class="card-top">
+            <span class="subject-tag">${escapeHtml(item.subject)}</span>
+            <button class="delete-btn" data-id="${id}">سڕینەوە</button>
+          </div>
+          <div class="assignment-title">${escapeHtml(item.title)}</div>
+          <div class="assignment-description">${escapeHtml(item.description)}</div>
+          <div class="card-footer">
+            <span>📌 ${escapeHtml(item.instructor)}</span>
+            <span>کاتی بەسەرچوون: <b>${displayDueDate}</b></span>
+          </div>
+        `;
+
+        // Delete Handler
+        const delBtn = card.querySelector('.delete-btn');
+        delBtn.addEventListener('click', async () => {
+          if (confirm("دڵنیایت لە سڕینەوەی ئەم ئەرکە؟")) {
+            const itemRef = ref(db, `Salahaddin-University/Mathematics-Dipartment/A1/${id}`);
+            await remove(itemRef);
+          }
+        });
+
+        assignmentFeed.appendChild(card);
+      });
+    });
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+
+</body>
+</html>
