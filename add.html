@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <title>Hello, World!</title>
+    <style>
+  body {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    height: 200vw;
+    width: 100vw;
+    padding: 0;
+    margin: 0;
+  }
+    .label {
+    display: flex;
+    align-items: center;
+      direction: rtl;
+    color: white;
+    background-color: #910D2A;
+    border: 1px solid black;
+    height: 14vw;
+    padding: 0;
+    margin: 0 0 0 0;
+  }
+  h1 {
+    font-size: 3.5vw;
+    margin: 0;
+    padding: 0;
+  }
+  .logo1 {
+    height: 9vw;
+    width: 9vw;
+    margin: 0 2vw 0 2vw;
+  }
+  .sub-label {
+    font-size: 2.5vw;
+    margin: 0;
+    padding: 0;
+  }
+    .main-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #ffffff;
+    min-height: 200vw;
+    width: 100vw;
+    padding-bottom: 15vw;
+  }
+  </style>
+</head>
+<body>
+  
+    <div class="label">
+    <img src="logo.png" class="logo1" alt="Logo">
+    <div class="main-label">
+  <h1>
+    زانکۆی سەلاحەدین-هەولێر
+  </h1>
+      <p class="sub-label">
+        پەروەردەی ماتماتیک / قۆناغی یەکەم / گرووپی A
+      </p>
+    </div>
+  </div>
+  
+    <div class="main-screen">
+              <div class="items">
+          <div class="labels">
+            دەربارەی بەکارهێنەر
+          </div>
+          <div class="item">
+            <p class="cmnt"></p>
+          </div>
+        </div>
+      
+    </div>
+  
+  <script type="module">
+    // 1. Import Firebase SDKs from CDN
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // 2. Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB... (keep your existing api key)",
+      authDomain: "cognito-f1f7b.firebaseapp.com",
+      databaseURL: "https://cognito-f1f7b-default-rtdb.firebaseio.com/",
+      projectId: "cognito-f1f7b",
+      storageBucket: "cognito-f1f7b.appspot.com",
+      messagingSenderId: "506661532829",
+      appId: "1:506661532829:web:7a28aa874ba80871691074",
+      measurementId: "G-HET2BZ1LP5"
+    };
+
+    // 3. Initialize Firebase & Database
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // 4. Function to add name: "umed" to the database
+    function addHomeworkToDatabase() {
+  // 1. Get current date details
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0'); // Ensures 2 digits (e.g., '10')
+  const day = String(now.getDate()).padStart(2, '0');       // Ensures 2 digits (e.g., '17')
+
+  // 2. Create a dynamic path based on the current date: dipartment/math/class1/GroupA/homework/2026/10/17
+  const homeworkPathRef = ref(db, "dipartment/math/class1/GroupA/homework/");
+
+  // 3. Use push() to add a new item to the list instead of overwriting with set()
+  push(homeworkPathRef, {
+    comment: "today we have studied this",
+    timestamp: now.toLocaleTimeString(),
+    datestamp: `${year}/${month}/${day}`,
+    expiredate: "expire-date"    // Optional: helps track exact submission time
+  })
+  .then(() => {
+    console.log("Homework added to the list successfully!");
+  })
+  .catch((error) => {
+    console.error("Error saving homework: ", error);
+  });
+}
+
+// Run the function
+addHomeworkToDatabase();
+  </script>
+</body>
+</html>
