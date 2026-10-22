@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>tables&courses</title>
+  <style>
+  body {
+    display: flex;
+    height: 400vw;
+    width: 100vw;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0;
+    margin: 0;
+  }
+  .nt {
+    width: 95vw;
+    margin: 5vw 0 5vw 0;
+    border: 0px solid black;
+    box-shadow: 0 0 2vw rgba(0, 0, 0, 0.3);
+  }
+  .label {
+    display: flex;
+    justify-content: center;
+    color: white;
+    background-color: #910D2A;
+    border: 1px solid black;
+    height: 12vw;
+    width: 100vw;
+    padding: 0;
+    margin: 0vw 0 0.95vw 0;
+  }
+  .p2 {
+    padding: 0;
+    margin: auto;
+    font-size: 5.7vw;
+    font-weight: 650;
+  }
+  .cb-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 5vw 0 0 0;
+    padding: 0;
+  }
+  .cb-item {
+    display: flex;
+    align-items: center;
+    width: 90vw;
+    border: 0px solid black;
+    border-radius: 1.5vw;
+    margin: 1.9vw 0 1.9vw 0;
+    padding: 0 0 0 0;
+    direction: ltr;
+    background-color: #ffffff;
+    box-shadow: 0 0 1.5vw rgba(0, 0, 0, 0.3);
+    transition: ease 0.2s;
+    text-decoration: none; 
+    color: inherit;        
+    cursor: none;
+    }
+  .cb-item:hover {
+    scale: 1.05;
+    box-shadow: 0 0 1vw rgba(0, 0, 0, 0.4);
+  }
+  .cb-name {
+    margin: 0 4vw 0 4vw;
+    font-weight: 400;
+    font-size: 4.5vw;
+  }
+  .cbsp {
+    font-weight: 800;
+    font-size: 2.5vw;
+    color: #888888;
+  }
+  .cb-img {
+    height: 15.2vw;
+    margin: 0;
+    border-radius: 1.5vw;
+  }
+  </style>
+</head>
+<body>
+  <div style="display:flex; flex-direction:column; align-items: center;">
+    <div class="label">
+  <p class="p2">
+    خشتە و کۆڕس
+  </p>
+    </div>
+    <img src="Table-A.png" alt="خشتە" class="nt">
+    <img src="Table-B.png" alt="خشتە" class="nt">
+    <img src="ساڵنامە.png" alt="ساڵنامە" class="nt">
+    <div style="margin-bottom: 15vw;"></div>
+       <div class="label">
+  <p class="p2">
+    Course Book(s)
+  </p>
+    </div>
+    <div class="cb-container">
+      <a href="ci.pdf" class="cb-item" download>
+        <img src="calculus1.jpg" class="cb-img">
+        <p class="cb-name">
+          Calculus I <psan class="cbsp"><br>by Dr.Ivan Dler & L. Osman Omer</psan>
+        </p>
+      </a>
+      <a href="fom.pdf" class="cb-item" download="">
+        <img src="fom.jpg" class="cb-img">
+        <p class="cb-name">
+          Foundations of Mathematics<psan class="cbsp"><br>By Dr.Hogr Mohammed & L. Shayma Maghdid</psan>
+        </p>
+      </a>
+      
+      <a href="psy.pdf" class="cb-item" download="">
+        <img src="psy.jpg" class="cb-img">
+        <p class="cb-name">
+          سایکۆلۆژی گشتی<psan class="cbsp"><br>By L. saadya zrar reshid</psan>
+        </p>
+      </a>
+            
+      <a href="eng.pdf" class="cb-item" download="">
+        <img src="eng.jpg" class="cb-img">
+        <p class="cb-name">
+        English for University Students<psan class="cbsp"><br>By L. Banaz Faisal Shakir</psan>
+        </p>
+      </a>
+      
+      <a href="cs.pdf" class="cb-item" download="">
+        <img src="cs.jpg" class="cb-img">
+        <p class="cb-name">
+        Computer Skills<psan class="cbsp"><br>By Dr. Maher Ali & L. Bushra Najmaddin</psan>
+        </p>
+      </a>
+    </div>
+  </div>
+</body>
+</html>
