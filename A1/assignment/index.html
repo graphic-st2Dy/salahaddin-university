@@ -2,7 +2,7 @@
 <html lang="ckb" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>ئەرکی ماڵەوە</title>
   <style>
     * {
@@ -57,7 +57,7 @@
       align-items: center;
       width: 100vw;
       padding-top: 5vw;
-      padding-bottom: 10vw;
+      padding-bottom: 20vw;
       background-color: #ffffff;
     }
 
@@ -192,6 +192,48 @@
       border: 0.2vw dashed #cccccc;
       border-radius: 1vw;
     }
+
+    /* Bottom Navigation Dock Styling */
+    .app-bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100vw;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border-top: 0.2vw solid rgba(145, 13, 42, 0.2);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 2.5vw 5vw;
+      z-index: 1000;
+      box-shadow: 0 -0.5vw 2vw rgba(0, 0, 0, 0.08);
+    }
+
+    .nav-btn {
+      background-color: #910D2A;
+      color: white;
+      border: none;
+      border-radius: 1.5vw;
+      padding: 2vw 5vw;
+      font-size: 3.2vw;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 1.5vw;
+      cursor: pointer;
+      box-shadow: 0 0.5vw 1vw rgba(145, 13, 42, 0.2);
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      font-family: inherit;
+    }
+
+    .nav-btn:active {
+      transform: scale(0.95);
+    }
+
+    .nav-btn:hover {
+      background-color: #bf0029;
+    }
   </style>
 </head>
 <body>
@@ -200,7 +242,7 @@
     <img src="logo.png" class="logo1" alt="Logo">
     <div class="main-label">
       <h1>زانکۆی سەلاحەدین-هەولێر</h1>
-      <p class="sub-label">پەروەردەی ماتماتیک / قۆناغی یەکەم / گرووپی A</p>
+      <p class="sub-label">پەروەردەی ماتماتیک / قۆناغی یەکەم</p>
     </div>
   </div>
 
@@ -209,6 +251,16 @@
       <div class="page-title">ئەرکی ماڵەوە (Assignments)</div>
       <div id="assignmentsList" class="empty-state">چاوەڕوان بە...</div>
     </div>
+  </div>
+
+  <!-- Bottom Navigation Bar (Refresh & Back swapped) -->
+  <div class="app-bottom-nav">
+    <button class="nav-btn" onclick="window.location.reload();">
+      <span>↻</span> نوێکردنەوە
+    </button>
+    <button class="nav-btn" onclick="if (document.referrer) { window.location.href = document.referrer; } else { window.history.back(); }">
+      <span>←</span> گەڕانەوە
+    </button>
   </div>
 
   <script type="module">
@@ -229,7 +281,6 @@
     const db = getDatabase(app);
 
     function isExpired(expiryDateStr) {
-        // If the assignment deadline is time-based, it doesn't auto-expire by calendar date
         if (expiryDateStr === 'time' || !expiryDateStr) {
             return false;
         }
@@ -251,12 +302,10 @@
 
         const data = snapshot.val();
         
-        // 1. Convert object into an array of items with IDs
         const assignmentsArray = Object.keys(data).map(key => {
             return { id: key, ...data[key] };
         });
 
-        // 2. Filter out expired items (8:30 AM rule for date-based tasks)
         const activeAssignments = assignmentsArray.filter(item => !isExpired(item.expiryDate));
 
         if (activeAssignments.length === 0) {
@@ -264,7 +313,6 @@
             return;
         }
 
-        // 3. Sort by expiry date (nearest date first; 'time' mode tasks placed at top/priority)
         activeAssignments.sort((a, b) => {
             if (a.expiryDate === 'time') return -1;
             if (b.expiryDate === 'time') return 1;
@@ -273,14 +321,12 @@
             return dateA - dateB;
         });
 
-        // 4. Render the cards
         activeAssignments.forEach(assignment => {
             const card = document.createElement('div');
             card.className = 'assignment-card';
 
             const isChecked = localStorage.getItem(`completed_${assignment.id}`) === 'true';
 
-            // Determine display text for due date
             const displayDueDate = (assignment.expiryDate === 'time' || !assignment.expiryDate) 
                 ? 'وانەیەکیتر' 
                 : assignment.expiryDate;
