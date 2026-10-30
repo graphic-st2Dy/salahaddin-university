@@ -1,395 +1,572 @@
-
 <!DOCTYPE html>
 <html lang="ckb" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دیاریکردنی بابەتی سیمینار - زانکۆی سەلاحەدین</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Vazirmatn Kurdish / Arabic Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Firebase App (Compat) & Realtime Database -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>دیاریکردنی بابەتەکانی سیمینار</title>
 
-    <style>
-        body {
-            font-family: 'Vazirmatn', sans-serif;
-            background-color: #f8fafc;
-            color: #1e293b;
-        }
-        /* Custom scrollbar styling for neatness */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-    </style>
+  <!-- Google Fonts: Vazirmatn for clean Kurdish typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --disabled-bg: #f1f5f9;
+      --disabled-text: #94a3b8;
+      --taken-bg: #fef2f2;
+      --taken-border: #fecaca;
+      --taken-text: #991b1b;
+      --selected-bg: #f0fdf4;
+      --selected-border: #bbf7d0;
+      --selected-text: #166534;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 1.5rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+    }
+
+    /* Header Styling */
+    .header {
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+    }
+
+    .header h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.25rem;
+    }
+
+    .header p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* Lock Banner */
+    .lock-banner {
+      display: none;
+      background-color: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+      padding: 0.85rem 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 1.25rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    /* Name Input Section */
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text-main);
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      background-color: var(--card-bg);
+      color: var(--text-main);
+    }
+
+    .input-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .input-group input:disabled {
+      background-color: var(--disabled-bg);
+      color: var(--disabled-text);
+      cursor: not-allowed;
+    }
+
+    .input-hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    /* Topic List Styling */
+    .topics-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .topics-header h2 {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .topic-count {
+      font-size: 0.8rem;
+      background-color: var(--disabled-bg);
+      padding: 0.25rem 0.6rem;
+      border-radius: 20px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .topic-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .topic-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background-color: var(--card-bg);
+      transition: all 0.2s ease;
+    }
+
+    .topic-info {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      flex: 1;
+      padding-left: 0.5rem;
+    }
+
+    .topic-num {
+      font-weight: 700;
+      color: var(--primary);
+      min-width: 1.8rem;
+      font-size: 0.95rem;
+      direction: ltr;
+      text-align: right;
+    }
+
+    .topic-title {
+      font-size: 0.925rem;
+      font-weight: 500;
+      color: var(--text-main);
+      line-height: 1.4;
+      direction: ltr;
+      text-align: left;
+    }
+
+    /* Choose Button */
+    .btn-choose {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.5rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .btn-choose:hover:not(:disabled) {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-choose:disabled {
+      background-color: var(--disabled-bg);
+      color: var(--disabled-text);
+      cursor: not-allowed;
+      border: 1px solid var(--border);
+    }
+
+    /* Topic Taken Badge */
+    .taken-badge {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--taken-text);
+      background-color: var(--taken-bg);
+      border: 1px solid var(--taken-border);
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      direction: rtl;
+    }
+
+    .selected-badge {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--selected-text);
+      background-color: var(--selected-bg);
+      border: 1px solid var(--selected-border);
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      direction: rtl;
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+      text-align: center;
+      padding: 2rem 0;
+      color: var(--text-muted);
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 0.75rem auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      padding-top: 0.85rem;
+    }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col items-center py-6 px-4 sm:px-6">
+<body>
 
-    <!-- Container -->
-    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-8">
-        
-        <!-- Header Section -->
-        <header class="text-center border-b border-slate-100 pb-6 mb-6">
-            <span class="inline-block bg-slate-100 text-slate-600 text-xs sm:text-sm font-medium px-3 py-1 rounded-full mb-3">
-                زانکۆی سەلاحەدین - بەشی ماتماتیک - گرووپی A1
-            </span>
-            <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">
-                دیاریکردنی بابەتی سیمینار
-            </h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-2">
-                تکایە ناوی تەواوت بنووسە و یەکێک لە بابەتەکان هەڵبژێرە (هەر بابەتێک بۆ یەک خوێندکارە)
-            </p>
-        </header>
-
-        <!-- Name Input Section -->
-        <section class="mb-6">
-            <label for="studentName" class="block text-sm font-medium text-slate-700 mb-2">
-                ناوی سیانی (ناوی خۆت و باوکت و باپیرت):
-            </label>
-            <div class="relative">
-                <input 
-                    type="text" 
-                    id="studentName" 
-                    placeholder="نموونە: ئارام ئەحمەد عەلی" 
-                    class="w-full px-4 py-3 text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-800 focus:bg-white transition-all duration-200 text-sm"
-                />
-            </div>
-            <p id="nameHelp" class="text-xs text-amber-600 mt-1.5 hidden">
-                تکایە سەرەتا ناوی خۆت بنووسە پێش هەڵبژاردنی بابەت.
-            </p>
-        </section>
-
-        <!-- Notification Banner -->
-        <div id="statusBanner" class="hidden mb-6 p-4 rounded-xl text-sm font-medium transition-all"></div>
-
-        <!-- Topics List Section -->
-        <section>
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold text-slate-800">لیستی بابەتەکان</h2>
-                <span id="counterBadge" class="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg">
-                    -- / 20 هەڵبژێردراوە
-                </span>
-            </div>
-
-            <!-- Loading Spinner -->
-            <div id="loadingSpinner" class="flex flex-col items-center justify-center py-12">
-                <div class="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
-                <span class="text-xs text-slate-400 mt-3">بارکردنی داتاکان...</span>
-            </div>
-
-            <!-- Topics Container -->
-            <div id="topicsList" class="space-y-2.5 hidden">
-                <!-- Topics will be dynamically populated here -->
-            </div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="mt-8 pt-4 border-t border-slate-100 text-center text-xs text-slate-400">
-            سیستەمی ڕێکخستنی بابەتەکان &bull; بەشی ماتماتیک A1
-        </footer>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>دیاریکردنی بابەتی سیمینار</h1>
+      <p>تکایە ناوی تەواوت بنووسە و بابەتێک هەڵبژێرە. هەر قوتابییەک تەنها دەتوانێت ۱ بابەت هەڵبژێرێت.</p>
     </div>
 
-    <!-- Confirmation Modal -->
-    <div id="confirmModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl border border-slate-100 text-center">
-            <h3 class="text-lg font-bold text-slate-800 mb-2">دڵنیابوونەوە</h3>
-            <p class="text-sm text-slate-600 mb-4">
-                ئایا دڵنیایت لە هەڵبژاردنی بابەتی <br>
-                <strong id="modalTopicTitle" class="text-slate-900 dir-ltr inline-block my-1 text-base"></strong>؟
-            </p>
-            <p class="text-xs text-rose-500 mb-6 font-medium">تێبینی: دوای تەمامکردن ناوت دەنووسرێت و ناتوانیت بابەتەکە بگوڕیت.</p>
-            <div class="flex gap-3 justify-center">
-                <button id="cancelBtn" class="w-1/2 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-sm transition-all">
-                    پاشگەزبوونەوە
-                </button>
-                <button id="confirmBtn" class="w-1/2 py-2.5 px-4 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-xl text-sm transition-all">
-                    بەڵێ، دڵنیام
-                </button>
-            </div>
-        </div>
+    <!-- Notification when topic is already chosen on this device -->
+    <div id="lockBanner" class="lock-banner">
+      تۆ پێشتر بابەتت هەڵبژاردووە: <strong id="lockedTopicTitle"></strong>
     </div>
 
-    <script>
-        // 20 Presentation Topics
-        const topicsData = [
-            { id: 1, title: "My University Life" },
-            { id: 2, title: "The Importance of English" },
-            { id: 3, title: "My Future Career" },
-            { id: 4, title: "The Importance of Mathematics in Our Daily Life" },
-            { id: 5, title: "How to Be a Successful University Student" },
-            { id: 6, title: "The Benefits of Reading Books" },
-            { id: 7, title: "The Importance of Computer Skills" },
-            { id: 8, title: "Healthy Habits for University Students" },
-            { id: 9, title: "The Importance of Teamwork" },
-            { id: 10, title: "How to Give a Good Presentation" },
-            { id: 11, title: "The Internet: Advantages and Disadvantages" },
-            { id: 12, title: "The Education System in Kurdistan" },
-            { id: 13, title: "The Education System in Britain" },
-            { id: 14, title: "Online Learning: Advantages and Disadvantages" },
-            { id: 15, title: "Tourism in Kurdistan" },
-            { id: 16, title: "Artificial Intelligence in Education" },
-            { id: 17, title: "The Role of Teachers in Society" },
-            { id: 18, title: "Your hometown" },
-            { id: 19, title: "The importance of water" },
-            { id: 20, title: "Global warming and its effects" }
-        ];
+    <!-- Student Name Input -->
+    <div class="input-group">
+      <label for="studentName">ناوی سیانیت بنووسە (ناوی خۆت و باوکت و باپیرت):</label>
+      <input type="text" id="studentName" placeholder="نموونە: ئومێد ئیبراهیم ڕەحمان" autocomplete="off">
+      <div class="input-hint">تێبینی: تاوەکو ناوی خۆت نەنوسی، دوگمەی هەڵبژاردن کارناکات.</div>
+    </div>
 
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyB-YOUR_ACTUAL_API_KEY",
-            authDomain: "cognito-f1f7b.firebaseapp.com",
-            databaseURL: "https://cognito-f1f7b-default-rtdb.firebaseio.com/",
-            projectId: "cognito-f1f7b",
-            storageBucket: "cognito-f1f7b.firebasestorage.app",
-            messagingSenderId: "506661532829",
-            appId: "1:506661532829:web:7a28aa874ba80871691074"
+    <!-- Topics Section -->
+    <div class="topics-header">
+      <h2>لیستی بابەتەکان</h2>
+      <span class="topic-count" id="chosenCounter">-- / 20 هەڵبژێردراوە</span>
+    </div>
+
+    <div id="loading" class="loading-spinner">
+      <div class="spinner"></div>
+      <p>بارکردنی داتاکان...</p>
+    </div>
+
+    <div class="topic-list" id="topicList" style="display: none;"></div>
+
+    <div class="footer">
+      سیستەمی ڕێکخستنی بابەتەکان • بەشی ماتماتیک A1
+    </div>
+  </div>
+
+  <!-- Firebase Modular JS SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-YOUR_ACTUAL_API_KEY",
+      authDomain: "cognito-f1f7b.firebaseapp.com",
+      databaseURL: "https://cognito-f1f7b-default-rtdb.firebaseio.com/",
+      projectId: "cognito-f1f7b",
+      storageBucket: "cognito-f1f7b.firebasestorage.app",
+      messagingSenderId: "506661532829",
+      appId: "1:506661532829:web:7a28aa874ba80871691074"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // List of 20 English Topics
+    const topics = [
+      { id: 1, title: "My University Life" },
+      { id: 2, title: "The Importance of English" },
+      { id: 3, title: "My Future Career" },
+      { id: 4, title: "The Importance of Mathematics in Our Daily Life" },
+      { id: 5, title: "How to Be a Successful University Student" },
+      { id: 6, title: "The Benefits of Reading Books" },
+      { id: 7, title: "The Importance of Computer Skills" },
+      { id: 8, title: "Healthy Habits for University Students" },
+      { id: 9, title: "The Importance of Teamwork" },
+      { id: 10, title: "How to Give a Good Presentation" },
+      { id: 11, title: "The Internet: Advantages and Disadvantages" },
+      { id: 12, title: "The Education System in Kurdistan" },
+      { id: 13, title: "The Education System in Britain" },
+      { id: 14, title: "Online Learning: Advantages and Disadvantages" },
+      { id: 15, title: "Tourism in Kurdistan" },
+      { id: 16, title: "Artificial Intelligence in Education" },
+      { id: 17, title: "The Role of Teachers in Society" },
+      { id: 18, title: "Your hometown" },
+      { id: 19, title: "The importance of water" },
+      { id: 20, title: "Global warming and its effects" }
+    ];
+
+    // Node Path
+    const dbPath = "Salahaddin-University/Mathematics-Dipartment/A1/topics";
+
+    // DOM Elements
+    const studentNameInput = document.getElementById("studentName");
+    const topicListContainer = document.getElementById("topicList");
+    const loadingContainer = document.getElementById("loading");
+    const chosenCounter = document.getElementById("chosenCounter");
+    const lockBanner = document.getElementById("lockBanner");
+    const lockedTopicTitle = document.getElementById("lockedTopicTitle");
+
+    // Local Storage Lock Keys
+    const LOCAL_STORAGE_KEY_ID = "seminar_chosen_topic_id";
+    const LOCAL_STORAGE_KEY_TITLE = "seminar_chosen_topic_title";
+
+    let deviceHasChosen = false;
+    let localChosenId = null;
+
+    // Helper: Detect specific hardware/device model synchronously
+    function getDeviceType() {
+      const ua = navigator.userAgent;
+      
+      // Match Vivo models (e.g. V2348, vivo V40, V2027)
+      const vivoMatch = ua.match(/(vivo\s+[A-Za-z0-9\s]+|V\d{4}[A-Z]?)/i);
+      if (vivoMatch) return vivoMatch[0].trim();
+
+      // Match Samsung Galaxy models
+      const samsungMatch = ua.match(/(SM-[A-Z0-9]+|Galaxy\s+[A-Za-z0-9\s]+)/i);
+      if (samsungMatch) return samsungMatch[0].trim();
+
+      // Match iPhone / iPad
+      if (/iPhone/i.test(ua)) return "iPhone";
+      if (/iPad/i.test(ua)) return "iPad";
+
+      // Match Xiaomi / Redmi
+      const xiaomiMatch = ua.match(/(Redmi\s+[A-Za-z0-9\s]+|POCO\s+[A-Za-z0-9\s]+|Mi\s+[A-Za-z0-9\s]+)/i);
+      if (xiaomiMatch) return xiaomiMatch[0].trim();
+
+      // Generic Android Match
+      const androidModelMatch = ua.match(/Android[^;]+;\s*([^;)]+)\)/i);
+      if (androidModelMatch && androidModelMatch[1]) {
+        const model = androidModelMatch[1].trim();
+        if (!model.includes("Build")) return model;
+      }
+
+      // Desktops / Operating Systems
+      if (/Windows/i.test(ua)) return "Windows PC";
+      if (/Macintosh/i.test(ua)) return "MacBook / Mac";
+      if (/Linux/i.test(ua)) return "Linux PC";
+
+      return "ئامێری نەناسراو";
+    }
+
+    // Check LocalStorage Lock Status
+    function checkLocalStorageLock() {
+      localChosenId = localStorage.getItem(LOCAL_STORAGE_KEY_ID);
+      const savedTitle = localStorage.getItem(LOCAL_STORAGE_KEY_TITLE);
+
+      if (localChosenId) {
+        deviceHasChosen = true;
+        lockBanner.style.display = "block";
+        lockedTopicTitle.textContent = savedTitle || "بابەتەکە";
+        studentNameInput.disabled = true;
+        studentNameInput.placeholder = "تۆ پێشتر بابەتت هەڵبژاردووە";
+      }
+    }
+
+    // Initialize lock check
+    checkLocalStorageLock();
+
+    // Enable/Disable buttons based on input state
+    studentNameInput.addEventListener("input", () => {
+      if (deviceHasChosen) return;
+      const isTyped = studentNameInput.value.trim().length > 2;
+      const buttons = document.querySelectorAll(".btn-choose");
+      buttons.forEach(btn => {
+        if (btn.dataset.taken === "false") {
+          btn.disabled = !isTyped;
+        }
+      });
+    });
+
+    // Listen to Firebase Realtime updates
+    const topicsRef = ref(db, dbPath);
+    onValue(topicsRef, (snapshot) => {
+      const dbData = snapshot.val() || {};
+      renderTopics(dbData);
+      
+      loadingContainer.style.display = "none";
+      topicListContainer.style.display = "flex";
+    }, (error) => {
+      console.error("Firebase Read Error:", error);
+      loadingContainer.innerHTML = "<p style='color:red;'>خەتایەک ڕوویدا لە بارکردنی داتاکان. تکایە دووبارە پەڕەکە نوێ بکەرەوە.</p>";
+    });
+
+    // Render topics
+    function renderTopics(dbData) {
+      topicListContainer.innerHTML = "";
+      let takenCount = 0;
+      const isTyped = studentNameInput.value.trim().length > 2;
+
+      topics.forEach((topic) => {
+        const topicRecord = dbData[topic.id];
+        const isTaken = !!topicRecord;
+        if (isTaken) takenCount++;
+
+        const card = document.createElement("div");
+        card.className = "topic-card";
+
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "topic-info";
+
+        const numSpan = document.createElement("span");
+        numSpan.className = "topic-num";
+        numSpan.textContent = topic.id + ".";
+
+        const titleSpan = document.createElement("span");
+        titleSpan.className = "topic-title";
+        titleSpan.textContent = topic.title;
+
+        infoDiv.appendChild(numSpan);
+        infoDiv.appendChild(titleSpan);
+        card.appendChild(infoDiv);
+
+        if (isTaken) {
+          const badge = document.createElement("div");
+          if (deviceHasChosen && String(localChosenId) === String(topic.id)) {
+            badge.className = "selected-badge";
+            badge.textContent = "✓ هەڵبژێردراوە لەلایەن تۆوە";
+          } else {
+            badge.className = "taken-badge";
+            badge.textContent = topicRecord.Name || "هەڵبژێردراوە";
+            badge.title = topicRecord.Name || "";
+          }
+          card.appendChild(badge);
+        } else {
+          const btn = document.createElement("button");
+          btn.className = "btn-choose";
+          btn.textContent = "هەڵبژاردن";
+          btn.dataset.taken = "false";
+          
+          if (deviceHasChosen || !isTyped) {
+            btn.disabled = true;
+          }
+
+          btn.addEventListener("click", () => handleSelectTopic(topic.id, topic.title));
+          card.appendChild(btn);
+        }
+
+        topicListContainer.appendChild(card);
+      });
+
+      chosenCounter.textContent = `${takenCount} / 20 هەڵبژێردراوە`;
+    }
+
+    // Handle topic selection with database transaction
+    function handleSelectTopic(topicId, topicTitle) {
+      if (deviceHasChosen) {
+        alert("تۆ پێشتر بابەتێکت هەڵبژاردووە!");
+        return;
+      }
+
+      const rawName = studentNameInput.value.trim();
+      if (!rawName || rawName.length < 3) {
+        alert("تکایە ناوی تەواوی خۆت بنووسە بەرلە هەڵبژاردنی بابەت!");
+        studentNameInput.focus();
+        return;
+      }
+
+      const specificDevice = getDeviceType();
+      const specificUserAgent = navigator.userAgent;
+
+      const singleTopicRef = ref(db, `${dbPath}/${topicId}`);
+
+      runTransaction(singleTopicRef, (currentData) => {
+        if (currentData !== null) {
+          return; // Topic already claimed
+        }
+        return {
+          Name: rawName,
+          TimeStamp: Date.now(),
+          UserAgent: specificUserAgent,
+          "Device-type": specificDevice
         };
+      }).then((result) => {
+        if (result.committed) {
+          // Store in LocalStorage
+          localStorage.setItem(LOCAL_STORAGE_KEY_ID, topicId);
+          localStorage.setItem(LOCAL_STORAGE_KEY_TITLE, topicTitle);
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const topicsRef = db.ref("Salahaddin-University/Mathematics-Dipartment/A1/topics");
-
-        // UI State & Elements
-        let dbState = {};
-        let selectedTopicForModal = null;
-        let hasUserSubmitted = false;
-
-        const studentNameInput = document.getElementById("studentName");
-        const nameHelp = document.getElementById("nameHelp");
-        const topicsListEl = document.getElementById("topicsList");
-        const loadingSpinner = document.getElementById("loadingSpinner");
-        const statusBanner = document.getElementById("statusBanner");
-        const counterBadge = document.getElementById("counterBadge");
-        const confirmModal = document.getElementById("confirmModal");
-        const modalTopicTitle = document.getElementById("modalTopicTitle");
-        const cancelBtn = document.getElementById("cancelBtn");
-        const confirmBtn = document.getElementById("confirmBtn");
-
-        // Helper: Detect Device Type
-        function getDeviceType() {
-            const ua = navigator.userAgent;
-            if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
-                return "Tablet";
-            }
-            if (/Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/i.test(ua)) {
-                return "Mobile";
-            }
-            return "Desktop";
+          checkLocalStorageLock();
+          alert(`پیرۆزە! بابەتی "${topicTitle}" بە سەرکەوتوویی بۆ تۆ تۆمارکرا.`);
+        } else {
+          alert("ببوورە! ئەم بابەتە دەستبەجێ لەلایەن قوتابییەکی ترەوە هەڵبژێردرا. تکایە بابەتێکی تر هەڵبژێرە.");
         }
-
-        // Check localStorage on load
-        function checkLocalStorageLock() {
-            try {
-                const savedTopicId = localStorage.getItem("chosen_topic_id");
-                const savedTopicTitle = localStorage.getItem("chosen_topic_title");
-                const savedStudentName = localStorage.getItem("chosen_student_name");
-
-                if (savedTopicId && savedTopicTitle) {
-                    hasUserSubmitted = true;
-                    if (savedStudentName) {
-                        studentNameInput.value = savedStudentName;
-                    }
-                    studentNameInput.disabled = true;
-                    showNotification(
-                        `تۆ لەم ئامێرەوە بابەتی "<strong>${savedTopicTitle}</strong>"ت هەڵبژاردووە (${savedStudentName || "خوێندکار"}). ناتوانیت بابەتی تر هەڵبژێریت.`,
-                        "success"
-                    );
-                }
-            } catch (e) {
-                console.warn("LocalStorage access restricted or unavailable", e);
-            }
-        }
-
-        // Display Notification Message
-        function showNotification(msg, type = "info") {
-            statusBanner.className = "mb-6 p-4 rounded-xl text-sm font-medium border flex items-center justify-between transition-all";
-            if (type === "error") {
-                statusBanner.classList.add("bg-rose-50", "text-rose-700", "border-rose-200");
-            } else if (type === "success") {
-                statusBanner.classList.add("bg-emerald-50", "text-emerald-700", "border-emerald-200");
-            } else {
-                statusBanner.classList.add("bg-sky-50", "text-sky-700", "border-sky-200");
-            }
-            statusBanner.innerHTML = `<span>${msg}</span>`;
-            statusBanner.classList.remove("hidden");
-        }
-
-        // Render Topics List
-        function renderTopics() {
-            topicsListEl.innerHTML = "";
-            let claimedCount = 0;
-
-            topicsData.forEach(topic => {
-                const topicData = dbState[topic.id];
-                const isClaimed = !!topicData;
-                if (isClaimed) claimedCount++;
-
-                const row = document.createElement("div");
-                row.className = `flex items-center justify-between p-3.5 sm:p-4 rounded-xl border transition-all duration-200 ${
-                    isClaimed 
-                        ? "bg-slate-50/60 border-slate-200/60 opacity-90" 
-                        : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm"
-                }`;
-
-                // Topic Number and Title
-                const leftDiv = document.createElement("div");
-                leftDiv.className = "flex items-center space-x-3 space-x-reverse min-w-0 pr-2";
-                
-                const numSpan = document.createElement("span");
-                numSpan.className = "w-7 h-7 flex-shrink-0 rounded-lg bg-slate-100 text-slate-600 font-semibold text-xs flex items-center justify-center";
-                numSpan.innerText = topic.id;
-
-                const titleSpan = document.createElement("span");
-                titleSpan.className = "text-sm font-medium text-slate-800 dir-ltr text-right truncate";
-                titleSpan.innerText = topic.title;
-
-                leftDiv.appendChild(numSpan);
-                leftDiv.appendChild(titleSpan);
-                row.appendChild(leftDiv);
-
-                // Action Area (Name badge OR Choice Button)
-                const actionDiv = document.createElement("div");
-                actionDiv.className = "flex-shrink-0 mr-3";
-
-                if (isClaimed) {
-                    const nameBadge = document.createElement("span");
-                    nameBadge.className = "inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80 max-w-[140px] sm:max-w-[180px] truncate";
-                    nameBadge.innerText = topicData.Name;
-                    nameBadge.title = topicData.Name;
-                    actionDiv.appendChild(nameBadge);
-                } else {
-                    const selectBtn = document.createElement("button");
-                    selectBtn.className = `px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 ${
-                        hasUserSubmitted 
-                            ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200" 
-                            : "bg-slate-800 hover:bg-slate-900 active:scale-95 text-white shadow-sm"
-                    }`;
-                    selectBtn.innerText = hasUserSubmitted ? "داخراوە" : "هەڵبژاردن";
-                    selectBtn.disabled = hasUserSubmitted;
-
-                    selectBtn.addEventListener("click", () => {
-                        if (hasUserSubmitted) return;
-
-                        const rawName = studentNameInput.value.trim();
-                        if (!rawName) {
-                            nameHelp.classList.remove("hidden");
-                            studentNameInput.focus();
-                            studentNameInput.classList.add("border-rose-400", "ring-2", "ring-rose-200");
-                            setTimeout(() => {
-                                studentNameInput.classList.remove("border-rose-400", "ring-2", "ring-rose-200");
-                            }, 2000);
-                            return;
-                        }
-
-                        nameHelp.classList.add("hidden");
-                        selectedTopicForModal = topic;
-                        modalTopicTitle.innerText = topic.title;
-                        confirmModal.classList.remove("hidden");
-                    });
-
-                    actionDiv.appendChild(selectBtn);
-                }
-
-                row.appendChild(actionDiv);
-                topicsListEl.appendChild(row);
-            });
-
-            // Update Counter
-            counterBadge.innerText = `${claimedCount} / ${topicsData.length} هەڵبژێردراوە`;
-        }
-
-        // Firebase Realtime Listener
-        topicsRef.on("value", (snapshot) => {
-            dbState = snapshot.val() || {};
-
-            // Always check local storage lock state
-            checkLocalStorageLock();
-
-            loadingSpinner.classList.add("hidden");
-            topicsListEl.classList.remove("hidden");
-            renderTopics();
-        }, (error) => {
-            console.error("Firebase error:", error);
-            loadingSpinner.classList.add("hidden");
-            showNotification("کێشەیەک لە پێوەندی لەگەڵ سێرڤەر ڕوویدا.", "error");
-        });
-
-        // Modal Action Handlers
-        cancelBtn.addEventListener("click", () => {
-            confirmModal.classList.add("hidden");
-            selectedTopicForModal = null;
-        });
-
-        confirmBtn.addEventListener("click", () => {
-            if (!selectedTopicForModal || hasUserSubmitted) return;
-
-            const name = studentNameInput.value.trim();
-            const topicId = selectedTopicForModal.id;
-            const targetTopicRef = db.ref(`Salahaddin-University/Mathematics-Dipartment/A1/topics/${topicId}`);
-
-            confirmBtn.disabled = true;
-            confirmBtn.innerText = "تۆمارکردن...";
-
-            // Transaction to prevent race conditions
-            targetTopicRef.transaction((currentData) => {
-                if (currentData !== null) {
-                    return; // Topic already taken
-                }
-                return {
-                    Name: name,
-                    TimeStamp: new Date().toISOString(),
-                    UserAgent: navigator.userAgent || "Unknown",
-                    "Device-type": getDeviceType()
-                };
-            }, (error, committed) => {
-                confirmBtn.disabled = false;
-                confirmBtn.innerText = "بەڵێ، دڵنیام";
-                confirmModal.classList.add("hidden");
-
-                if (error) {
-                    showNotification("کێشەیەک لە تۆمارکردن هەبوو. تکایە دووبارە هەوڵبدەرەوە.", "error");
-                } else if (!committed) {
-                    showNotification("ببوورە! ئەم بابەتە کەمێک پێش ئێستا لەلایەن خوێندکارێکی ترەوە هەڵبژێردرا.", "error");
-                } else {
-                    hasUserSubmitted = true;
-                    
-                    // Save lock permanently in LocalStorage
-                    try {
-                        localStorage.setItem("chosen_topic_id", topicId);
-                        localStorage.setItem("chosen_topic_title", selectedTopicForModal.title);
-                        localStorage.setItem("chosen_student_name", name);
-                    } catch (e) {
-                        console.warn("Could not write to localStorage", e);
-                    }
-
-                    studentNameInput.disabled = true;
-                    showNotification(`دەستخۆش ${name}! بابەتی "${selectedTopicForModal.title}" بۆ تۆ تۆمارکرا.`, "success");
-                    renderTopics();
-                }
-                selectedTopicForModal = null;
-            });
-        });
-
-        // Hide warning when user types name
-        studentNameInput.addEventListener("input", () => {
-            if (studentNameInput.value.trim()) {
-                nameHelp.classList.add("hidden");
-            }
-        });
-    </script>
+      }).catch((err) => {
+        console.error("Transaction Error:", err);
+        alert("کێشەیەک لە پەیوەندی ڕوویدا. تکایە دووبارە هەوڵبدەرەوە.");
+      });
+    }
+  </script>
 </body>
 </html>
