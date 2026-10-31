@@ -16,6 +16,8 @@
       --card-bg: #ffffff;
       --primary: #2563eb;
       --primary-hover: #1d4ed8;
+      --accent: #10b981;
+      --accent-hover: #059669;
       --text-main: #0f172a;
       --text-muted: #64748b;
       --border: #e2e8f0;
@@ -27,6 +29,8 @@
       --selected-bg: #f0fdf4;
       --selected-border: #bbf7d0;
       --selected-text: #166534;
+      --custom-topic-bg: #f0f9ff;
+      --custom-topic-border: #bae6fd;
       --radius: 12px;
       --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
     }
@@ -91,9 +95,9 @@
       line-height: 1.4;
     }
 
-    /* Name Input Section */
+    /* Input Groups */
     .input-group {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
     }
 
     .input-group label {
@@ -131,6 +135,57 @@
       font-size: 0.8rem;
       color: var(--text-muted);
       margin-top: 0.35rem;
+    }
+
+    /* Custom Topic Box */
+    .custom-topic-box {
+      background-color: var(--custom-topic-bg);
+      border: 1px dashed var(--custom-topic-border);
+      padding: 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 1.5rem;
+    }
+
+    .custom-topic-box h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #0369B1;
+      margin-bottom: 0.5rem;
+    }
+
+    .custom-input-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .custom-input-row input {
+      flex: 1;
+      direction: ltr;
+      text-align: left;
+    }
+
+    .btn-add-custom {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-add-custom:hover:not(:disabled) {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-add-custom:disabled {
+      background-color: var(--disabled-bg);
+      color: var(--disabled-text);
+      cursor: not-allowed;
+      border: 1px solid var(--border);
     }
 
     /* Topic List Styling */
@@ -224,7 +279,7 @@
       border: 1px solid var(--border);
     }
 
-    /* Topic Taken Badge */
+    /* Topic Badges */
     .taken-badge {
       font-size: 0.85rem;
       font-weight: 600;
@@ -290,7 +345,7 @@
     <!-- Header -->
     <div class="header">
       <h1>دیاریکردنی بابەتی سیمینار</h1>
-      <p>تکایە ناوی تەواوت بنووسە و بابەتێک هەڵبژێرە. هەر قوتابییەک تەنها دەتوانێت ۱ بابەت هەڵبژێرێت.</p>
+      <p>تکایە ناوی تەواوت بنووسە و بابەتێک هەڵبژێرە، یان بابەتێکی نوێ لە لایەن خۆتەوە بنووسە.</p>
     </div>
 
     <!-- Notification when topic is already chosen on this device -->
@@ -305,10 +360,20 @@
       <div class="input-hint">تێبینی: تاوەکو ناوی خۆت نەنوسی، دوگمەی هەڵبژاردن کارناکات.</div>
     </div>
 
+    <!-- Add Custom Topic Section -->
+    <div class="custom-topic-box">
+      <h3>دەتەوێت بابەتێکی تایبەت بە خۆت بنووسیت؟</h3>
+      <div class="custom-input-row">
+        <input type="text" id="customTopicInput" placeholder="Enter your own topic title..." autocomplete="off">
+        <button id="btnAddCustom" class="btn-add-custom" disabled>زیادکردنی بابەت</button>
+      </div>
+      <div class="input-hint">کاتێک بابەتێک لێرە بنووسیت و زیادی بکەیت، راستەوخۆ دەبێتە بابەتی تۆ.</div>
+    </div>
+
     <!-- Topics Section -->
     <div class="topics-header">
       <h2>لیستی بابەتەکان</h2>
-      <span class="topic-count" id="chosenCounter">-- / 20 هەڵبژێردراوە</span>
+      <span class="topic-count" id="chosenCounter">-- هەڵبژێردراوە</span>
     </div>
 
     <div id="loading" class="loading-spinner">
@@ -343,8 +408,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // List of 20 English Topics
-    const topics = [
+    // Initial Default Topics (1 to 20)
+    const defaultTopics = [
       { id: 1, title: "My University Life" },
       { id: 2, title: "The Importance of English" },
       { id: 3, title: "My Future Career" },
@@ -368,10 +433,12 @@
     ];
 
     // Node Path
-    const dbPath = "Salahaddin-University/Mathematics-Dipartment/B1/topics";
+    const dbPath = "Salahaddin-University/Mathematics-Dipartment/topics/english/B1";
 
     // DOM Elements
     const studentNameInput = document.getElementById("studentName");
+    const customTopicInput = document.getElementById("customTopicInput");
+    const btnAddCustom = document.getElementById("btnAddCustom");
     const topicListContainer = document.getElementById("topicList");
     const loadingContainer = document.getElementById("loading");
     const chosenCounter = document.getElementById("chosenCounter");
@@ -379,40 +446,35 @@
     const lockedTopicTitle = document.getElementById("lockedTopicTitle");
 
     // Local Storage Lock Keys
-    const LOCAL_STORAGE_KEY_ID = "seminar_chosen_topic_id";
-    const LOCAL_STORAGE_KEY_TITLE = "seminar_chosen_topic_title";
+    const LOCAL_STORAGE_KEY_ID = "seminar_chosen_topic_id1";
+    const LOCAL_STORAGE_KEY_TITLE = "seminar_chosen_topic_title1";
 
     let deviceHasChosen = false;
     let localChosenId = null;
+    let currentMaxTopicId = 20;
 
-    // Helper: Detect specific hardware/device model synchronously
+    // Helper: Detect specific hardware/device model
     function getDeviceType() {
       const ua = navigator.userAgent;
-      
-      // Match Vivo models (e.g. V2348, vivo V40, V2027)
+
       const vivoMatch = ua.match(/(vivo\s+[A-Za-z0-9\s]+|V\d{4}[A-Z]?)/i);
       if (vivoMatch) return vivoMatch[0].trim();
 
-      // Match Samsung Galaxy models
       const samsungMatch = ua.match(/(SM-[A-Z0-9]+|Galaxy\s+[A-Za-z0-9\s]+)/i);
       if (samsungMatch) return samsungMatch[0].trim();
 
-      // Match iPhone / iPad
       if (/iPhone/i.test(ua)) return "iPhone";
       if (/iPad/i.test(ua)) return "iPad";
 
-      // Match Xiaomi / Redmi
       const xiaomiMatch = ua.match(/(Redmi\s+[A-Za-z0-9\s]+|POCO\s+[A-Za-z0-9\s]+|Mi\s+[A-Za-z0-9\s]+)/i);
       if (xiaomiMatch) return xiaomiMatch[0].trim();
 
-      // Generic Android Match
       const androidModelMatch = ua.match(/Android[^;]+;\s*([^;)]+)\)/i);
       if (androidModelMatch && androidModelMatch[1]) {
         const model = androidModelMatch[1].trim();
         if (!model.includes("Build")) return model;
       }
 
-      // Desktops / Operating Systems
       if (/Windows/i.test(ua)) return "Windows PC";
       if (/Macintosh/i.test(ua)) return "MacBook / Mac";
       if (/Linux/i.test(ua)) return "Linux PC";
@@ -429,8 +491,13 @@
         deviceHasChosen = true;
         lockBanner.style.display = "block";
         lockedTopicTitle.textContent = savedTitle || "بابەتەکە";
+        
         studentNameInput.disabled = true;
+        customTopicInput.disabled = true;
+        btnAddCustom.disabled = true;
+        
         studentNameInput.placeholder = "تۆ پێشتر بابەتت هەڵبژاردووە";
+        customTopicInput.placeholder = "تۆ پێشتر بابەتت هەڵبژاردووە";
       }
     }
 
@@ -438,23 +505,33 @@
     checkLocalStorageLock();
 
     // Enable/Disable buttons based on input state
-    studentNameInput.addEventListener("input", () => {
+    function updateControlsState() {
       if (deviceHasChosen) return;
-      const isTyped = studentNameInput.value.trim().length > 2;
+
+      const isNameTyped = studentNameInput.value.trim().length >= 3;
+      const isCustomTyped = customTopicInput.value.trim().length >= 3;
+
+      // Enable/Disable Custom Topic Add Button
+      btnAddCustom.disabled = !(isNameTyped && isCustomTyped);
+
+      // Enable/Disable Choose Buttons
       const buttons = document.querySelectorAll(".btn-choose");
       buttons.forEach(btn => {
         if (btn.dataset.taken === "false") {
-          btn.disabled = !isTyped;
+          btn.disabled = !isNameTyped;
         }
       });
-    });
+    }
+
+    studentNameInput.addEventListener("input", updateControlsState);
+    customTopicInput.addEventListener("input", updateControlsState);
 
     // Listen to Firebase Realtime updates
     const topicsRef = ref(db, dbPath);
     onValue(topicsRef, (snapshot) => {
       const dbData = snapshot.val() || {};
       renderTopics(dbData);
-      
+
       loadingContainer.style.display = "none";
       topicListContainer.style.display = "flex";
     }, (error) => {
@@ -462,13 +539,37 @@
       loadingContainer.innerHTML = "<p style='color:red;'>خەتایەک ڕوویدا لە بارکردنی داتاکان. تکایە دووبارە پەڕەکە نوێ بکەرەوە.</p>";
     });
 
-    // Render topics
+    // Render topics combining default and custom topics from DB
     function renderTopics(dbData) {
       topicListContainer.innerHTML = "";
-      let takenCount = 0;
-      const isTyped = studentNameInput.value.trim().length > 2;
+      
+      // Merge default topics with all topic IDs present in DB
+      const allTopicMap = new Map();
+      
+      // Load default topics first
+      defaultTopics.forEach(t => allTopicMap.set(t.id, { id: t.id, title: t.title }));
 
-      topics.forEach((topic) => {
+      // Process DB entries
+      let maxKey = 20;
+      Object.keys(dbData).forEach(key => {
+        const idNum = parseInt(key, 10);
+        if (!isNaN(idNum)) {
+          if (idNum > maxKey) maxKey = idNum;
+          
+          const title = dbData[key].Title || (allTopicMap.has(idNum) ? allTopicMap.get(idNum).title : `Custom Topic #${idNum}`);
+          allTopicMap.set(idNum, { id: idNum, title: title });
+        }
+      });
+
+      currentMaxTopicId = maxKey;
+
+      let takenCount = 0;
+      const isNameTyped = studentNameInput.value.trim().length >= 3;
+
+      // Sort topics by ID numerical order
+      const sortedTopics = Array.from(allTopicMap.values()).sort((a, b) => a.id - b.id);
+
+      sortedTopics.forEach((topic) => {
         const topicRecord = dbData[topic.id];
         const isTaken = !!topicRecord;
         if (isTaken) takenCount++;
@@ -508,7 +609,7 @@
           btn.textContent = "هەڵبژاردن";
           btn.dataset.taken = "false";
           
-          if (deviceHasChosen || !isTyped) {
+          if (deviceHasChosen || !isNameTyped) {
             btn.disabled = true;
           }
 
@@ -519,10 +620,10 @@
         topicListContainer.appendChild(card);
       });
 
-      chosenCounter.textContent = `${takenCount} / 20 هەڵبژێردراوە`;
+      chosenCounter.textContent = `${takenCount} / ${sortedTopics.length} هەڵبژێردراوە`;
     }
 
-    // Handle topic selection with database transaction
+    // Handle standard list selection
     function handleSelectTopic(topicId, topicTitle) {
       if (deviceHasChosen) {
         alert("تۆ پێشتر بابەتێکت هەڵبژاردووە!");
@@ -536,31 +637,64 @@
         return;
       }
 
+      saveTopicToDatabase(topicId, topicTitle, rawName);
+    }
+
+    // Handle custom topic submission
+    btnAddCustom.addEventListener("click", () => {
+      if (deviceHasChosen) return;
+
+      const rawName = studentNameInput.value.trim();
+      const customTitle = customTopicInput.value.trim();
+
+      if (!rawName || rawName.length < 3) {
+        alert("تکایە پێشتر ناوی تەواوی خۆت بنووسە!");
+        studentNameInput.focus();
+        return;
+      }
+
+      if (!customTitle || customTitle.length < 3) {
+        alert("تکایە بابەتێکی دیاریکراو بنووسە!");
+        customTopicInput.focus();
+        return;
+      }
+
+      const newTopicId = currentMaxTopicId + 1;
+      saveTopicToDatabase(newTopicId, customTitle, rawName, true);
+    });
+
+    // Helper function to save topic selection directly to Firebase
+    function saveTopicToDatabase(topicId, topicTitle, studentName, isCustom = false) {
       const specificDevice = getDeviceType();
       const specificUserAgent = navigator.userAgent;
 
       const singleTopicRef = ref(db, `${dbPath}/${topicId}`);
 
+      const recordData = {
+        Name: studentName,
+        TimeStamp: Date.now(),
+        UserAgent: specificUserAgent,
+        "Device-type": specificDevice
+      };
+
+      if (isCustom) {
+        recordData.Title = topicTitle;
+      }
+
       runTransaction(singleTopicRef, (currentData) => {
         if (currentData !== null) {
-          return; // Topic already claimed
+          return; // Already taken
         }
-        return {
-          Name: rawName,
-          TimeStamp: Date.now(),
-          UserAgent: specificUserAgent,
-          "Device-type": specificDevice
-        };
+        return recordData;
       }).then((result) => {
         if (result.committed) {
-          // Store in LocalStorage
           localStorage.setItem(LOCAL_STORAGE_KEY_ID, topicId);
           localStorage.setItem(LOCAL_STORAGE_KEY_TITLE, topicTitle);
 
           checkLocalStorageLock();
-          alert(`پیرۆزە! بابەتی "${topicTitle}" بە سەرکەوتوویی بۆ تۆ تۆمارکرا.`);
+          alert(`پیرۆزە! بابەتی "${topicTitle}" بە ژمارە #${topicId} بە سەرکەوتوویی بۆ تۆ تۆمارکرا.`);
         } else {
-          alert("ببوورە! ئەم بابەتە دەستبەجێ لەلایەن قوتابییەکی ترەوە هەڵبژێردرا. تکایە بابەتێکی تر هەڵبژێرە.");
+          alert("کێشەیەک ڕوویدا یان ئەم شوێنە پێشتر پڕکرایەوە! تکایە دووبارە هەوڵبدەرەوە.");
         }
       }).catch((err) => {
         console.error("Transaction Error:", err);
