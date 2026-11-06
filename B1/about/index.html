@@ -1,1 +1,160 @@
+<!DOCTYPE html>
 
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>about</title>
+  <style>
+    body {
+    display: flex;
+    flex-direction: column;
+    min-height: 200vw;
+    width: 100vw;
+    background-color: white;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 0;
+    margin: 0;
+    /* Added bottom padding so content clears the fixed navigation dock */
+    padding-bottom: 20vw;
+  }
+    .label {
+    display: flex;
+    justify-content: center;
+    color: white;
+    background-color: #910D2A;
+    border: 1px solid black;
+    height: 12vw;
+    width: 100vw;
+    padding: 0;
+    margin: 0;
+  }
+    h1 {
+    padding: 0;
+    margin: auto;
+    font-size: 5.7vw;
+    font-weight: 650;
+  }
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #ffffff;
+    min-height: 200vw;
+    width: 100vw;
+    padding-bottom: 15vw;
+  }
+  .items {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    box-shadow: 0 0 3vw rgba(0, 0, 0, 0.3);
+    min-height: 50vw;
+    width: 80vw;
+    margin: 15vw 15vw 0 15vw ;
+  }
+  .labels {
+    display: flex;
+    align-items: center;
+    background: linear-gradient(to top, #7f001b, #b20026);
+    color: white;
+    height: 10vw;
+    width: 76vw;
+    margin: 0;
+    padding-right: 4vw;
+    direction: rtl;
+    font-weight: 600;
+    font-size: 4vw;
+  }
+  .item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 40vw;
+    width: 80vw;
+    margin: 0;
+  }
+  .cmnt {
+    min-height: 35vw;
+    width: 74vw;
+    direction: rtl;
+    margin: 2vw;
+    font-size: 3vw;
+    font-weight: 600;
+  }
+
+  /* Bottom Navigation Dock Styling */
+  .app-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-top: 0.2vw solid rgba(145, 13, 42, 0.2);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 2.5vw 5vw;
+    z-index: 1000;
+    box-shadow: 0 -0.5vw 2vw rgba(0, 0, 0, 0.08);
+  }
+
+  .nav-btn {
+    background-color: #910D2A;
+    color: white;
+    border: none;
+    border-radius: 1.5vw;
+    padding: 2vw 5vw;
+    font-size: 3.2vw;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 1.5vw;
+    cursor: pointer;
+    box-shadow: 0 0.5vw 1vw rgba(145, 13, 42, 0.2);
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    font-family: inherit;
+  }
+
+  .nav-btn:active {
+    transform: scale(0.95);
+  }
+
+  .nav-btn:hover {
+    background-color: #bf0029;
+  }
+  </style>
+</head>
+<body>
+    <div class="label">
+  <h1>
+    دەربارە
+  </h1>
+    </div>
+      <div class="container">
+        <div class="items">
+          <div class="labels">
+            دەربارەی ئەم ماڵپەڕە
+          </div>
+          <div class="item">
+            <p class="cmnt">-سوپاس و ستایش بۆ خودای باڵادەست بە فەزڵی ئەو بیرۆکەی ئەوەمان بۆ هات ئەم ماڵپەڕە پێشکەش بکەین بە خوێندکارانی مەرحەلە یەکی زانکۆی پەروەردەی سەڵاحەددین بەشی ماتماتیک بە مەبەستی هاوکاریکردن و دروستکردنی ژینگەیەکی گونجاوی خوێندن بۆیان <br> -ئەم ماڵپەڕە هێشتا لە ژێر دروستکردندایە و ئێمە دەستدەکەین بە چاودێریکردنی ڕەخنە و پێشنیاری قوتابیان بە شێوازێکی بەردەوام، بەردەوام دەبین و لەسەر داواکاری ئەوان هەموو بەش و تایبەتمەندییەکانیتر تەواو دەکەین بۆیان پشتیوان بە خوا</p>
+          </div>
+        </div>
+        
+        
+        
+      </div>
+
+  <!-- Bottom Navigation Bar (Back left, Refresh right) -->
+  <div class="app-bottom-nav">
+    <button class="nav-btn" onclick="if (document.referrer) { window.location.href = document.referrer; } else { window.history.back(); }">
+      <span>←</span> گەڕانەوە
+    </button>
+    <button class="nav-btn" onclick="window.location.reload();">
+      <span>↻</span> نوێکردنەوە
+    </button>
+  </div>
+</body>
+</html>
