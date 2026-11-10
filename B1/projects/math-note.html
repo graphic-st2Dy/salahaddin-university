@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Note Studio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .font-math {
+            font-family: 'Fira Code', monospace;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.4);
+            border-radius: 3px;
+        }
+        /* Key touch active animation */
+        .key-btn {
+            transition: all 0.06s ease;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .key-btn:active {
+            transform: scale(0.90);
+        }
+        /* Rich text editor styling */
+        #editor {
+            min-height: 100%;
+            outline: none;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        #editor:empty:before {
+            content: attr(placeholder);
+            color: #9ca3af;
+            pointer-events: none;
+            display: block;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 h-full flex flex-col overflow-hidden transition-colors duration-200">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 z-50 transform translate-y-[-100px] opacity-0 transition-all duration-300 bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 px-4 py-2 rounded-xl shadow-lg flex items-center space-x-2 text-sm font-medium pointer-events-none">
+        <i class="fas fa-check-circle text-emerald-400"></i>
+        <span id="toast-message">Notification</span>
+    </div>
+
+    <!-- Top Navigation Bar -->
+    <header class="no-print h-14 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700/60 px-4 flex items-center justify-between shrink-0 shadow-sm z-10">
+        <div class="flex items-center space-x-3">
+            <button id="toggle-sidebar-btn" class="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-white font-bold font-math shadow-sm text-sm">
+                    f(x)
+                </div>
+                <span class="font-semibold text-base tracking-tight hidden sm:inline">MathNote</span>
+            </div>
+        </div>
+
+        <!-- Note Title Input -->
+        <div class="flex-1 max-w-sm mx-4">
+            <input type="text" id="note-title-input" class="w-full bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200/60 focus:bg-white dark:focus:bg-slate-800 border border-transparent focus:border-brand-500 rounded-lg px-3 py-1.5 text-sm font-medium outline-none transition text-center sm:text-left" placeholder="Note Title..." />
+        </div>
+
+        <!-- Right Controls -->
+        <div class="flex items-center space-x-1">
+            <button id="copy-note-btn" title="Copy Text" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-xs transition flex items-center space-x-1">
+                <i class="fas fa-copy"></i><span class="hidden md:inline">Copy</span>
+            </button>
+            <button id="download-btn" title="Export TXT" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-xs transition flex items-center space-x-1">
+                <i class="fas fa-download"></i><span class="hidden md:inline">Export</span>
+            </button>
+            <button id="print-btn" title="Print / PDF" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-xs transition">
+                <i class="fas fa-print"></i>
+            </button>
+            <div class="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+            <button id="theme-toggle-btn" title="Toggle Theme" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition">
+                <i class="fas fa-moon dark:hidden"></i>
+                <i class="fas fa-sun hidden dark:block text-amber-400"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace Area -->
+    <div class="flex-1 flex overflow-hidden relative">
+        
+        <!-- Sidebar: Notes List -->
+        <aside id="sidebar" class="no-print w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700/60 flex flex-col shrink-0 absolute sm:relative z-20 h-full transition-transform duration-300 transform -translate-x-full sm:translate-x-0 shadow-lg sm:shadow-none">
+            <div class="p-3 border-b border-slate-200 dark:border-slate-700/60">
+                <button id="new-note-btn" class="w-full bg-brand-500 hover:bg-brand-600 text-white rounded-xl py-2 px-3 text-xs font-semibold flex items-center justify-center space-x-2 transition shadow-sm">
+                    <i class="fas fa-plus"></i>
+                    <span>New Math Note</span>
+                </button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="p-2.5 pb-1">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-3 top-2.5 text-xs text-slate-400"></i>
+                    <input type="text" id="search-notes-input" placeholder="Search notes..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-100 dark:bg-slate-700/50 border border-transparent focus:border-brand-500 rounded-lg outline-none transition" />
+                </div>
+            </div>
+
+            <!-- Notes List Container -->
+            <div id="notes-list" class="flex-1 overflow-y-auto px-2 py-1 space-y-1"></div>
+
+            <!-- Footer Stats -->
+            <div class="p-3 border-t border-slate-200 dark:border-slate-700/60 text-[11px] text-slate-400 flex justify-between items-center">
+                <span id="notes-count">0 notes</span>
+                <span class="text-[10px]">Saved</span>
+            </div>
+        </aside>
+
+        <!-- Sidebar Overlay (Mobile) -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/40 z-10 hidden sm:hidden backdrop-blur-sm"></div>
+
+        <!-- Content Area -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50 dark:bg-slate-900">
+            
+            <!-- Quick Toolbar -->
+            <div class="no-print bg-white/70 dark:bg-slate-800/70 backdrop-blur border-b border-slate-200 dark:border-slate-700/50 px-4 py-1.5 flex items-center justify-between text-slate-600 dark:text-slate-300 text-xs">
+                <div class="flex items-center space-x-1">
+                    <button onclick="formatDoc('bold')" title="Bold" class="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded font-bold w-7 h-7 flex items-center justify-center">B</button>
+                    <button onclick="formatDoc('italic')" title="Italic" class="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded italic w-7 h-7 flex items-center justify-center font-serif">I</button>
+                    <div class="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
+                    <button onclick="formatDoc('insertUnorderedList')" title="Bullet List" class="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded w-7 h-7 flex items-center justify-center"><i class="fas fa-list-ul"></i></button>
+                </div>
+                
+                <button id="toggle-keyboard-btn" class="bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 font-medium px-2.5 py-1 rounded-md flex items-center space-x-1.5 border border-brand-200 dark:border-brand-800/50 hover:bg-brand-100 transition">
+                    <i class="fas fa-keyboard"></i>
+                    <span>Keyboard</span>
+                    <i id="kbd-chevron" class="fas fa-chevron-down text-[10px] ml-1"></i>
+                </button>
+            </div>
+
+            <!-- Note Editor Box -->
+            <div class="flex-1 p-4 sm:p-6 overflow-y-auto flex justify-center">
+                <div class="w-full max-w-3xl bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700/60 p-6 sm:p-8 flex flex-col min-h-[350px]">
+                    <div class="mb-3 pb-2 border-b border-slate-100 dark:border-slate-700/50">
+                        <h1 id="doc-display-title" class="text-xl sm:text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100 outline-none" contenteditable="true" placeholder="Untitled Note">Untitled Note</h1>
+                        <div class="text-[11px] text-slate-400 mt-0.5 flex items-center space-x-2">
+                            <span id="doc-date">Today</span>
+                            <span>•</span>
+                            <span id="char-count">0 chars</span>
+                        </div>
+                    </div>
+                    <div id="editor" inputmode="none" contenteditable="true" class="flex-1 text-slate-700 dark:text-slate-200 text-sm sm:text-base leading-relaxed font-math focus:outline-none" placeholder="Type your notes or use the built-in keyboard below..."></div>
+                </div>
+            </div>
+
+            <!-- Virtual Keyboard Container (Defaults to English ABC) -->
+            <div id="keyboard-container" class="no-print bg-slate-100 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-2xl transition-all duration-200 flex flex-col">
+                
+                <!-- Keyboard Tabs -->
+                <div class="flex items-center justify-between px-3 pt-2 pb-1 border-b border-slate-200/60 dark:border-slate-700/60 text-xs font-medium">
+                    <div class="flex space-x-1 overflow-x-auto" id="kbd-tabs">
+                        <button data-tab="abc" class="kbd-tab active px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-sm font-semibold transition">English (ABC)</button>
+                        <button data-tab="super" class="kbd-tab px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-white/50 transition">Superscripts</button>
+                        <button data-tab="sub" class="kbd-tab px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-white/50 transition">Subscripts</button>
+                        <button data-tab="symbols" class="kbd-tab px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-white/50 transition">Math Symbols</button>
+                        <button data-tab="greek" class="kbd-tab px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-white/50 transition">Greek</button>
+                    </div>
+                    <button id="close-kbd-btn" class="text-slate-400 hover:text-slate-600 p-1">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+
+                <!-- Keyboard Keys Viewport -->
+                <div class="p-2.5 overflow-y-auto max-h-[220px]">
+                    
+                    <!-- Tab 1: English QWERTY Keyboard (Default) -->
+                    <div id="tab-abc" class="kbd-panel space-y-1.5 max-w-3xl mx-auto">
+                        <div class="grid grid-cols-10 gap-1">
+                            <button class="key-btn" data-key="q">q</button><button class="key-btn" data-key="w">w</button><button class="key-btn" data-key="e">e</button><button class="key-btn" data-key="r">r</button><button class="key-btn" data-key="t">t</button><button class="key-btn" data-key="y">y</button><button class="key-btn" data-key="u">u</button><button class="key-btn" data-key="i">i</button><button class="key-btn" data-key="o">o</button><button class="key-btn" data-key="p">p</button>
+                        </div>
+                        <div class="grid grid-cols-9 gap-1 px-3">
+                            <button class="key-btn" data-key="a">a</button><button class="key-btn" data-key="s">s</button><button class="key-btn" data-key="d">d</button><button class="key-btn" data-key="f">f</button><button class="key-btn" data-key="g">g</button><button class="key-btn" data-key="h">h</button><button class="key-btn" data-key="j">j</button><button class="key-btn" data-key="k">k</button><button class="key-btn" data-key="l">l</button>
+                        </div>
+                        <div class="grid grid-cols-9 gap-1">
+                            <button class="key-btn bg-slate-200 dark:bg-slate-600 text-xs font-bold" data-key="A">UP</button>
+                            <button class="key-btn" data-key="z">z</button><button class="key-btn" data-key="x">x</button><button class="key-btn" data-key="c">c</button><button class="key-btn" data-key="v">v</button><button class="key-btn" data-key="b">b</button><button class="key-btn" data-key="n">n</button><button class="key-btn" data-key="m">m</button>
+                            <button class="key-btn bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 text-xs" id="abc-backspace"><i class="fas fa-backspace"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Superscripts -->
+                    <div id="tab-super" class="kbd-panel hidden grid grid-cols-8 sm:grid-cols-10 gap-1.5 max-w-3xl mx-auto">
+                        <button class="key-btn" data-key="⁰">⁰</button><button class="key-btn" data-key="¹">¹</button><button class="key-btn" data-key="²">²</button><button class="key-btn" data-key="³">³</button><button class="key-btn" data-key="⁴">⁴</button><button class="key-btn" data-key="⁵">⁵</button><button class="key-btn" data-key="⁶">⁶</button><button class="key-btn" data-key="⁷">⁷</button><button class="key-btn" data-key="⁸">⁸</button><button class="key-btn" data-key="⁹">⁹</button>
+                        <button class="key-btn" data-key="⁺">⁺</button><button class="key-btn" data-key="⁻">⁻</button><button class="key-btn" data-key="ⁿ">ⁿ</button><button class="key-btn" data-key="⁼">=</button><button class="key-btn" data-key="⁽">⁽</button><button class="key-btn" data-key="⁾">⁾</button><button class="key-btn" data-key="ˣ">ˣ</button><button class="key-btn" data-key="ⁱ">ⁱ</button><button class="key-btn" data-key="ᶠ">ᶠ</button><button class="key-btn" data-key="ᵃ">ᵃ</button>
+                    </div>
+
+                    <!-- Tab 3: Subscripts -->
+                    <div id="tab-sub" class="kbd-panel hidden grid grid-cols-8 sm:grid-cols-10 gap-1.5 max-w-3xl mx-auto">
+                        <button class="key-btn" data-key="₀">₀</button><button class="key-btn" data-key="₁">₁</button><button class="key-btn" data-key="₂">₂</button><button class="key-btn" data-key="₃">₃</button><button class="key-btn" data-key="₄">₄</button><button class="key-btn" data-key="₅">₅</button><button class="key-btn" data-key="₆">₆</button><button class="key-btn" data-key="₇">₇</button><button class="key-btn" data-key="₈">₈</button><button class="key-btn" data-key="₉">₉</button>
+                        <button class="key-btn" data-key="₊">₊</button><button class="key-btn" data-key="₋">₋</button><button class="key-btn" data-key="ₙ">ₙ</button><button class="key-btn" data-key="₌">=</button><button class="key-btn" data-key="₍">₍</button><button class="key-btn" data-key="₎">₎</button><button class="key-btn" data-key="ₓ">ₓ</button><button class="key-btn" data-key="ᵢ">ᵢ</button><button class="key-btn" data-key="ₐ">ₐ</button><button class="key-btn" data-key="ₑ">ₑ</button>
+                    </div>
+
+  <!-- Tab 4: Math Symbols (Expanded & Comprehensive) -->
+<div id="tab-symbols" class="kbd-panel hidden grid grid-cols-8 sm:grid-cols-10 gap-1.5 max-w-3xl mx-auto">
+    <!-- Basic Arithmetic & Comparison -->
+    <button class="key-btn" data-key="+">+</button>
+    <button class="key-btn" data-key="−">−</button>
+    <button class="key-btn" data-key="×">×</button>
+    <button class="key-btn" data-key="÷">÷</button>
+    <button class="key-btn" data-key="·">·</button>
+    <button class="key-btn" data-key="=">=</button>
+    <button class="key-btn" data-key="≠">≠</button>
+    <button class="key-btn" data-key="≈">≈</button>
+    <button class="key-btn" data-key="±">±</button>
+    <button class="key-btn" data-key="∓">∓</button>
+    
+    <button class="key-btn" data-key="<">&lt;</button>
+    <button class="key-btn" data-key=">">&gt;</button>
+    <button class="key-btn" data-key="≤">≤</button>
+    <button class="key-btn" data-key="≥">≥</button>
+    <button class="key-btn" data-key="≮">≮</button>
+    <button class="key-btn" data-key="≯">≯</button>
+    <button class="key-btn" data-key="≡">≡</button>
+    <button class="key-btn" data-key="≢">≢</button>
+    <button class="key-btn" data-key="≅">≅</button>
+    <button class="key-btn" data-key="≃">≃</button>
+
+    <!-- Roots, Calculus & Analysis -->
+    <button class="key-btn" data-key="√">√</button>
+    <button class="key-btn" data-key="∛">∛</button>
+    <button class="key-btn" data-key="∜">∜</button>
+    <button class="key-btn" data-key="∞">∞</button>
+    <button class="key-btn" data-key="∫">∫</button>
+    <button class="key-btn" data-key="∬">∬</button>
+    <button class="key-btn" data-key="∭">∭</button>
+    <button class="key-btn" data-key="∮">∮</button>
+    <button class="key-btn" data-key="∑">∑</button>
+    <button class="key-btn" data-key="∏">∏</button>
+
+    <button class="key-btn" data-key="∂">∂</button>
+    <button class="key-btn" data-key="∇">∇</button>
+    <button class="key-btn" data-key="∝">∝</button>
+    <button class="key-btn" data-key="°">°</button>
+    <button class="key-btn" data-key="′">′</button>
+    <button class="key-btn" data-key="″">″</button>
+    <button class="key-btn" data-key="∴">∴</button>
+    <button class="key-btn" data-key="∵">∵</button>
+    <button class="key-btn" data-key="∼">∼</button>
+    <button class="key-btn" data-key="≁">≁</button>
+
+    <!-- Set Theory & Logic -->
+    <button class="key-btn" data-key="∈">∈</button>
+    <button class="key-btn" data-key="∉">∉</button>
+    <button class="key-btn" data-key="⊂">⊂</button>
+    <button class="key-btn" data-key="⊃">⊃</button>
+    <button class="key-btn" data-key="⊆">⊆</button>
+    <button class="key-btn" data-key="⊇">⊇</button>
+    <button class="key-btn" data-key="∪">∪</button>
+    <button class="key-btn" data-key="∩">∩</button>
+    <button class="key-btn" data-key="∅">∅</button>
+    <button class="key-btn" data-key="∖">∖</button>
+
+    <button class="key-btn" data-key="∀">∀</button>
+    <button class="key-btn" data-key="∃">∃</button>
+    <button class="key-btn" data-key="∄">∄</button>
+    <button class="key-btn" data-key="⇒">⇒</button>
+    <button class="key-btn" data-key="⇔">⇔</button>
+    <button class="key-btn" data-key="¬">¬</button>
+    <button class="key-btn" data-key="∧">∧</button>
+    <button class="key-btn" data-key="∨">∨</button>
+    <button class="key-btn" data-key="⊢">⊢</button>
+    <button class="key-btn" data-key="⊨">⊨</button>
+
+    <!-- Geometry & Advanced Relations -->
+    <button class="key-btn" data-key="⊥">⊥</button>
+    <button class="key-btn" data-key="∥">∥</button>
+    <button class="key-btn" data-key="∦">∦</button>
+    <button class="key-btn" data-key="∠">∠</button>
+    <button class="key-btn" data-key="∡">∡</button>
+    <button class="key-btn" data-key="⊙">⊙</button>
+    <button class="key-btn" data-key="⌂">⌂</button>
+    <button class="key-btn" data-key="Ø">Ø</button>
+    <button class="key-btn" data-key="ℵ">ℵ</button>
+    <button class="key-btn" data-key="ℜ">ℜ</button>
+</div>
+
+
+                    <!-- Tab 5: Greek -->
+                    <div id="tab-greek" class="kbd-panel hidden grid grid-cols-8 sm:grid-cols-10 gap-1.5 max-w-3xl mx-auto">
+                        <button class="key-btn" data-key="α">α</button><button class="key-btn" data-key="β">β</button><button class="key-btn" data-key="γ">γ</button><button class="key-btn" data-key="δ">δ</button><button class="key-btn" data-key="ε">ε</button><button class="key-btn" data-key="θ">θ</button><button class="key-btn" data-key="λ">λ</button><button class="key-btn" data-key="μ">μ</button><button class="key-btn" data-key="π">π</button><button class="key-btn" data-key="σ">σ</button>
+                        <button class="key-btn" data-key="τ">τ</button><button class="key-btn" data-key="φ">φ</button><button class="key-btn" data-key="ω">ω</button><button class="key-btn" data-key="Δ">Δ</button><button class="key-btn" data-key="Θ">Θ</button><button class="key-btn" data-key="Λ">Λ</button><button class="key-btn" data-key="Ω">Ω</button><button class="key-btn" data-key="Σ">Σ</button><button class="key-btn" data-key="Ψ">Ψ</button><button class="key-btn" data-key="Φ">Φ</button>
+                    </div>
+
+                    <!-- Bottom Utility Row -->
+                    <div class="mt-2.5 pt-1.5 border-t border-slate-200 dark:border-slate-700/60 flex items-center justify-between gap-2 max-w-3xl mx-auto text-xs">
+                        <button id="key-space" class="flex-1 bg-white dark:bg-slate-700 hover:bg-slate-200 border border-slate-300 dark:border-slate-600 rounded-lg py-1.5 font-semibold shadow-sm transition">Space</button>
+                        <button id="key-backspace" class="bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 hover:bg-amber-200 border border-amber-200 dark:border-amber-800/50 rounded-lg px-3 py-1.5 font-semibold transition">
+                            <i class="fas fa-backspace"></i> Delete
+                        </button>
+                        <button id="key-enter" class="bg-brand-500 hover:bg-brand-600 text-white rounded-lg px-3 py-1.5 font-semibold shadow-sm transition">
+                            Enter
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Script Application Logic -->
+    <script>
+        let notes = [];
+        let currentNoteId = null;
+        let isKeyboardVisible = true;
+        let isUpperCase = false;
+
+        const keyStyle = "bg-white dark:bg-slate-700 hover:bg-brand-50 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 rounded-lg py-2 text-center font-math text-sm sm:text-base shadow-sm active:scale-95 transition cursor-pointer select-none flex items-center justify-center";
+
+        const editor = document.getElementById('editor');
+        const docDisplayTitle = document.getElementById('doc-display-title');
+        const noteTitleInput = document.getElementById('note-title-input');
+        const notesList = document.getElementById('notes-list');
+        const newNoteBtn = document.getElementById('new-note-btn');
+        const searchInput = document.getElementById('search-notes-input');
+        const keyboardContainer = document.getElementById('keyboard-container');
+        const toggleKeyboardBtn = document.getElementById('toggle-keyboard-btn');
+        const closeKbdBtn = document.getElementById('close-kbd-btn');
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const charCountEl = document.getElementById('char-count');
+        const notesCountEl = document.getElementById('notes-count');
+        const docDateEl = document.getElementById('doc-date');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initKeys();
+            loadTheme();
+            loadNotes();
+            setupEventListeners();
+        });
+
+        function initKeys() {
+            document.querySelectorAll('.key-btn').forEach(btn => {
+                if (!btn.classList.contains('bg-slate-200') && !btn.classList.contains('bg-amber-100')) {
+                    btn.className = keyStyle;
+                }
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const key = btn.getAttribute('data-key');
+                    if (key === 'A') {
+                        isUpperCase = !isUpperCase;
+                        document.querySelectorAll('#tab-abc .key-btn').forEach(b => {
+                            const k = b.getAttribute('data-key');
+                            if (k && k.length === 1 && k !== 'A') {
+                                b.setAttribute('data-key', isUpperCase ? k.toUpperCase() : k.toLowerCase());
+                                b.innerText = isUpperCase ? k.toUpperCase() : k.toLowerCase();
+                            }
+                        });
+                        return;
+                    }
+                    if (key) insertAtCursor(key);
+                });
+            });
+        }
+
+        function insertAtCursor(text) {
+            editor.focus();
+            const sel = window.getSelection();
+            if (sel.getRangeAt && sel.rangeCount) {
+                let range = sel.getRangeAt(0);
+                range.deleteContents();
+                const textNode = document.createTextNode(text);
+                range.insertNode(textNode);
+                range.setStartAfter(textNode);
+                range.setEndAfter(textNode);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            } else {
+                editor.innerText += text;
+            }
+            handleEditorInput();
+        }
+
+        function formatDoc(cmd, value = null) {
+            document.execCommand(cmd, false, value);
+            editor.focus();
+        }
+
+        function loadNotes() {
+            const saved = localStorage.getItem('math_notes_app');
+            if (saved) {
+                try { notes = JSON.parse(saved); } catch(e) { notes = []; }
+            }
+            if (!notes || notes.length === 0) {
+                notes = [{
+                    id: Date.now().toString(),
+                    title: 'Calculus Notes',
+                    content: 'Welcome to MathNote!\n\nUse the built-in English keyboard to type, and switch tabs for math symbols:\n• Quadratic: x = (−b ± √(b² − 4ac)) / (2a)\n• Function: f(x) = x² + 2x + 1',
+                    updatedAt: new Date().toISOString()
+                }];
+                saveNotesToStorage();
+            }
+            currentNoteId = notes[0].id;
+            renderNotesList();
+            loadCurrentNoteIntoEditor();
+        }
+
+        function saveNotesToStorage() {
+            localStorage.setItem('math_notes_app', JSON.stringify(notes));
+            notesCountEl.innerText = `${notes.length} notes`;
+        }
+
+        function renderNotesList(filterQuery = '') {
+            notesList.innerHTML = '';
+            const filtered = notes.filter(n => n.title.toLowerCase().includes(filterQuery.toLowerCase()) || n.content.toLowerCase().includes(filterQuery.toLowerCase()));
+            
+            if (filtered.length === 0) {
+                notesList.innerHTML = `<div class="text-center py-6 text-xs text-slate-400">No notes found</div>`;
+                return;
+            }
+
+            filtered.forEach(note => {
+                const isActive = note.id === currentNoteId;
+                const item = document.createElement('div');
+                item.className = `group p-2 rounded-xl cursor-pointer transition flex items-center justify-between ${isActive ? 'bg-brand-50 dark:bg-brand-900/30 border border-brand-200 dark:border-brand-800/50' : 'hover:bg-slate-100 dark:hover:bg-slate-700/50'}`;
+                
+                item.innerHTML = `
+                    <div class="flex-1 min-w-0 pr-2">
+                        <div class="font-semibold text-xs truncate ${isActive ? 'text-brand-700 dark:text-brand-300' : 'text-slate-700 dark:text-slate-200'}">${escapeHtml(note.title || 'Untitled')}</div>
+                        <div class="text-[10px] text-slate-400 truncate mt-0.5">${escapeHtml(note.content.replace(/<[^>]*>/g, '').substring(0, 25)) || 'Empty...'}</div>
+                    </div>
+                    <button onclick="deleteNote(event, '${note.id}')" class="hidden group-hover:block p-1 text-slate-400 hover:text-red-500 rounded"><i class="fas fa-trash-alt text-xs"></i></button>
+                `;
+                item.addEventListener('click', () => {
+                    currentNoteId = note.id;
+                    renderNotesList(searchInput.value);
+                    loadCurrentNoteIntoEditor();
+                    if (window.innerWidth < 640) closeSidebar();
+                });
+                notesList.appendChild(item);
+            });
+        }
+
+        function loadCurrentNoteIntoEditor() {
+            const activeNote = notes.find(n => n.id === currentNoteId);
+            if (!activeNote) return;
+            docDisplayTitle.innerText = activeNote.title || 'Untitled';
+            noteTitleInput.value = activeNote.title || '';
+            editor.innerHTML = activeNote.content || '';
+            updateCharCount();
+        }
+
+        function createNewNote() {
+            const newNote = { id: Date.now().toString(), title: 'New Note', content: '', updatedAt: new Date().toISOString() };
+            notes.unshift(newNote);
+            currentNoteId = newNote.id;
+            saveNotesToStorage();
+            renderNotesList();
+            loadCurrentNoteIntoEditor();
+            editor.focus();
+        }
+
+        function deleteNote(e, id) {
+            e.stopPropagation();
+            if (notes.length <= 1) return;
+            notes = notes.filter(n => n.id !== id);
+            if (currentNoteId === id) currentNoteId = notes[0].id;
+            saveNotesToStorage();
+            renderNotesList(searchInput.value);
+            loadCurrentNoteIntoEditor();
+        }
+
+        function handleEditorInput() {
+            const activeNote = notes.find(n => n.id === currentNoteId);
+            if (!activeNote) return;
+            activeNote.content = editor.innerHTML;
+            activeNote.updatedAt = new Date().toISOString();
+            updateCharCount();
+            saveNotesToStorage();
+            renderNotesList(searchInput.value);
+        }
+
+        function updateCharCount() {
+            charCountEl.innerText = `${(editor.innerText || '').length} chars`;
+        }
+
+        function setupEventListeners() {
+            docDisplayTitle.addEventListener('input', () => {
+                noteTitleInput.value = docDisplayTitle.innerText;
+                syncTitle(docDisplayTitle.innerText);
+            });
+            noteTitleInput.addEventListener('input', () => {
+                docDisplayTitle.innerText = noteTitleInput.value || 'Untitled';
+                syncTitle(noteTitleInput.value);
+            });
+
+            function syncTitle(title) {
+                const note = notes.find(n => n.id === currentNoteId);
+                if (note) { note.title = title; saveNotesToStorage(); renderNotesList(searchInput.value); }
+            }
+
+            editor.addEventListener('input', handleEditorInput);
+            newNoteBtn.addEventListener('click', createNewNote);
+            searchInput.addEventListener('input', (e) => renderNotesList(e.target.value));
+
+            // Keyboard tabs switching
+            document.querySelectorAll('.kbd-tab').forEach(tabBtn => {
+                tabBtn.addEventListener('click', () => {
+                    document.querySelectorAll('.kbd-tab').forEach(t => {
+                        t.classList.remove('active', 'bg-white', 'dark:bg-slate-700', 'text-brand-600', 'dark:text-brand-400', 'shadow-sm', 'font-semibold');
+                        t.classList.add('text-slate-600', 'dark:text-slate-300');
+                    });
+                    tabBtn.classList.add('active', 'bg-white', 'dark:bg-slate-700', 'text-brand-600', 'dark:text-brand-400', 'shadow-sm', 'font-semibold');
+                    tabBtn.classList.remove('text-slate-600', 'dark:text-slate-300');
+
+                    const target = tabBtn.getAttribute('data-tab');
+                    document.querySelectorAll('.kbd-panel').forEach(p => p.classList.add('hidden'));
+                    document.getElementById(`tab-${target}`).classList.remove('hidden');
+                });
+            });
+
+            document.getElementById('key-space').addEventListener('click', () => insertAtCursor(' '));
+            document.getElementById('key-backspace').addEventListener('click', deleteKeyAction);
+            document.getElementById('abc-backspace').addEventListener('click', deleteKeyAction);
+
+            function deleteKeyAction() {
+                editor.focus();
+                document.execCommand('delete');
+                handleEditorInput();
+            }
+
+            document.getElementById('key-enter').addEventListener('click', () => insertAtCursor('\n'));
+
+            toggleKeyboardBtn.addEventListener('click', toggleKeyboard);
+            closeKbdBtn.addEventListener('click', toggleKeyboard);
+
+            document.getElementById('copy-note-btn').addEventListener('click', () => {
+                navigator.clipboard.writeText(editor.innerText);
+                showToast('Copied to clipboard');
+            });
+
+            document.getElementById('download-btn').addEventListener('click', () => {
+                const note = notes.find(n => n.id === currentNoteId);
+                const blob = new Blob([editor.innerText], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${(note ? note.title : 'note').replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('Exported successfully');
+            });
+
+            document.getElementById('print-btn').addEventListener('click', () => window.print());
+
+            themeToggleBtn.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                localStorage.setItem('math_app_theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+            });
+
+            toggleSidebarBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('-translate-x-full');
+                sidebarOverlay.classList.toggle('hidden');
+            });
+            sidebarOverlay.addEventListener('click', closeSidebar);
+        }
+
+        function closeSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        }
+
+        function toggleKeyboard() {
+            isKeyboardVisible = !isKeyboardVisible;
+            keyboardContainer.classList.toggle('hidden', !isKeyboardVisible);
+            document.getElementById('kbd-chevron').className = isKeyboardVisible ? 'fas fa-chevron-down text-[10px] ml-1' : 'fas fa-chevron-up text-[10px] ml-1';
+        }
+
+        function loadTheme() {
+            if (localStorage.getItem('math_app_theme') === 'dark' || (!localStorage.getItem('math_app_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('translate-y-[-100px]', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-[-100px]', 'opacity-0');
+            }, 2000);
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+    </script>
+</body>
+</html>

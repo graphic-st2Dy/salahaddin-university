@@ -1,1 +1,229 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>ئامرازەکان و پڕۆژەکان - Tools & Projects</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      width: 100vw;
+      padding: 0;
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #f9f9f9;
+      /* Padding at bottom to ensure content isn't covered by fixed navigation dock */
+      padding-bottom: 25vw;
+    }
+
+    /* Top Banner Header */
+    .label {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      background-color: #910D2A;
+      border-bottom: 1px solid black;
+      height: 14vw;
+      width: 100vw;
+      padding: 0;
+      margin: 0 0 4vw 0;
+      box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.2);
+    }
+
+    .p2 {
+      padding: 0;
+      margin: 0;
+      font-size: 5.7vw;
+      font-weight: 650;
+      text-align: center;
+    }
+
+    /* Main Grid Container: 2 Columns */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4vw;
+      width: 90vw;
+      margin: 2vw auto;
+    }
+
+    /* Project Grid Card Item */
+    .project-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      background-color: #ffffff;
+      border-radius: 2.5vw;
+      padding: 3vw;
+      text-decoration: none;
+      color: #222222;
+      box-shadow: 0 0 1.8vw rgba(0, 0, 0, 0.15);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .project-card:hover {
+      transform: scale(1.04);
+      box-shadow: 0 0.8vw 2.5vw rgba(145, 13, 42, 0.25);
+    }
+
+    /* Project Icon / Image */
+    .project-img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 2vw;
+      margin-bottom: 2.5vw;
+      background-color: #f0f0f0;
+      box-shadow: inset 0 0 1vw rgba(0,0,0,0.05);
+    }
+
+    /* Project Title under the image */
+    .project-title {
+      margin: 0;
+      font-size: 3.8vw;
+      font-weight: 650;
+      text-align: center;
+      line-height: 1.3;
+      color: #111111;
+      word-break: break-word;
+    }
+
+    /* Optional Subtitle/Category text under the title */
+    .project-desc {
+      margin-top: 1vw;
+      font-size: 2.6vw;
+      font-weight: 400;
+      color: #777777;
+      text-align: center;
+    }
+
+    /* Bottom Navigation Dock Styling */
+    .app-bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100vw;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      border-top: 0.2vw solid rgba(145, 13, 42, 0.2);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 2.5vw 5vw;
+      z-index: 1000;
+      box-shadow: 0 -0.5vw 2vw rgba(0, 0, 0, 0.08);
+    }
+
+    .nav-btn {
+      background-color: #910D2A;
+      color: white;
+      border: none;
+      border-radius: 1.5vw;
+      padding: 2vw 5vw;
+      font-size: 3.2vw;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 1.5vw;
+      cursor: pointer;
+      box-shadow: 0 0.5vw 1vw rgba(145, 13, 42, 0.2);
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      font-family: inherit;
+    }
+
+    .nav-btn:active {
+      transform: scale(0.95);
+    }
+
+    .nav-btn:hover {
+      background-color: #bf0029;
+    }
+
+    /* Responsive adjustments for desktop/larger screens */
+    @media (min-width: 768px) {
+      body {
+        padding-bottom: 100px;
+      }
+      .label {
+        height: 70px;
+        margin-bottom: 20px;
+      }
+      .p2 {
+        font-size: 24px;
+      }
+      .grid-container {
+        width: 80vw;
+        max-width: 900px;
+        gap: 20px;
+      }
+      .project-card {
+        border-radius: 12px;
+        padding: 16px;
+      }
+      .project-img {
+        border-radius: 10px;
+        margin-bottom: 12px;
+      }
+      .project-title {
+        font-size: 16px;
+      }
+      .project-desc {
+        font-size: 12px;
+        margin-top: 4px;
+      }
+      .app-bottom-nav {
+        padding: 12px 20px;
+      }
+      .nav-btn {
+        padding: 10px 24px;
+        font-size: 15px;
+        border-radius: 8px;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Banner Header -->
+  <div class="label">
+    <p class="p2">ئامرازەکان و پڕۆژەکان</p>
+  </div>
+
+  <!-- 2-Column Grid Container -->
+  <div class="grid-container">
+
+    <!-- Project 1: Math Note -->
+    <a href="math-note.html" class="project-card">
+      <img src="math-note.jpg" alt="Math Note" class="project-img">
+      <p class="project-title">Math Note</p>
+      <span class="project-desc">هاوکێشەی بیرکاری</span>
+    </a>
+
+    <!-- Add as many items as you want here... -->
+
+  </div>
+
+  <!-- Bottom Navigation Dock -->
+  <div class="app-bottom-nav">
+    <button class="nav-btn" onclick="window.location.reload();">
+      <span>↻</span> نوێکردنەوە
+    </button>
+    <button class="nav-btn" onclick="if (document.referrer) { window.location.href = document.referrer; } else { window.history.back(); }">
+      <span>→</span> گەڕانەوە
+    </button>
+  </div>
+
+</body>
+</html>
