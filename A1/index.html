@@ -86,6 +86,42 @@
     transition: ease 0.15s;
     user-select: none;
   }
+  .item-G{
+    display: flex;
+    height: 30vw;
+    width: 40vw;
+    color: #bf0029;
+    border: 0.2vw solid #bf0028;
+    background-color: #ffffff;
+    box-shadow: 0 0 10vw rgba(0, 0, 0, 0.2);
+    border-radius: 0.5vw;
+    font-size: 5vw;
+    font-weight: 600;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;     
+    cursor: none;
+    transition: ease 0.15s;
+    user-select: none;
+
+    /* Added pulse animation */
+    animation: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        /* Base subtle shadow + light glow */
+        box-shadow: 0 0 2vw rgba(0, 0, 0, 0.2), 
+                    0 0 0.25vw rgba(191, 0, 40, 0.3);
+    }
+    50% {
+        /* Slightly larger & stronger glow */
+        box-shadow: 0 0 5vw rgba(0, 0, 0, 0.2), 
+                    0 0 2vw rgba(191, 0, 40, 0.7);
+    }
+}
+
   .item-l {
     display: flex;
     height: 30vw;
@@ -141,9 +177,9 @@
         <a href="projects/index.html" class="item">
           پڕۆژەکان
         </a>
-        <div class="item-l">
-          ڕێنمایی
-        </div>
+        <a href="https://registration.su.edu.krd/" class="item-G">
+          دەروازە
+        </a>
       </div>
       <div class="items">
         <a href="about/index.html" class="item">
