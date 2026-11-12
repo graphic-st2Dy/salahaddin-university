@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Session - Math Department</title>
+  
+  <style>
+    :root {
+      --bg-color: #f3f3f3;
+      --card-bg: #ffffff;
+      --accent: #0078d4;
+      --accent-hover: #106ebe;
+      --text-main: #242424;
+      --text-muted: #616161;
+      --border-color: #e0e0e0;
+      --success: #107c10;
+      --danger: #d13438;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    header h1 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-back {
+      background: #f0f0f0;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn-back:hover { background: #e5e5e5; }
+
+    main {
+      max-width: 800px;
+      width: 100%;
+      margin: 32px auto;
+      padding: 0 20px;
+      flex: 1;
+    }
+
+    /* Auth Modal Overlay for Quiz */
+    .auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(243, 243, 243, 0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .auth-card {
+      background: var(--card-bg);
+      padding: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+    }
+
+    .auth-card h2 { font-size: 1.4rem; margin-bottom: 8px; }
+    .auth-card p { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 24px; }
+
+    .input-group { margin-bottom: 16px; text-align: left; }
+    .input-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted); }
+    .input-group input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 1rem;
+      outline: none;
+    }
+    .input-group input:focus { border-color: var(--accent); }
+
+    .error-msg { color: var(--danger); font-size: 0.85rem; margin-bottom: 14px; display: none; }
+
+    .btn-primary {
+      width: 100%;
+      padding: 10px;
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background-color: var(--accent-hover); }
+
+    /* Quiz Card Container */
+    .quiz-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .quiz-progress {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+
+    .question-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      background: #fafafa;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .option-label:hover {
+      background: #f0f0f0;
+      border-color: #b0b0b0;
+    }
+
+    .option-label input {
+      accent-color: var(--accent);
+      width: 18px;
+      height: 18px;
+    }
+
+    .quiz-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-color);
+      padding-top: 20px;
+    }
+
+    .btn-nav {
+      padding: 8px 20px;
+      background: #f0f0f0;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-main);
+    }
+    .btn-nav:hover:not(:disabled) { background: #e5e5e5; }
+    .btn-nav:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-submit {
+      padding: 8px 24px;
+      background: var(--success);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-submit:hover { background: #0e6b0e; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1 id="quizTitleHeader">Loading Quiz...</h1>
+    <div class="nav-links">
+      <a href="index.html" class="btn-back" onclick="syncAndExit()">Exit & Save</a>
+    </div>
+  </header>
+
+  <!-- Quiz ID Verification Modal (Required per quiz start) -->
+  <div id="authOverlay" class="auth-overlay" style="display: none;">
+    <div class="auth-card">
+      <h2>Enter Student ID</h2>
+      <p>Confirm your ID to start this quiz session</p>
+      
+      <div id="errorMsg" class="error-msg">Invalid ID. Please try again.</div>
+      
+      <div class="input-group">
+        <label for="quizStudentId">Student ID</label>
+        <input type="text" id="quizStudentId" placeholder="e.g. 1122" maxlength="4">
+      </div>
+      
+      <button class="btn-primary" onclick="verifyQuizSessionID()">Confirm & Start</button>
+    </div>
+  </div>
+
+  <main>
+    <div class="quiz-container">
+      <div id="progressIndicator" class="quiz-progress">Question 1 of 50</div>
+      <div id="questionText" class="question-title">Loading questions...</div>
+      
+      <div id="optionsList" class="options-list">
+        <!-- Dynamic options A, B, C, D -->
+      </div>
+
+      <div class="quiz-controls">
+        <button id="prevBtn" class="btn-nav" onclick="prevQuestion()" disabled>Previous</button>
+        <button id="nextBtn" class="btn-nav" onclick="nextQuestion()">Next</button>
+        <button id="finishBtn" class="btn-submit" style="display: none;" onclick="finishQuiz()">Submit Quiz</button>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-YOUR_ACTUAL_API_KEY",
+      authDomain: "cognito-f1f7b.firebaseapp.com",
+      databaseURL: "https://cognito-f1f7b-default-rtdb.firebaseio.com/",
+      projectId: "cognito-f1f7b",
+      storageBucket: "cognito-f1f7b.firebasestorage.app",
+      messagingSenderId: "506661532829",
+      appId: "1:506661532829:web:7a28aa874ba80871691074"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Get Quiz ID from URL parameters (e.g. quiz.html?quiz=calc_ch1)
+    const urlParams = new URLSearchParams(window.location.search);
+    const quizId = urlParams.get('quiz') || 'default_quiz';
+
+    let studentId = localStorage.getItem('quiz_session_id');
+    let studentName = localStorage.getItem('quiz_session_name');
+    let studentGroup = localStorage.getItem('quiz_session_group');
+
+    let currentQuestionIndex = 0;
+    let userAnswers = {}; // Stores user selected answers by question index
+
+    // Sample question array template (Up to 50 questions can be placed here)
+    
+const questions = [
+  // 1–10: Foundations and notation
+  {
+    question: "What is a set in mathematics?",
+    options: {
+      A: "A collection of objects",
+      B: "A mathematical equation",
+      C: "A single number",
+      D: "A type of function"
+    },
+    answer: "A"
+  },
+  {
+    question: "What are the objects inside a set called?",
+    options: {
+      A: "Variables",
+      B: "Elements or members",
+      C: "Functions",
+      D: "Operators"
+    },
+    answer: "B"
+  },
+  {
+    question: "Why is set theory important in modern mathematics?",
+    options: {
+      A: "It is used only in geometry",
+      B: "It replaces all mathematical operations",
+      C: "Other mathematical notions can be built upon it",
+      D: "It is used only for counting"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which of the following is a correct way to represent a set by listing its elements?",
+    options: {
+      A: "(1, 2, 3)",
+      B: "[1, 2, 3]",
+      C: "1 + 2 + 3",
+      D: "{1, 2, 3}"
+    },
+    answer: "D"
+  },
+  {
+    question: "Which notation represents a set by describing a property of its elements?",
+    options: {
+      A: "{x | P(x)}",
+      B: "{1, 2, 3}",
+      C: "(x, y)",
+      D: "x + y"
+    },
+    answer: "A"
+  },
+  {
+    question: "What does the expression x ∈ A mean?",
+    options: {
+      A: "A is a subset of x",
+      B: "x is an element of A",
+      C: "x is not an element of A",
+      D: "A is empty"
+    },
+    answer: "B"
+  },
+  {
+    question: "If A = {2, 4, 6, 8}, which statement is correct?",
+    options: {
+      A: "3 ∈ A",
+      B: "5 ∈ A",
+      C: "6 ∈ A",
+      D: "9 ∈ A"
+    },
+    answer: "C"
+  },
+  {
+    question: "What does the notation x ∉ A mean?",
+    options: {
+      A: "x belongs to A",
+      B: "x equals A",
+      C: "A contains only x",
+      D: "x does not belong to A"
+    },
+    answer: "D"
+  },
+  {
+    question: "Which letters are usually used to represent sets?",
+    options: {
+      A: "Capital letters",
+      B: "Lowercase letters only",
+      C: "Greek numbers only",
+      D: "Roman numerals"
+    },
+    answer: "A"
+  },
+  {
+    question: "What is a Venn diagram used for?",
+    options: {
+      A: "Solving differential equations",
+      B: "Representing sets visually",
+      C: "Finding derivatives",
+      D: "Calculating square roots"
+    },
+    answer: "B"
+  },
+
+  // 11–20: Types of sets and relationships
+  {
+    question: "What is a finite set?",
+    options: {
+      A: "A set with no elements",
+      B: "A set containing infinitely many elements",
+      C: "A set containing a finite number of elements",
+      D: "A set containing only one element"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which of the following is an infinite set?",
+    options: {
+      A: "{1, 2, 3}",
+      B: "{2, 4, 6, 8}",
+      C: "{a, b, c, d}",
+      D: "The set of all positive integers"
+    },
+    answer: "D"
+  },
+  {
+    question: "If A = {1, 2, 3, 4, 5}, what is |A|?",
+    options: {
+      A: "5",
+      B: "4",
+      C: "6",
+      D: "10"
+    },
+    answer: "A"
+  },
+  {
+    question: "Which symbol represents the empty set?",
+    options: {
+      A: "ℝ",
+      B: "∅",
+      C: "∈",
+      D: "⊆"
+    },
+    answer: "B"
+  },
+  {
+    question: "Why is the set {x ∈ ℕ | x² = 6} empty?",
+    options: {
+      A: "Because 6 is not a natural number",
+      B: "Because natural numbers cannot be squared",
+      C: "Because no natural number has a square equal to 6",
+      D: "Because every natural number is negative"
+    },
+    answer: "C"
+  },
+  {
+    question: "What does A ⊆ B mean?",
+    options: {
+      A: "A and B have no common elements",
+      B: "A is an element of B",
+      C: "A is larger than B",
+      D: "Every element of A is also an element of B"
+    },
+    answer: "D"
+  },
+  {
+    question: "If A = {1, 2} and B = {1, 2, 3}, which statement is correct?",
+    options: {
+      A: "A ⊆ B",
+      B: "B ⊆ A",
+      C: "A = B",
+      D: "A ∩ B = ∅"
+    },
+    answer: "A"
+  },
+  {
+    question: "What makes A a proper subset of B?",
+    options: {
+      A: "A contains every element outside B",
+      B: "A is a subset of B but A ≠ B",
+      C: "A and B have no common elements",
+      D: "A and B must be equal"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which statement is always true for every set A?",
+    options: {
+      A: "A ⊂ A",
+      B: "A = ∅",
+      C: "A ⊆ A",
+      D: "A ∩ A = ∅"
+    },
+    answer: "C"
+  },
+  {
+    question: "When are two sets called comparable?",
+    options: {
+      A: "When they have exactly two elements",
+      B: "When they are both empty",
+      C: "When they have no common elements",
+      D: "When one is a subset of the other or vice versa"
+    },
+    answer: "D"
+  },
+
+  // 21–30: Equality and universal sets
+  {
+    question: "When are two sets A and B equal?",
+    options: {
+      A: "When every element of A belongs to B and every element of B belongs to A",
+      B: "When they have different elements",
+      C: "When A has more elements than B",
+      D: "When they have no elements"
+    },
+    answer: "A"
+  },
+  {
+    question: "Are the sets {1, 2, 3} and {3, 1, 2} equal?",
+    options: {
+      A: "No, because their order is different",
+      B: "Yes, because they contain the same elements",
+      C: "No, because 3 is first in one set",
+      D: "Yes, but only if they have the same notation"
+    },
+    answer: "B"
+  },
+  {
+    question: "If A = {a, b, c} and B = {a, b}, what can we conclude?",
+    options: {
+      A: "A = B",
+      B: "B is a proper subset of A and A is a proper subset of B",
+      C: "A ≠ B",
+      D: "A ∩ B = ∅"
+    },
+    answer: "C"
+  },
+  {
+    question: "If A ⊆ B and B ⊆ C, what must be true?",
+    options: {
+      A: "C ⊆ A",
+      B: "A = C",
+      C: "A ∩ C = ∅",
+      D: "A ⊆ C"
+    },
+    answer: "D"
+  },
+  {
+    question: "What is a universal set?",
+    options: {
+      A: "The set containing all elements considered in a particular discussion",
+      B: "A set that always contains only one element",
+      C: "A set without elements",
+      D: "A set containing only natural numbers"
+    },
+    answer: "A"
+  },
+  {
+    question: "If U = {1, 2, 3, 4} and A = {1, 2}, which statement is correct?",
+    options: {
+      A: "U ⊆ A",
+      B: "A ⊆ U",
+      C: "A = ∅",
+      D: "U = ∅"
+    },
+    answer: "B"
+  },
+  {
+    question: "If A = {x ∈ ℕ | x < 4} and ℕ = {1, 2, 3, ...}, what is A?",
+    options: {
+      A: "{0, 1, 2, 3, 4}",
+      B: "{4, 5, 6}",
+      C: "{1, 2, 3}",
+      D: "{1, 2, 3, 4}"
+    },
+    answer: "C"
+  },
+  {
+    question: "What does the closed interval [a, b] represent when a ≤ b?",
+    options: {
+      A: "Only the numbers greater than b",
+      B: "Only the numbers between a and b, excluding both endpoints",
+      C: "Only the numbers a and b",
+      D: "All real numbers x satisfying a ≤ x ≤ b"
+    },
+    answer: "D"
+  },
+  {
+    question: "If A = B and B = C, which property follows?",
+    options: {
+      A: "A = C",
+      B: "A ∩ C = ∅",
+      C: "A ⊂ C",
+      D: "A ≠ C"
+    },
+    answer: "A"
+  },
+  {
+    question: "If A ⊆ B, which statement describes their relationship correctly?",
+    options: {
+      A: "A must be empty",
+      B: "B is a superset of A",
+      C: "A must have more elements than B",
+      D: "A and B must be disjoint"
+    },
+    answer: "B"
+  },
+
+  // 31–40: Basic operations on sets
+  {
+    question: "What is the union of two sets A and B?",
+    options: {
+      A: "The elements common to both sets only",
+      B: "The elements in A but not in B",
+      C: "All elements belonging to A or B or both",
+      D: "All elements outside both sets"
+    },
+    answer: "C"
+  },
+  {
+    question: "If A = {1, 2} and B = {2, 3}, what is A ∪ B?",
+    options: {
+      A: "{2}",
+      B: "{1}",
+      C: "{3}",
+      D: "{1, 2, 3}"
+    },
+    answer: "D"
+  },
+  {
+    question: "What is the intersection of two sets?",
+    options: {
+      A: "The elements common to both sets",
+      B: "All elements from both sets",
+      C: "The elements that belong to neither set",
+      D: "The elements that belong to only one set"
+    },
+    answer: "A"
+  },
+  {
+    question: "If A = {1, 2, 3} and B = {2, 3, 4}, what is A ∩ B?",
+    options: {
+      A: "{1, 4}",
+      B: "{2, 3}",
+      C: "{1, 2, 3, 4}",
+      D: "{1, 2}"
+    },
+    answer: "B"
+  },
+  {
+    question: "What does A \\ B represent?",
+    options: {
+      A: "Elements that belong to B but not A",
+      B: "Elements common to A and B",
+      C: "Elements belonging to A but not B",
+      D: "All elements of the universal set"
+    },
+    answer: "C"
+  },
+  {
+    question: "If A = {1, 2, 3} and B = {2, 3, 4}, what is A \\ B?",
+    options: {
+      A: "{2, 3}",
+      B: "{4}",
+      C: "{1, 2, 3, 4}",
+      D: "{1}"
+    },
+    answer: "D"
+  },
+  {
+    question: "Using the same sets A = {1, 2, 3} and B = {2, 3, 4}, what is B \\ A?",
+    options: {
+      A: "{4}",
+      B: "{1}",
+      C: "{2, 3}",
+      D: "{1, 4}"
+    },
+    answer: "A"
+  },
+  {
+    question: "What is the symmetric difference of A and B?",
+    options: {
+      A: "Elements common to both sets",
+      B: "Elements belonging to one set but not both",
+      C: "Elements outside the universal set",
+      D: "All elements of both sets, including common elements"
+    },
+    answer: "B"
+  },
+  {
+    question: "If A = {1, 2, 3} and B = {2, 3, 4}, what is A △ B?",
+    options: {
+      A: "{2, 3}",
+      B: "{1, 2, 3, 4}",
+      C: "{1, 4}",
+      D: "{1, 2, 4}"
+    },
+    answer: "C"
+  },
+  {
+    question: "What is the complement of a set A relative to universal set U?",
+    options: {
+      A: "All elements belonging to A",
+      B: "Only the elements common to A and U",
+      C: "The elements of A that are repeated",
+      D: "All elements in U that do not belong to A"
+    },
+    answer: "D"
+  },
+
+  // 41–50: Complement, disjoint sets and properties
+  {
+    question: "If U = {1, 2, 3, 4, 5} and A = {1, 3}, what is Aᶜ?",
+    options: {
+      A: "{2, 4, 5}",
+      B: "{1, 3}",
+      C: "{1, 2, 3, 4, 5}",
+      D: "∅"
+    },
+    answer: "A"
+  },
+  {
+    question: "Which expression is equivalent to A \\ B?",
+    options: {
+      A: "A ∪ B",
+      B: "A ∩ Bᶜ",
+      C: "A ∩ B",
+      D: "B ∩ Aᶜ"
+    },
+    answer: "B"
+  },
+  {
+    question: "What is A ∪ Aᶜ when U is the universal set?",
+    options: {
+      A: "∅",
+      B: "A",
+      C: "U",
+      D: "Aᶜ"
+    },
+    answer: "C"
+  },
+  {
+    question: "What is A ∩ Aᶜ?",
+    options: {
+      A: "U",
+      B: "A",
+      C: "Aᶜ",
+      D: "∅"
+    },
+    answer: "D"
+  },
+  {
+    question: "When are two sets called disjoint?",
+    options: {
+      A: "When they have no common elements",
+      B: "When they contain exactly the same elements",
+      C: "When one is a subset of the other",
+      D: "When both contain infinitely many elements"
+    },
+    answer: "A"
+  },
+  {
+    question: "If A and B are disjoint, what is A ∩ B?",
+    options: {
+      A: "U",
+      B: "∅",
+      C: "A ∪ B",
+      D: "A"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which of the following is the commutative law for union?",
+    options: {
+      A: "A ∪ (B ∪ C) = (A ∪ B) ∪ C",
+      B: "A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C)",
+      C: "A ∪ B = B ∪ A",
+      D: "A ∪ ∅ = A"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which law allows us to change the grouping of sets without changing the result of their union?",
+    options: {
+      A: "Commutative law",
+      B: "Distributive law",
+      C: "Complement law",
+      D: "Associative law"
+    },
+    answer: "D"
+  },
+  {
+    question: "Which expression represents the distributive law of intersection over union?",
+    options: {
+      A: "A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C)",
+      B: "A ∩ B = B ∩ A",
+      C: "(A ∩ B) ∩ C = A ∩ (B ∩ C)",
+      D: "A ∪ Aᶜ = U"
+    },
+    answer: "A"
+  },
+  {
+    question: "If A = {1, 2}, B = {2, 3}, and U = {0, 1, 2, 3, 4}, what is (A ∪ B)ᶜ?",
+    options: {
+      A: "{1, 2, 3}",
+      B: "{0, 4}",
+      C: "{2}",
+      D: "{0, 1, 2, 3, 4}"
+    },
+    answer: "B"
+  }
+];
+
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('quizTitleHeader').textContent = `Quiz Session: ${quizId}`;
+      
+      if (!studentId || !studentName) {
+        document.getElementById('authOverlay').style.display = 'flex';
+      } else {
+        initQuizSession();
+      }
+    });
+
+    window.verifyQuizSessionID = function() {
+      const inputId = document.getElementById('quizStudentId').value.trim();
+      const errorMsg = document.getElementById('errorMsg');
+
+      if (!inputId || inputId.length !== 4) {
+        errorMsg.textContent = "Please enter a valid 4-digit ID.";
+        errorMsg.style.display = "block";
+        return;
+      }
+
+      get(ref(db, `Salahaddin-University/Mathematics-Dipartment/quiz/${inputId}`)).then(snapshot => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          studentId = inputId;
+          studentName = data['studentName'];
+          studentGroup = data['studentGroup'];
+
+          localStorage.setItem('quiz_session_id', studentId);
+          localStorage.setItem('quiz_session_name', studentName);
+          localStorage.setItem('quiz_session_group', studentGroup);
+
+          document.getElementById('authOverlay').style.display = 'none';
+          initQuizSession();
+        } else {
+          errorMsg.textContent = "Student ID not found in database.";
+          errorMsg.style.display = "block";
+        }
+      }).catch(err => {
+        console.error(err);
+        errorMsg.textContent = "Database connection error.";
+        errorMsg.style.display = "block";
+      });
+    };
+
+    function initQuizSession() {
+      loadQuestion(currentQuestionIndex);
+      updateProgressScore(); // Publish initial partial score right when starting/resuming
+    }
+
+    window.loadQuestion = function(index) {
+      if (questions.length === 0) {
+        document.getElementById('questionText').textContent = "No questions available for this quiz yet.";
+        document.getElementById('optionsList').innerHTML = '';
+        return;
+      }
+
+      const q = questions[index];
+      document.getElementById('progressIndicator').textContent = `Question ${index + 1} of ${questions.length}`;
+      document.getElementById('questionText').textContent = q.question;
+
+      const optionsList = document.getElementById('optionsList');
+      optionsList.innerHTML = '';
+
+      for (const [key, value] of Object.entries(q.options)) {
+        const isChecked = userAnswers[index] === key ? 'checked' : '';
+        const label = document.createElement('label');
+        label.className = 'option-label';
+        label.innerHTML = `
+          <input type="radio" name="option" value="${key}" ${isChecked} onclick="selectAnswer('${key}')">
+          <span><strong>${key}.</strong> ${value}</span>
+        `;
+        optionsList.appendChild(label);
+      }
+
+      document.getElementById('prevBtn').disabled = (index === 0);
+      if (index === questions.length - 1) {
+        document.getElementById('nextBtn').style.display = 'none';
+        document.getElementById('finishBtn').style.display = 'block';
+      } else {
+        document.getElementById('nextBtn').style.display = 'block';
+        document.getElementById('finishBtn').style.display = 'none';
+      }
+    };
+
+    window.selectAnswer = function(key) {
+      userAnswers[currentQuestionIndex] = key;
+      updateProgressScore(); // Updates partial progress in Firebase live
+    };
+
+    window.nextQuestion = function() {
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        loadQuestion(currentQuestionIndex);
+      }
+    };
+
+    window.prevQuestion = function() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        loadQuestion(currentQuestionIndex);
+      }
+    };
+
+    function calculateResults() {
+      let truths = 0;
+      let falses = 0;
+
+      questions.forEach((q, idx) => {
+        if (userAnswers[idx]) {
+          if (userAnswers[idx] === q.answer) {
+            truths++;
+          } else {
+            falses++;
+          }
+        }
+      });
+
+      // Ratio calculation (Truths / Falses). Avoid division by zero.
+      const ratio = falses === 0 ? truths.toFixed(2) : (truths / falses).toFixed(2);
+      return { truths, falses, ratio };
+    }
+
+    function updateProgressScore() {
+      if (!studentId) return;
+
+      const { truths, falses, ratio } = calculateResults();
+      const leaderboardRef = ref(db, `quizzes/${quizId}/leaderboard/${studentId}`);
+
+      set(leaderboardRef, {
+        "student-name": studentName,
+        "student-group": studentGroup,
+        "truths": truths,
+        "falses": falses,
+        "tf-ratio": ratio,
+        "timestamp": Date.now()
+      }).catch(err => console.error("Error updating score:", err));
+    }
+
+    window.syncAndExit = function() {
+      updateProgressScore();
+      window.location.href = "index.html";
+    };
+
+    window.finishQuiz = function() {
+      updateProgressScore();
+      alert("Quiz submitted successfully!");
+      window.location.href = `leaderboard.html?quiz=${quizId}`;
+    };
+  </script>
+</body>
+</html>
