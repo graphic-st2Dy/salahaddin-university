@@ -1,1 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Department Quiz Hub</title>
+  
+  <style>
+    :root {
+      --bg-color: #f3f3f3;
+      --card-bg: #ffffff;
+      --accent: #0078d4;
+      --accent-hover: #106ebe;
+      --text-main: #242424;
+      --text-muted: #616161;
+      --border-color: #e0e0e0;
+      --danger: #d13438;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
 
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Header Bar */
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .user-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      background: #f8f9fa;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+    }
+
+    .user-badge strong {
+      color: var(--text-main);
+    }
+
+    .btn-logout {
+      background: none;
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1200px;
+      width: 100%;
+      margin: 32px auto;
+      padding: 0 20px;
+      flex: 1;
+    }
+
+    /* Auth Modal Overlay */
+    .auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(243, 243, 243, 0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .auth-card {
+      background: var(--card-bg);
+      padding: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+    }
+
+    .auth-card h2 {
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+    }
+
+    .auth-card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-group input:focus {
+      border-color: var(--accent);
+    }
+
+    .error-msg {
+      color: var(--danger);
+      font-size: 0.85rem;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 10px;
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--accent-hover);
+    }
+
+    /* Grid Layout: 3 Columns */
+    .quiz-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .quiz-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .quiz-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Quiz Item Card */
+    .quiz-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .quiz-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .subject-icon {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 4px;
+      background: #f0f0f0;
+    }
+
+    .card-titles h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .card-titles p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .card-actions {
+      margin-top: auto;
+      display: flex;
+      gap: 10px;
+      padding-top: 16px;
+    }
+
+    .btn-secondary {
+      flex: 1;
+      padding: 8px 12px;
+      background-color: #f0f0f0;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+      background-color: #e5e5e5;
+    }
+
+    .btn-start {
+      flex: 1;
+      padding: 8px 12px;
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .btn-start:hover {
+      background-color: var(--accent-hover);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header>
+    <h1>Mathematics Quizzes</h1>
+    <div id="userBadge" class="user-badge" style="display: none;">
+      <span><strong id="displayName">--</strong> (<span id="displayGroup">--</span>) | ID: <span id="displayId">--</span></span>
+      <button class="btn-logout" onclick="logout()">Change ID</button>
+    </div>
+  </header>
+
+  <!-- Login Modal Overlay -->
+  <div id="authOverlay" class="auth-overlay">
+    <div class="auth-card">
+      <h2>Welcome Student</h2>
+      <p>Enter your 4-digit student ID to continue</p>
+      
+      <div id="errorMsg" class="error-msg">Invalid Student ID. Please try again.</div>
+      
+      <div class="input-group">
+        <label for="studentIdInput">Student ID</label>
+        <input type="text" id="studentIdInput" placeholder="e.g. 1234" maxlength="4">
+      </div>
+      
+      <button class="btn-primary" onclick="verifyAndJoin()">Join App</button>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <main>
+    <div id="quizGrid" class="quiz-grid">
+      <!-- Dynamic quiz cards loaded from Firebase -->
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, get, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // -------------------------------------------------------------
+    // Firebase Configuration
+    // -------------------------------------------------------------
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-YOUR_ACTUAL_API_KEY",
+      authDomain: "cognito-f1f7b.firebaseapp.com",
+      databaseURL: "https://cognito-f1f7b-default-rtdb.firebaseio.com/",
+      projectId: "cognito-f1f7b",
+      storageBucket: "cognito-f1f7b.firebasestorage.app",
+      messagingSenderId: "506661532829",
+      appId: "1:506661532829:web:7a28aa874ba80871691074"
+    };
+    
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // -------------------------------------------------------------
+    // Page Load & Session Management
+    // -------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      const storedId = localStorage.getItem('student_id');
+      const storedName = localStorage.getItem('student_name');
+      const storedGroup = localStorage.getItem('student_group');
+
+      if (storedId && storedName && storedGroup) {
+        showDashboard(storedId, storedName, storedGroup);
+      }
+    });
+
+    // -------------------------------------------------------------
+    // Verification & Login
+    // -------------------------------------------------------------
+    window.verifyAndJoin = function() {
+      const idInput = document.getElementById('studentIdInput').value.trim();
+      const errorMsg = document.getElementById('errorMsg');
+
+      if (!idInput || idInput.length !== 4) {
+        errorMsg.textContent = "Please enter a valid 4-digit ID.";
+        errorMsg.style.display = "block";
+        return;
+      }
+
+      // Check Realtime Database path: .../quiz/(student-id)/
+      const studentRef = ref(db, `Salahaddin-University/Mathematics-Dipartment/quiz/${idInput}`);
+      get(studentRef)
+        .then(snapshot => {
+          if (snapshot.exists()) {
+            const data = snapshot.val();
+            const studentName = data['studentName'];
+            const studentGroup = data['studentGroup'];
+
+            // Save details locally
+            localStorage.setItem('student_id', idInput);
+            localStorage.setItem('student_name', studentName);
+            localStorage.setItem('student_group', studentGroup);
+
+            errorMsg.style.display = "none";
+            showDashboard(idInput, studentName, studentGroup);
+          } else {
+            errorMsg.textContent = "Student ID not found in database.";
+            errorMsg.style.display = "block";
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          errorMsg.textContent = "Database error. Please try again.";
+          errorMsg.style.display = "block";
+        });
+    };
+
+    function showDashboard(id, name, group) {
+      document.getElementById('authOverlay').style.display = 'none';
+      document.getElementById('userBadge').style.display = 'flex';
+      
+      document.getElementById('displayName').textContent = name;
+      document.getElementById('displayGroup').textContent = group;
+      document.getElementById('displayId').textContent = id;
+
+      loadQuizCatalog();
+    }
+
+    window.logout = function() {
+      localStorage.removeItem('student_id');
+      localStorage.removeItem('student_name');
+      localStorage.removeItem('student_group');
+      location.reload();
+    };
+
+    // -------------------------------------------------------------
+    // Catalog Loader (Sorted by modification time)
+    // -------------------------------------------------------------
+        // -------------------------------------------------------------
+    // Catalog Loader (Sorted client-side to avoid Firebase rules error)
+    // -------------------------------------------------------------
+    function loadQuizCatalog() {
+      const grid = document.getElementById('quizGrid');
+      grid.innerHTML = '';
+
+      const catalogRef = ref(db, 'catalog');
+      get(catalogRef).then(snapshot => {
+        if (!snapshot.exists()) {
+          grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No quizzes available right now.</p>';
+          return;
+        }
+
+        const items = [];
+        snapshot.forEach(child => {
+          items.push({ id: child.key, ...child.val() });
+        });
+
+        // Sort by modification time client-side (newest first)
+        items.sort((a, b) => (b.modifiedAt || 0) - (a.modifiedAt || 0));
+
+        items.forEach(quiz => {
+          const card = document.createElement('div');
+          card.className = 'quiz-card';
+          card.innerHTML = `
+            <div class="card-header">
+              <img src="${quiz.icon || 'https://via.placeholder.com/48'}" alt="Icon" class="subject-icon">
+              <div class="card-titles">
+                <h3>${quiz.title}</h3>
+                <p>${quiz.subtitle || ''}</p>
+              </div>
+            </div>
+            <div class="card-actions">
+              <a href="leaderboard.html?quiz=${quiz.id}" class="btn-secondary">Leaderboard</a>
+              <a href="${quiz.targetHtml || 'quiz.html'}?quiz=${quiz.id}" class="btn-start">Start</a>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      }).catch(err => {
+        console.error("Error loading catalog:", err);
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Error loading catalog.</p>';
+      });
+    }
+
+  </script>
+</body>
+</html>
