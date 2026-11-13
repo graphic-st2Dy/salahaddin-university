@@ -23,6 +23,13 @@
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      -webkit-user-drag: none; /* Prevent dragging elements */
+      user-select: none;      /* Prevent text highlighting */
+    }
+
+    /* Allow normal input text selection & typing */
+    input {
+      user-select: text !important;
     }
 
     body {
@@ -237,6 +244,7 @@
       object-fit: cover;
       border-radius: 4px;
       background: #f0f0f0;
+      pointer-events: none; /* Prevents dragging/right-click dragging contexts on images */
     }
 
     .card-titles h3 {
@@ -293,7 +301,7 @@
     }
   </style>
 </head>
-<body>
+<body oncontextmenu="return false;"> <!-- Optional: blocks right-click inspection context menu -->
 
   <!-- Top Navigation Header -->
   <header>
@@ -358,20 +366,18 @@
     // -------------------------------------------------------------
     // Security & Ban Settings
     // -------------------------------------------------------------
-    const MAX_WRONG_ATTEMPTS = 3; // More than 3 wrong attempts (i.e., 4th) triggers ban
-    const BAN_DURATION_MS = 12 * 60 * 60 * 1000; // 30 minutes ban (adjust as needed)
+    const MAX_WRONG_ATTEMPTS = 3; 
+    const BAN_DURATION_MS = 12 * 60 * 60 * 1000; 
     let banInterval = null;
 
     // -------------------------------------------------------------
     // Page Load & Session Management
     // -------------------------------------------------------------
     window.addEventListener('DOMContentLoaded', () => {
-      // Allow pressing "Enter" in the input box
       document.getElementById('studentIdInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') verifyAndJoin();
       });
 
-      // Check if user is currently banned first
       if (checkBanStatus()) return;
 
       const storedId = localStorage.getItem('student_id');
@@ -394,7 +400,6 @@
         applyBanUI(bannedUntil);
         return true;
       } else if (bannedUntil !== 0) {
-        // Ban expired: clear ban and reset attempts
         localStorage.removeItem('banned_until');
         localStorage.setItem('failed_attempts', '0');
         removeBanUI();
@@ -472,11 +477,9 @@
         return;
       }
 
-      // Prevent rapid double-clicking while fetching
       joinBtn.disabled = true;
       joinBtn.textContent = "Checking...";
 
-      // Check Realtime Database path: .../quiz/(student-id)/
       const studentRef = ref(db, `Salahaddin-University/Mathematics-Dipartment/quiz/${idInput}`);
       get(studentRef)
         .then(snapshot => {
@@ -488,11 +491,9 @@
             const studentName = data['studentName'];
             const studentGroup = data['studentGroup'];
 
-            // Reset failed attempts on successful login
             localStorage.removeItem('failed_attempts');
             localStorage.removeItem('banned_until');
 
-            // Save details locally
             localStorage.setItem('student_id', idInput);
             localStorage.setItem('student_name', studentName);
             localStorage.setItem('student_group', studentGroup);
@@ -531,7 +532,7 @@
     };
 
     // -------------------------------------------------------------
-    // Catalog Loader (Sorted client-side to avoid Firebase rules error)
+    // Catalog Loader (Sorted client-side & Secured with draggable="false")
     // -------------------------------------------------------------
     function loadQuizCatalog() {
       const grid = document.getElementById('quizGrid');
@@ -549,7 +550,6 @@
           items.push({ id: child.key, ...child.val() });
         });
 
-        // Sort by modification time client-side (newest first)
         items.sort((a, b) => (b.modifiedAt || 0) - (a.modifiedAt || 0));
 
         items.forEach(quiz => {
@@ -557,7 +557,7 @@
           card.className = 'quiz-card';
           card.innerHTML = `
             <div class="card-header">
-              <img src="${quiz.icon || 'https://via.placeholder.com/48'}" alt="Icon" class="subject-icon">
+              <img src="${quiz.icon || 'https://via.placeholder.com/48'}" alt="Icon" class="subject-icon" draggable="false" ondragstart="return false;">
               <div class="card-titles">
                 <h3>${quiz.title}</h3>
                 <p>${quiz.subtitle || ''}</p>
