@@ -113,8 +113,30 @@
       outline: none;
     }
     .input-group input:focus { border-color: var(--accent); }
+    .input-group input:disabled {
+      background-color: #f0f0f0;
+      cursor: not-allowed;
+    }
 
-    .error-msg { color: var(--danger); font-size: 0.85rem; margin-bottom: 14px; display: none; }
+    .error-msg { 
+      color: var(--danger); 
+      font-size: 0.85rem; 
+      margin-bottom: 14px; 
+      display: none; 
+      font-weight: 500;
+    }
+
+    .ban-banner {
+      background-color: #fde7e9;
+      border: 1px solid #f1bbbc;
+      color: var(--danger);
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      display: none;
+      line-height: 1.4;
+    }
 
     .btn-primary {
       width: 100%;
@@ -127,7 +149,11 @@
       font-weight: 600;
       cursor: pointer;
     }
-    .btn-primary:hover { background-color: var(--accent-hover); }
+    .btn-primary:hover:not(:disabled) { background-color: var(--accent-hover); }
+    .btn-primary:disabled {
+      background-color: #a0c4e2;
+      cursor: not-allowed;
+    }
 
     /* Quiz Card Container */
     .quiz-container {
@@ -219,7 +245,7 @@
   <header>
     <h1 id="quizTitleHeader">Loading Quiz...</h1>
     <div class="nav-links">
-      <a href="index.html" class="btn-back" onclick="syncAndExit()">Exit & Save</a>
+      <a href="../index.html" class="btn-back" onclick="syncAndExit()">Exit & Save</a>
     </div>
   </header>
 
@@ -229,6 +255,12 @@
       <h2>Enter Student ID</h2>
       <p>Confirm your ID to start this quiz session</p>
       
+      <div id="banBanner" class="ban-banner">
+        <strong>Access Suspended</strong><br>
+        Too many invalid ID attempts.<br>
+        Try again in <span id="banTimer">--:--</span>
+      </div>
+
       <div id="errorMsg" class="error-msg">Invalid ID. Please try again.</div>
       
       <div class="input-group">
@@ -236,7 +268,7 @@
         <input type="text" id="quizStudentId" placeholder="e.g. 1122" maxlength="4">
       </div>
       
-      <button class="btn-primary" onclick="verifyQuizSessionID()">Confirm & Start</button>
+      <button id="startQuizBtn" class="btn-primary" onclick="verifyQuizSessionID()">Confirm & Start</button>
     </div>
   </div>
 
@@ -273,6 +305,13 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+
+    // -------------------------------------------------------------
+    // Security & Ban Settings (Synced with index.html)
+    // -------------------------------------------------------------
+    const MAX_WRONG_ATTEMPTS = 3; // More than 3 wrong attempts (4th) triggers ban
+    const BAN_DURATION_MS = 30 * 60 * 1000; // 30 minutes ban
+    let banInterval = null;
 
     // Get Quiz ID from URL parameters (e.g. quiz.html?quiz=calc_ch1)
     const urlParams = new URLSearchParams(window.location.search);
@@ -800,9 +839,94 @@ const questions = [
 ];
 
 
+    // -------------------------------------------------------------
+    // Ban Logic
+    // -------------------------------------------------------------
+    function checkBanStatus() {
+      const bannedUntil = parseInt(localStorage.getItem('banned_until') || '0', 10);
+      const now = Date.now();
+
+      if (bannedUntil > now) {
+        document.getElementById('authOverlay').style.display = 'flex';
+        applyBanUI(bannedUntil);
+        return true;
+      } else if (bannedUntil !== 0) {
+        localStorage.removeItem('banned_until');
+        localStorage.setItem('failed_attempts', '0');
+        removeBanUI();
+      }
+      return false;
+    }
+
+    function applyBanUI(bannedUntil) {
+      const input = document.getElementById('quizStudentId');
+      const btn = document.getElementById('startQuizBtn');
+      const banBanner = document.getElementById('banBanner');
+      const errorMsg = document.getElementById('errorMsg');
+
+      input.disabled = true;
+      btn.disabled = true;
+      errorMsg.style.display = 'none';
+      banBanner.style.display = 'block';
+
+      if (banInterval) clearInterval(banInterval);
+
+      const updateTimer = () => {
+        const remaining = bannedUntil - Date.now();
+        if (remaining <= 0) {
+          clearInterval(banInterval);
+          localStorage.removeItem('banned_until');
+          localStorage.setItem('failed_attempts', '0');
+          removeBanUI();
+          return;
+        }
+        const mins = Math.floor(remaining / 60000);
+        const secs = Math.floor((remaining % 60000) / 1000);
+        document.getElementById('banTimer').textContent = 
+          `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      };
+
+      updateTimer();
+      banInterval = setInterval(updateTimer, 1000);
+    }
+
+    function removeBanUI() {
+      document.getElementById('quizStudentId').disabled = false;
+      document.getElementById('startQuizBtn').disabled = false;
+      document.getElementById('banBanner').style.display = 'none';
+    }
+
+    function recordFailedAttempt(baseMessage) {
+      let attempts = parseInt(localStorage.getItem('failed_attempts') || '0', 10) + 1;
+      localStorage.setItem('failed_attempts', attempts.toString());
+
+      const errorMsg = document.getElementById('errorMsg');
+
+      if (attempts > MAX_WRONG_ATTEMPTS) {
+        const bannedUntil = Date.now() + BAN_DURATION_MS;
+        localStorage.setItem('banned_until', bannedUntil.toString());
+        applyBanUI(bannedUntil);
+      } else {
+        const remainingTries = (MAX_WRONG_ATTEMPTS + 1) - attempts;
+        errorMsg.textContent = `${baseMessage} (${remainingTries} ${remainingTries === 1 ? 'try' : 'tries'} left before ban)`;
+        errorMsg.style.display = "block";
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Page Initialization
+    // -------------------------------------------------------------
     window.addEventListener('DOMContentLoaded', () => {
       document.getElementById('quizTitleHeader').textContent = `Quiz Session: ${quizId}`;
       
+      // Allow pressing "Enter" in the input box
+      document.getElementById('quizStudentId').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') verifyQuizSessionID();
+      });
+
+      // Enforce ban check before allowing access
+      if (checkBanStatus()) return;
+
       if (!studentId || !studentName) {
         document.getElementById('authOverlay').style.display = 'flex';
       } else {
@@ -811,34 +935,48 @@ const questions = [
     });
 
     window.verifyQuizSessionID = function() {
+      if (checkBanStatus()) return;
+
       const inputId = document.getElementById('quizStudentId').value.trim();
       const errorMsg = document.getElementById('errorMsg');
+      const startBtn = document.getElementById('startQuizBtn');
 
-      if (!inputId || inputId.length !== 4) {
-        errorMsg.textContent = "Please enter a valid 4-digit ID.";
-        errorMsg.style.display = "block";
+      if (!inputId || inputId.length !== 4 || !/^\d{4}$/.test(inputId)) {
+        recordFailedAttempt("Please enter a valid 4-digit ID.");
         return;
       }
 
+      startBtn.disabled = true;
+      startBtn.textContent = "Verifying...";
+
       get(ref(db, `Salahaddin-University/Mathematics-Dipartment/quiz/${inputId}`)).then(snapshot => {
+        startBtn.disabled = false;
+        startBtn.textContent = "Confirm & Start";
+
         if (snapshot.exists()) {
           const data = snapshot.val();
           studentId = inputId;
           studentName = data['studentName'];
           studentGroup = data['studentGroup'];
 
+          // Clear failed attempts on valid ID
+          localStorage.removeItem('failed_attempts');
+          localStorage.removeItem('banned_until');
+
           localStorage.setItem('quiz_session_id', studentId);
           localStorage.setItem('quiz_session_name', studentName);
           localStorage.setItem('quiz_session_group', studentGroup);
 
+          errorMsg.style.display = 'none';
           document.getElementById('authOverlay').style.display = 'none';
           initQuizSession();
         } else {
-          errorMsg.textContent = "Student ID not found in database.";
-          errorMsg.style.display = "block";
+          recordFailedAttempt("Student ID not found.");
         }
       }).catch(err => {
         console.error(err);
+        startBtn.disabled = false;
+        startBtn.textContent = "Confirm & Start";
         errorMsg.textContent = "Database connection error.";
         errorMsg.style.display = "block";
       });
@@ -940,7 +1078,7 @@ const questions = [
 
     window.syncAndExit = function() {
       updateProgressScore();
-      window.location.href = "index.html";
+      window.location.href = "../index.html";
     };
 
     window.finishQuiz = function() {
