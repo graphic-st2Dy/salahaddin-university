@@ -144,11 +144,6 @@
       color: var(--text-main);
     }
 
-    .student-info span {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
     .score-badge {
       font-weight: 600;
       color: var(--success);
@@ -284,7 +279,6 @@
             <td class="rank-cell ${rankClass}">#${rank}</td>
             <td class="student-info">
               <strong>${name}</strong>
-              <span>ID: ${entry.id || '--'}</span>
             </td>
             <td>Group ${group}</td>
             <td><span class="score-badge">${truths}</span></td>
