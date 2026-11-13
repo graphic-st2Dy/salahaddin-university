@@ -24,6 +24,13 @@
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      -webkit-user-drag: none; /* Prevent dragging elements */
+      user-select: none;      /* Prevent text highlighting */
+    }
+
+    /* Allow normal input text selection & typing */
+    input {
+      user-select: text !important;
     }
 
     body {
@@ -240,7 +247,7 @@
     .btn-submit:hover { background: #0e6b0e; }
   </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
   <header>
     <h1 id="quizTitleHeader">Loading Quiz...</h1>
@@ -309,8 +316,8 @@
     // -------------------------------------------------------------
     // Security & Ban Settings (Synced with index.html)
     // -------------------------------------------------------------
-    const MAX_WRONG_ATTEMPTS = 3; // More than 3 wrong attempts (4th) triggers ban
-    const BAN_DURATION_MS = 30 * 60 * 1000; // 30 minutes ban
+    const MAX_WRONG_ATTEMPTS = 3; 
+    const BAN_DURATION_MS = 30 * 60 * 1000; 
     let banInterval = null;
 
     // Get Quiz ID from URL parameters (e.g. quiz.html?quiz=calc_ch1)
@@ -322,9 +329,8 @@
     let studentGroup = localStorage.getItem('quiz_session_group');
 
     let currentQuestionIndex = 0;
-    let userAnswers = {}; // Stores user selected answers by question index
+    let userAnswers = {}; 
 
-    // Sample question array template (Up to 50 questions can be placed here)
     
 const questions = [
   // 1–10: Foundations and notation
@@ -839,9 +845,6 @@ const questions = [
 ];
 
 
-    // -------------------------------------------------------------
-    // Ban Logic
-    // -------------------------------------------------------------
     function checkBanStatus() {
       const bannedUntil = parseInt(localStorage.getItem('banned_until') || '0', 10);
       const now = Date.now();
@@ -913,18 +916,13 @@ const questions = [
       }
     }
 
-    // -------------------------------------------------------------
-    // Page Initialization
-    // -------------------------------------------------------------
     window.addEventListener('DOMContentLoaded', () => {
       document.getElementById('quizTitleHeader').textContent = `Quiz Session: ${quizId}`;
       
-      // Allow pressing "Enter" in the input box
       document.getElementById('quizStudentId').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') verifyQuizSessionID();
       });
 
-      // Enforce ban check before allowing access
       if (checkBanStatus()) return;
 
       if (!studentId || !studentName) {
@@ -959,7 +957,6 @@ const questions = [
           studentName = data['studentName'];
           studentGroup = data['studentGroup'];
 
-          // Clear failed attempts on valid ID
           localStorage.removeItem('failed_attempts');
           localStorage.removeItem('banned_until');
 
@@ -984,7 +981,7 @@ const questions = [
 
     function initQuizSession() {
       loadQuestion(currentQuestionIndex);
-      updateProgressScore(); // Publish initial partial score right when starting/resuming
+      updateProgressScore();
     }
 
     window.loadQuestion = function(index) {
@@ -1024,7 +1021,7 @@ const questions = [
 
     window.selectAnswer = function(key) {
       userAnswers[currentQuestionIndex] = key;
-      updateProgressScore(); // Updates partial progress in Firebase live
+      updateProgressScore();
     };
 
     window.nextQuestion = function() {
@@ -1055,7 +1052,6 @@ const questions = [
         }
       });
 
-      // Ratio calculation (Truths / Falses). Avoid division by zero.
       const ratio = falses === 0 ? truths.toFixed(2) : (truths / falses).toFixed(2);
       return { truths, falses, ratio };
     }
