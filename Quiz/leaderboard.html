@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Leaderboard - Math Department</title>
+  
+  <style>
+    :root {
+      --bg-color: #f3f3f3;
+      --card-bg: #ffffff;
+      --accent: #0078d4;
+      --accent-hover: #106ebe;
+      --text-main: #242424;
+      --text-muted: #616161;
+      --border-color: #e0e0e0;
+      --success: #107c10;
+      --gold: #d9b22e;
+      --silver: #8c929a;
+      --bronze: #b08d57;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Header Bar */
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .btn-back {
+      background: #f0f0f0;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn-back:hover { background: #e5e5e5; }
+
+    /* Main Container */
+    main {
+      max-width: 900px;
+      width: 100%;
+      margin: 32px auto;
+      padding: 0 20px;
+      flex: 1;
+    }
+
+    .leaderboard-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .leaderboard-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .leaderboard-header h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .leaderboard-header p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Table Design */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 14px 20px;
+      font-size: 0.92rem;
+    }
+
+    th {
+      background-color: #fafafa;
+      color: var(--text-muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    tr:not(:last-child) td {
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    tr:hover td {
+      background-color: #fcfcfc;
+    }
+
+    .rank-cell {
+      font-weight: 600;
+      width: 60px;
+      text-align: center;
+    }
+
+    .rank-1 { color: #b78103; background: #fff8e1; }
+    .rank-2 { color: #5f6368; background: #f1f3f4; }
+    .rank-3 { color: #8d4e00; background: #fbe9e7; }
+
+    .student-info strong {
+      display: block;
+      color: var(--text-main);
+    }
+
+    .student-info span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .score-badge {
+      font-weight: 600;
+      color: var(--success);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header>
+    <h1 id="pageTitle">Leaderboard</h1>
+    <a href="index.html" class="btn-back">Back to Hub</a>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <div class="leaderboard-card">
+      <div class="leaderboard-header">
+        <div>
+          <h2 id="quizNameHeading">Quiz Leaderboard</h2>
+          <p>Rankings based on correct answers and T/F ratio</p>
+        </div>
+      </div>
+
+      <div id="tableContainer">
+        <table>
+          <thead>
+            <tr>
+              <th class="rank-cell">Rank</th>
+              <th>Student Name</th>
+              <th>Group</th>
+              <th>Truths (Score)</th>
+              <th>Falses</th>
+              <th>T/F Ratio</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody">
+            <!-- Dynamic rows injected here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // -------------------------------------------------------------
+    // Firebase Configuration
+    // -------------------------------------------------------------
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-YOUR_ACTUAL_API_KEY",
+      authDomain: "cognito-f1f7b.firebaseapp.com",
+      databaseURL: "https://cognito-f1f7b-default-rtdb.firebaseio.com/",
+      projectId: "cognito-f1f7b",
+      storageBucket: "cognito-f1f7b.firebasestorage.app",
+      messagingSenderId: "506661532829",
+      appId: "1:506661532829:web:7a28aa874ba80871691074"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Get Quiz ID from URL parameter (e.g. leaderboard.html?quiz=calc_ch1)
+    const urlParams = new URLSearchParams(window.location.search);
+    const quizId = urlParams.get('quiz');
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!quizId) {
+        document.getElementById('quizNameHeading').textContent = "No Quiz Specified";
+        document.getElementById('tableContainer').innerHTML = '<div class="empty-state">Please select a valid quiz from the hub.</div>';
+        return;
+      }
+
+      document.getElementById('quizNameHeading').textContent = `Leaderboard: ${quizId}`;
+      loadLeaderboardData();
+    });
+
+    function loadLeaderboardData() {
+      const tbody = document.getElementById('leaderboardBody');
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Loading rankings...</td></tr>';
+
+      // Fetch from path: quizzes/{quiz_id}/leaderboard
+      const leaderboardRef = ref(db, `quizzes/${quizId}/leaderboard`);
+
+      get(leaderboardRef).then(snapshot => {
+        if (!snapshot.exists()) {
+          tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No student attempts recorded for this quiz yet. Be the first!</td></tr>';
+          return;
+        }
+
+        const entries = [];
+        snapshot.forEach(child => {
+          entries.push({ id: child.key, ...child.val() });
+        });
+
+        // Sort: Highest truths first. If tied, lowest falses first.
+        entries.sort((a, b) => {
+          const truthsA = Number(a.truths || 0);
+          const truthsB = Number(b.truths || 0);
+          if (truthsB !== truthsA) return truthsB - truthsA;
+          
+          const falsesA = Number(a.falses || 0);
+          const falsesB = Number(b.falses || 0);
+          return falsesA - falsesB;
+        });
+
+        tbody.innerHTML = '';
+
+        entries.forEach((entry, index) => {
+          const rank = index + 1;
+          const name = entry['studentName'] || entry['student-name'] || 'Unknown Student';
+          const group = entry['studentGroup'] || entry['student-group'] || '-';
+          const truths = entry['truths'] ?? 0;
+          const falses = entry['falses'] ?? 0;
+          const ratio = entry['tf-ratio'] || (falses === 0 ? Number(truths).toFixed(2) : (truths / falses).toFixed(2));
+
+          let rankClass = '';
+          if (rank === 1) rankClass = 'rank-1';
+          else if (rank === 2) rankClass = 'rank-2';
+          else if (rank === 3) rankClass = 'rank-3';
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="rank-cell ${rankClass}">#${rank}</td>
+            <td class="student-info">
+              <strong>${name}</strong>
+              <span>ID: ${entry.id || '--'}</span>
+            </td>
+            <td>Group ${group}</td>
+            <td><span class="score-badge">${truths}</span></td>
+            <td>${falses}</td>
+            <td>${ratio}</td>
+          `;
+          tbody.appendChild(row);
+        });
+
+      }).catch(err => {
+        console.error("Error loading leaderboard:", err);
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Error loading leaderboard data. Please check connection.</td></tr>';
+      });
+    }
+  </script>
+</body>
+</html>
