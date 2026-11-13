@@ -145,11 +145,29 @@
       border-color: var(--accent);
     }
 
+    .input-group input:disabled {
+      background-color: #f0f0f0;
+      cursor: not-allowed;
+    }
+
     .error-msg {
       color: var(--danger);
       font-size: 0.85rem;
       margin-bottom: 14px;
       display: none;
+      font-weight: 500;
+    }
+
+    .ban-banner {
+      background-color: #fde7e9;
+      border: 1px solid #f1bbbc;
+      color: var(--danger);
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      display: none;
+      line-height: 1.4;
     }
 
     .btn-primary {
@@ -165,8 +183,13 @@
       transition: background 0.2s;
     }
 
-    .btn-primary:hover {
+    .btn-primary:hover:not(:disabled) {
       background-color: var(--accent-hover);
+    }
+
+    .btn-primary:disabled {
+      background-color: #a0c4e2;
+      cursor: not-allowed;
     }
 
     /* Grid Layout: 3 Columns */
@@ -287,6 +310,12 @@
       <h2>Welcome</h2>
       <p>Enter your 4-digit student ID to continue</p>
       
+      <div id="banBanner" class="ban-banner">
+        <strong>Access Suspended</strong><br>
+        Too many invalid ID attempts.<br>
+        Try again in <span id="banTimer">--:--</span>
+      </div>
+
       <div id="errorMsg" class="error-msg">Invalid Student ID. Please try again.</div>
       
       <div class="input-group">
@@ -294,7 +323,7 @@
         <input type="text" id="studentIdInput" placeholder="e.g. 1234" maxlength="4">
       </div>
       
-      <button class="btn-primary" onclick="verifyAndJoin()">Join App</button>
+      <button id="joinBtn" class="btn-primary" onclick="verifyAndJoin()">Join App</button>
     </div>
   </div>
 
@@ -307,7 +336,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, get, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     // -------------------------------------------------------------
     // Firebase Configuration
@@ -327,9 +356,24 @@
     const db = getDatabase(app);
 
     // -------------------------------------------------------------
+    // Security & Ban Settings
+    // -------------------------------------------------------------
+    const MAX_WRONG_ATTEMPTS = 3; // More than 3 wrong attempts (i.e., 4th) triggers ban
+    const BAN_DURATION_MS = 12 * 60 * 60 * 1000; // 30 minutes ban (adjust as needed)
+    let banInterval = null;
+
+    // -------------------------------------------------------------
     // Page Load & Session Management
     // -------------------------------------------------------------
     window.addEventListener('DOMContentLoaded', () => {
+      // Allow pressing "Enter" in the input box
+      document.getElementById('studentIdInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') verifyAndJoin();
+      });
+
+      // Check if user is currently banned first
+      if (checkBanStatus()) return;
+
       const storedId = localStorage.getItem('student_id');
       const storedName = localStorage.getItem('student_name');
       const storedGroup = localStorage.getItem('student_group');
@@ -340,26 +384,113 @@
     });
 
     // -------------------------------------------------------------
+    // Ban Logic
+    // -------------------------------------------------------------
+    function checkBanStatus() {
+      const bannedUntil = parseInt(localStorage.getItem('banned_until') || '0', 10);
+      const now = Date.now();
+
+      if (bannedUntil > now) {
+        applyBanUI(bannedUntil);
+        return true;
+      } else if (bannedUntil !== 0) {
+        // Ban expired: clear ban and reset attempts
+        localStorage.removeItem('banned_until');
+        localStorage.setItem('failed_attempts', '0');
+        removeBanUI();
+      }
+      return false;
+    }
+
+    function applyBanUI(bannedUntil) {
+      const input = document.getElementById('studentIdInput');
+      const btn = document.getElementById('joinBtn');
+      const banBanner = document.getElementById('banBanner');
+      const errorMsg = document.getElementById('errorMsg');
+
+      input.disabled = true;
+      btn.disabled = true;
+      errorMsg.style.display = 'none';
+      banBanner.style.display = 'block';
+
+      if (banInterval) clearInterval(banInterval);
+
+      const updateTimer = () => {
+        const remaining = bannedUntil - Date.now();
+        if (remaining <= 0) {
+          clearInterval(banInterval);
+          localStorage.removeItem('banned_until');
+          localStorage.setItem('failed_attempts', '0');
+          removeBanUI();
+          return;
+        }
+        const mins = Math.floor(remaining / 60000);
+        const secs = Math.floor((remaining % 60000) / 1000);
+        document.getElementById('banTimer').textContent = 
+          `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      };
+
+      updateTimer();
+      banInterval = setInterval(updateTimer, 1000);
+    }
+
+    function removeBanUI() {
+      document.getElementById('studentIdInput').disabled = false;
+      document.getElementById('joinBtn').disabled = false;
+      document.getElementById('banBanner').style.display = 'none';
+    }
+
+    function recordFailedAttempt(baseMessage) {
+      let attempts = parseInt(localStorage.getItem('failed_attempts') || '0', 10) + 1;
+      localStorage.setItem('failed_attempts', attempts.toString());
+
+      const errorMsg = document.getElementById('errorMsg');
+
+      if (attempts > MAX_WRONG_ATTEMPTS) {
+        const bannedUntil = Date.now() + BAN_DURATION_MS;
+        localStorage.setItem('banned_until', bannedUntil.toString());
+        applyBanUI(bannedUntil);
+      } else {
+        const remainingTries = (MAX_WRONG_ATTEMPTS + 1) - attempts;
+        errorMsg.textContent = `${baseMessage} (${remainingTries} ${remainingTries === 1 ? 'try' : 'tries'} left)`;
+        errorMsg.style.display = "block";
+      }
+    }
+
+    // -------------------------------------------------------------
     // Verification & Login
     // -------------------------------------------------------------
     window.verifyAndJoin = function() {
+      if (checkBanStatus()) return;
+
       const idInput = document.getElementById('studentIdInput').value.trim();
       const errorMsg = document.getElementById('errorMsg');
+      const joinBtn = document.getElementById('joinBtn');
 
-      if (!idInput || idInput.length !== 4) {
-        errorMsg.textContent = "Please enter a valid 4-digit ID.";
-        errorMsg.style.display = "block";
+      if (!idInput || idInput.length !== 4 || !/^\d{4}$/.test(idInput)) {
+        recordFailedAttempt("Please enter a valid 4-digit ID.");
         return;
       }
+
+      // Prevent rapid double-clicking while fetching
+      joinBtn.disabled = true;
+      joinBtn.textContent = "Checking...";
 
       // Check Realtime Database path: .../quiz/(student-id)/
       const studentRef = ref(db, `Salahaddin-University/Mathematics-Dipartment/quiz/${idInput}`);
       get(studentRef)
         .then(snapshot => {
+          joinBtn.disabled = false;
+          joinBtn.textContent = "Join App";
+
           if (snapshot.exists()) {
             const data = snapshot.val();
             const studentName = data['studentName'];
             const studentGroup = data['studentGroup'];
+
+            // Reset failed attempts on successful login
+            localStorage.removeItem('failed_attempts');
+            localStorage.removeItem('banned_until');
 
             // Save details locally
             localStorage.setItem('student_id', idInput);
@@ -369,12 +500,13 @@
             errorMsg.style.display = "none";
             showDashboard(idInput, studentName, studentGroup);
           } else {
-            errorMsg.textContent = "Student ID not found in database.";
-            errorMsg.style.display = "block";
+            recordFailedAttempt("Student ID not found.");
           }
         })
         .catch(err => {
           console.error(err);
+          joinBtn.disabled = false;
+          joinBtn.textContent = "Join App";
           errorMsg.textContent = "Database error. Please try again.";
           errorMsg.style.display = "block";
         });
@@ -399,9 +531,6 @@
     };
 
     // -------------------------------------------------------------
-    // Catalog Loader (Sorted by modification time)
-    // -------------------------------------------------------------
-        // -------------------------------------------------------------
     // Catalog Loader (Sorted client-side to avoid Firebase rules error)
     // -------------------------------------------------------------
     function loadQuizCatalog() {
