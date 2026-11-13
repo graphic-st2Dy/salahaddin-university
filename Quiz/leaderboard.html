@@ -113,7 +113,7 @@
 
     th, td {
       padding: 14px 20px;
-      font-size: 0.92rem;
+      font-size: 0.88rem;
     }
 
     th {
@@ -182,10 +182,10 @@
           <thead>
             <tr>
               <th class="rank-cell">Rank</th>
-              <th>Student Name</th>
+              <th>Name</th>
               <th>Group</th>
-              <th>Truths (Score)</th>
-              <th>Falses</th>
+              <th>Score</th>
+              <th>mistakes</th>
               <th>T/F Ratio</th>
             </tr>
           </thead>
@@ -282,7 +282,7 @@
             <td class="student-info">
               <strong>${name}</strong>
             </td>
-            <td>Group ${group}</td>
+            <td>${group}</td>
             <td><span class="score-badge">${truths}</span></td>
             <td>${falses}</td>
             <td>${ratio}</td>
