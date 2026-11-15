@@ -135,7 +135,7 @@
       height: 18px;
     }
 
-    /* Feedback Styling */
+    /* Feedback Highlights */
     .option-label.correct {
       background-color: var(--success-bg) !important;
       border-color: var(--success) !important;
@@ -174,8 +174,20 @@
     .btn-nav:hover:not(:disabled) { background: #e5e5e5; }
     .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
 
+    .btn-check {
+      padding: 8px 20px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-check:hover:not(:disabled) { background: var(--accent-hover); }
+    .btn-check:disabled { background: #a0c4e2; cursor: not-allowed; }
+
     .btn-submit {
-      padding: 8px 24px;
+      padding: 8px 20px;
       background: var(--success);
       color: white;
       border: none;
@@ -224,10 +236,9 @@
 
       <div class="quiz-controls">
         <button id="prevBtn" class="btn-nav" onclick="prevQuestion()" disabled>Previous</button>
+        <button id="checkBtn" class="btn-check" onclick="checkAnswer()" disabled>Check</button>
         <button id="nextBtn" class="btn-nav" onclick="nextQuestion()" disabled>Next</button>
-        <div id="endActionContainer" style="display: flex; gap: 10px;">
-          <a id="leaderboardBtn" href="#" class="btn-submit" style="display: none;">View Leaderboard</a>
-        </div>
+        <a id="leaderboardBtn" href="#" class="btn-submit" style="display: none;">Leaderboard</a>
       </div>
     </div>
   </main>
@@ -260,8 +271,9 @@
 
     let currentQuestionIndex = 0;
     
-    // Load saved user answers from localStorage if they exist
+    // Load saved user answers & checked status from localStorage
     let userAnswers = JSON.parse(localStorage.getItem(`quiz_${quizId}_answers`) || '{}');
+    let checkedStatus = JSON.parse(localStorage.getItem(`quiz_${quizId}_checked`) || '{}');
 
     // Sample question array (expandable up to 50)
     
@@ -786,18 +798,18 @@ const questions = [
       }
 
       document.getElementById('quizTitleHeader').textContent = `Quiz: ${quizId}`;
-      document.getElementById('leaderboardBtn.href') = `leaderboard.html?quiz=${quizId}`;
       document.getElementById('leaderboardBtn').href = `leaderboard.html?quiz=${quizId}`;
 
       if (isReviewMode) {
         document.getElementById('completionBanner').style.display = 'block';
         document.getElementById('modeIndicator').textContent = 'REVIEW MODE';
+        document.getElementById('checkBtn').style.display = 'none';
       }
 
-      // Find first unanswered question if resuming, unless in review mode
+      // Find first unanswered or unchecked question if resuming
       if (!isReviewMode) {
         for (let i = 0; i < questions.length; i++) {
-          if (!userAnswers[i]) {
+          if (!checkedStatus[i]) {
             currentQuestionIndex = i;
             break;
           }
@@ -821,54 +833,71 @@ const questions = [
       const optionsList = document.getElementById('optionsList');
       optionsList.innerHTML = '';
 
-      const answeredKey = userAnswers[index];
-      const isAnswered = answeredKey !== undefined;
+      const selectedKey = userAnswers[index];
+      const isChecked = checkedStatus[index] === true;
 
       for (const [key, value] of Object.entries(q.options)) {
         const label = document.createElement('label');
         label.className = 'option-label';
-        if (isAnswered || isReviewMode) label.classList.add('locked');
+        if (isChecked || isReviewMode) label.classList.add('locked');
 
         let extraClass = '';
-        if (isAnswered || isReviewMode) {
+        if (isChecked || isReviewMode) {
           if (key === q.answer) {
-            extraClass = 'correct'; // Highlight correct answer green
-          } else if (key === answeredKey) {
+            extraClass = 'correct'; // Highlight correct choice green
+          } else if (key === selectedKey) {
             extraClass = 'incorrect'; // Highlight user's wrong choice red
           }
         }
         if (extraClass) label.classList.add(extraClass);
 
-        const isChecked = answeredKey === key ? 'checked' : '';
+        const isRadioChecked = selectedKey === key ? 'checked' : '';
         label.innerHTML = `
-          <input type="radio" name="option" value="${key}" ${isChecked} ${isAnswered || isReviewMode ? 'disabled' : ''} onclick="selectAnswer('${key}')">
+          <input type="radio" name="option" value="${key}" ${isRadioChecked} ${isChecked || isReviewMode ? 'disabled' : ''} onclick="selectAnswer('${key}')">
           <span><strong>${key}.</strong> ${value}</span>
         `;
         optionsList.appendChild(label);
       }
 
-      // Navigation button states
+      // Button controls state management
       document.getElementById('prevBtn').disabled = (index === 0);
       
-      // Next button is enabled if current question is answered or if we are in review mode
+      const checkBtn = document.getElementById('checkBtn');
       const nextBtn = document.getElementById('nextBtn');
-      if (index === questions.length - 1) {
-        nextBtn.style.display = 'none';
-        document.getElementById('leaderboardBtn').style.display = 'inline-block';
+      const leaderboardBtn = document.getElementById('leaderboardBtn');
+
+      if (!isReviewMode) {
+        checkBtn.disabled = !selectedKey || isChecked;
+        nextBtn.disabled = !isChecked;
       } else {
-        nextBtn.style.display = 'inline-block';
-        nextBtn.disabled = !isAnswered && !isReviewMode;
-        document.getElementById('leaderboardBtn').style.display = 'inline-block'; // Always available to check leaderboard
+        nextBtn.disabled = (index === questions.length - 1);
+      }
+
+      // Show leaderboard button if all questions are checked or if in review mode
+      const allChecked = Object.keys(checkedStatus).length === questions.length;
+      if (allChecked || isReviewMode) {
+        leaderboardBtn.style.display = 'inline-block';
+      } else {
+        leaderboardBtn.style.display = 'none';
       }
     };
 
     window.selectAnswer = function(key) {
-      if (isReviewMode || userAnswers[currentQuestionIndex] !== undefined) return;
+      if (isReviewMode || checkedStatus[currentQuestionIndex]) return;
 
       userAnswers[currentQuestionIndex] = key;
       localStorage.setItem(`quiz_${quizId}_answers`, JSON.stringify(userAnswers));
 
-      // Lock options and show color highlights immediately
+      // Enable the check button once an answer is chosen
+      document.getElementById('checkBtn').disabled = false;
+    };
+
+    window.checkAnswer = function() {
+      if (!userAnswers[currentQuestionIndex] || checkedStatus[currentQuestionIndex]) return;
+
+      checkedStatus[currentQuestionIndex] = true;
+      localStorage.setItem(`quiz_${quizId}_checked`, JSON.stringify(checkedStatus));
+
       loadQuestion(currentQuestionIndex);
       updateProgressScore();
     };
@@ -890,11 +919,11 @@ const questions = [
     function calculateResults() {
       let truths = 0;
       let falses = 0;
-      let answeredCount = 0;
+      let checkedCount = 0;
 
       questions.forEach((q, idx) => {
-        if (userAnswers[idx]) {
-          answeredCount++;
+        if (checkedStatus[idx]) {
+          checkedCount++;
           if (userAnswers[idx] === q.answer) {
             truths++;
           } else {
@@ -904,7 +933,7 @@ const questions = [
       });
 
       const ratio = falses === 0 ? truths.toFixed(2) : (truths / falses).toFixed(2);
-      const isComplete = answeredCount === questions.length;
+      const isComplete = checkedCount === questions.length;
       return { truths, falses, ratio, isComplete };
     }
 
