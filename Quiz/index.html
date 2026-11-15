@@ -14,6 +14,7 @@
       --text-main: #242424;
       --text-muted: #616161;
       --border-color: #e0e0e0;
+      --success: #107c10;
       --danger: #d13438;
       --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
@@ -23,11 +24,10 @@
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-      -webkit-user-drag: none; /* Prevent dragging elements */
-      user-select: none;      /* Prevent text highlighting */
+      -webkit-user-drag: none;
+      user-select: none;
     }
 
-    /* Allow normal input text selection & typing */
     input {
       user-select: text !important;
     }
@@ -244,7 +244,7 @@
       object-fit: cover;
       border-radius: 4px;
       background: #f0f0f0;
-      pointer-events: none; /* Prevents dragging/right-click dragging contexts on images */
+      pointer-events: none;
     }
 
     .card-titles h3 {
@@ -260,18 +260,24 @@
     .card-actions {
       margin-top: auto;
       display: flex;
-      gap: 10px;
+      flex-direction: column;
+      gap: 8px;
       padding-top: 16px;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 8px;
     }
 
     .btn-secondary {
       flex: 1;
-      padding: 8px 12px;
+      padding: 8px 10px;
       background-color: #f0f0f0;
       color: var(--text-main);
       border: 1px solid var(--border-color);
       border-radius: 4px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
       text-align: center;
@@ -282,14 +288,20 @@
       background-color: #e5e5e5;
     }
 
+    .btn-secondary.disabled {
+      opacity: 0.4;
+      pointer-events: none;
+      background-color: #f5f5f5;
+    }
+
     .btn-start {
       flex: 1;
-      padding: 8px 12px;
+      padding: 8px 10px;
       background-color: var(--accent);
       color: white;
       border: none;
       border-radius: 4px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
       text-align: center;
@@ -299,9 +311,16 @@
     .btn-start:hover {
       background-color: var(--accent-hover);
     }
+
+    .btn-restart {
+      background-color: #b78103;
+    }
+    .btn-restart:hover {
+      background-color: #936802;
+    }
   </style>
 </head>
-<body oncontextmenu="return false;"> <!-- Optional: blocks right-click inspection context menu -->
+<body oncontextmenu="return false;">
 
   <!-- Top Navigation Header -->
   <header>
@@ -344,11 +363,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, get, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // -------------------------------------------------------------
-    // Firebase Configuration
-    // -------------------------------------------------------------
     const firebaseConfig = {
       apiKey: "AIzaSyB-YOUR_ACTUAL_API_KEY",
       authDomain: "cognito-f1f7b.firebaseapp.com",
@@ -359,20 +375,13 @@
       appId: "1:506661532829:web:7a28aa874ba80871691074"
     };
     
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // -------------------------------------------------------------
-    // Security & Ban Settings
-    // -------------------------------------------------------------
     const MAX_WRONG_ATTEMPTS = 3; 
     const BAN_DURATION_MS = 12 * 60 * 60 * 1000; 
     let banInterval = null;
 
-    // -------------------------------------------------------------
-    // Page Load & Session Management
-    // -------------------------------------------------------------
     window.addEventListener('DOMContentLoaded', () => {
       document.getElementById('studentIdInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') verifyAndJoin();
@@ -389,9 +398,6 @@
       }
     });
 
-    // -------------------------------------------------------------
-    // Ban Logic
-    // -------------------------------------------------------------
     function checkBanStatus() {
       const bannedUntil = parseInt(localStorage.getItem('banned_until') || '0', 10);
       const now = Date.now();
@@ -462,9 +468,6 @@
       }
     }
 
-    // -------------------------------------------------------------
-    // Verification & Login
-    // -------------------------------------------------------------
     window.verifyAndJoin = function() {
       if (checkBanStatus()) return;
 
@@ -531,9 +534,26 @@
       location.reload();
     };
 
-    // -------------------------------------------------------------
-    // Catalog Loader (Sorted client-side & Secured with draggable="false")
-    // -------------------------------------------------------------
+    // Immediate restart handler with no confirmation popups
+    window.restartQuiz = function(quizId) {
+      const studentId = localStorage.getItem('student_id');
+      if (!studentId) return;
+
+      // 1. Wipe local storage state for this quiz
+      localStorage.removeItem(`quiz_${quizId}_answers`);
+      localStorage.removeItem(`quiz_${quizId}_completed`);
+
+      // 2. Remove entry from Firebase leaderboard immediately
+      const leaderboardRef = ref(db, `quizzes/${quizId}/leaderboard/${studentId}`);
+      remove(leaderboardRef).then(() => {
+        // Redirect right into the quiz start page
+        window.location.href = `quiz.html?quiz=${quizId}`;
+      }).catch(err => {
+        console.error("Error clearing Firebase score:", err);
+        window.location.href = `quiz.html?quiz=${quizId}`;
+      });
+    };
+
     function loadQuizCatalog() {
       const grid = document.getElementById('quizGrid');
       grid.innerHTML = '';
@@ -553,6 +573,9 @@
         items.sort((a, b) => (b.modifiedAt || 0) - (a.modifiedAt || 0));
 
         items.forEach(quiz => {
+          const isCompleted = localStorage.getItem(`quiz_${quiz.id}_completed`) === 'true';
+          const targetHtml = quiz.targetHtml || 'quiz.html';
+
           const card = document.createElement('div');
           card.className = 'quiz-card';
           card.innerHTML = `
@@ -564,8 +587,13 @@
               </div>
             </div>
             <div class="card-actions">
-              <a href="leaderboard.html?quiz=${quiz.id}" class="btn-secondary">Leaderboard</a>
-              <a href="${quiz.targetHtml || 'quiz.html'}?quiz=${quiz.id}" class="btn-start">Start</a>
+              <div class="action-row">
+                <a href="leaderboard.html?quiz=${quiz.id}" class="btn-secondary">Leaderboard</a>
+                <a href="${targetHtml}?quiz=${quiz.id}" class="btn-start ${isCompleted ? 'btn-restart' : ''}" ${isCompleted ? `onclick="event.preventDefault(); restartQuiz('${quiz.id}');"` : ''}>${isCompleted ? 'Restart' : 'Start'}</a>
+              </div>
+              <div class="action-row">
+                <a href="quiz.html?quiz=${quiz.id}&review=true" class="btn-secondary ${!isCompleted ? 'disabled' : ''}">Review</a>
+              </div>
             </div>
           `;
           grid.appendChild(card);
