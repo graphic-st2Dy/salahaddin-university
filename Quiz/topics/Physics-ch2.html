@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Session - Math Department</title>
+  
+  <style>
+    :root {
+      --bg-color: #f3f3f3;
+      --card-bg: #ffffff;
+      --accent: #0078d4;
+      --accent-hover: #106ebe;
+      --text-main: #242424;
+      --text-muted: #616161;
+      --border-color: #e0e0e0;
+      --success: #107c10;
+      --success-bg: #dff6dd;
+      --danger: #d13438;
+      --danger-bg: #fde7e9;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      -webkit-user-drag: none;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    header h1 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-back {
+      background: #f0f0f0;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn-back:hover { background: #e5e5e5; }
+
+    main {
+      max-width: 800px;
+      width: 100%;
+      margin: 32px auto;
+      padding: 0 20px;
+      flex: 1;
+    }
+
+    .quiz-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .quiz-progress {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .question-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      background: #fafafa;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .option-label:hover:not(.locked) {
+      background: #f0f0f0;
+      border-color: #b0b0b0;
+    }
+
+    .option-label input {
+      accent-color: var(--accent);
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Feedback Highlights */
+    .option-label.correct {
+      background-color: var(--success-bg) !important;
+      border-color: var(--success) !important;
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .option-label.incorrect {
+      background-color: var(--danger-bg) !important;
+      border-color: var(--danger) !important;
+      color: var(--danger);
+    }
+
+    .option-label.locked {
+      cursor: default;
+    }
+
+    .quiz-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-color);
+      padding-top: 20px;
+      gap: 10px;
+    }
+
+    .btn-nav {
+      padding: 8px 20px;
+      background: #f0f0f0;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-main);
+    }
+    .btn-nav:hover:not(:disabled) { background: #e5e5e5; }
+    .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-check {
+      padding: 8px 20px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-check:hover:not(:disabled) { background: var(--accent-hover); }
+    .btn-check:disabled { background: #a0c4e2; cursor: not-allowed; }
+
+    .btn-submit {
+      padding: 8px 20px;
+      background: var(--success);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn-submit:hover { background: #0e6b0e; }
+
+    .completion-banner {
+      background: #e1dfdd;
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--text-main);
+      display: none;
+    }
+  </style>
+</head>
+<body oncontextmenu="return false;">
+
+  <header>
+    <h1 id="quizTitleHeader">Quiz Session</h1>
+    <div class="nav-links">
+      <a href="../index.html" class="btn-back">Exit to Hub</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="quiz-container">
+      <div id="completionBanner" class="completion-banner">Review Mode: Quiz Completed</div>
+      
+      <div class="quiz-progress">
+        <span id="progressIndicator">Question 1 of 50</span>
+        <span id="modeIndicator" style="color: var(--accent); font-weight: 600;"></span>
+      </div>
+
+      <div id="questionText" class="question-title">Loading questions...</div>
+      
+      <div id="optionsList" class="options-list">
+        <!-- Dynamic options A, B, C, D -->
+      </div>
+
+      <div class="quiz-controls">
+        <button id="prevBtn" class="btn-nav" onclick="prevQuestion()" disabled>Previous</button>
+        <button id="checkBtn" class="btn-check" onclick="checkAnswer()" disabled>Check</button>
+        <button id="nextBtn" class="btn-nav" onclick="nextQuestion()" disabled>Next</button>
+        <a id="leaderboardBtn" href="#" class="btn-submit" style="display: none;">Leaderboard</a>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-YOUR_ACTUAL_API_KEY",
+      authDomain: "cognito-f1f7b.firebaseapp.com",
+      databaseURL: "https://cognito-f1f7b-default-rtdb.firebaseio.com/",
+      projectId: "cognito-f1f7b",
+      storageBucket: "cognito-f1f7b.firebasestorage.app",
+      messagingSenderId: "506661532829",
+      appId: "1:506661532829:web:7a28aa874ba80871691074"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const quizId = urlParams.get('quiz') || 'default_quiz';
+    const isReviewMode = urlParams.get('review') === 'true';
+
+    // Retrieve Student SSO details from localStorage
+    const studentId = localStorage.getItem('student_id');
+    const studentName = localStorage.getItem('student_name');
+    const studentGroup = localStorage.getItem('student_group');
+
+    let currentQuestionIndex = 0;
+    
+    // Load saved user answers & checked status from localStorage
+    let userAnswers = JSON.parse(localStorage.getItem(`quiz_${quizId}_answers`) || '{}');
+    let checkedStatus = JSON.parse(localStorage.getItem(`quiz_${quizId}_checked`) || '{}');
+
+    // Sample question array (expandable up to 50)
+    
+
+const questions = [
+  {
+    question: "What are physical quantities?",
+    options: {
+      A: "Objects that can only be seen",
+      B: "Quantities that cannot be measured",
+      C: "Quantities that can be measured and used to express physical laws",
+      D: "Numbers without units"
+    },
+    answer: "C"
+  },
+  {
+    question: "How many fundamental physical quantities are there?",
+    options: {
+      A: "Seven",
+      B: "Five",
+      C: "Six",
+      D: "Nine"
+    },
+    answer: "A"
+  },
+  {
+    question: "Which of the following is a fundamental physical quantity?",
+    options: {
+      A: "Speed",
+      B: "Mass",
+      C: "Force",
+      D: "Acceleration"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which of the following is a derived physical quantity?",
+    options: {
+      A: "Length",
+      B: "Time",
+      C: "Temperature",
+      D: "Velocity"
+    },
+    answer: "D"
+  },
+  {
+    question: "What distinguishes fundamental quantities from derived quantities?",
+    options: {
+      A: "Fundamental quantities are independent, while derived quantities are defined using other quantities",
+      B: "Fundamental quantities always have larger values",
+      C: "Derived quantities cannot be measured",
+      D: "Fundamental quantities have no units"
+    },
+    answer: "A"
+  },
+  {
+    question: "Which of the following is NOT one of the seven fundamental quantities?",
+    options: {
+      A: "Electric current",
+      B: "Force",
+      C: "Luminous intensity",
+      D: "Amount of substance"
+    },
+    answer: "B"
+  },
+  {
+    question: "What is measurement?",
+    options: {
+      A: "The calculation of an unknown number",
+      B: "The comparison of two different physical laws",
+      C: "The comparison of an unknown physical quantity with a known fixed quantity",
+      D: "The process of changing one unit into another"
+    },
+    answer: "C"
+  },
+  {
+    question: "What is a unit?",
+    options: {
+      A: "The numerical value of a measurement",
+      B: "An unknown physical quantity",
+      C: "The result of multiplying two quantities",
+      D: "A standard quantity used for measurement"
+    },
+    answer: "D"
+  },
+  {
+    question: "What two things are needed to express a physical measurement?",
+    options: {
+      A: "A numerical value and a unit",
+      B: "A formula and a graph",
+      C: "A mass and a length",
+      D: "A number and a dimension"
+    },
+    answer: "A"
+  },
+  {
+    question: "Which equation represents the measure of a physical quantity?",
+    options: {
+      A: "Q = n + u",
+      B: "Q = nu",
+      C: "Q = n/u",
+      D: "Q = u - n"
+    },
+    answer: "B"
+  },
+  {
+    question: "In the equation Q = nu, what does n represent?",
+    options: {
+      A: "The size of the unit",
+      B: "The physical dimension",
+      C: "The numerical value of the quantity",
+      D: "The standard unit"
+    },
+    answer: "C"
+  },
+  {
+    question: "The length of a classroom is 8 m. What is the numerical value of this measurement?",
+    options: {
+      A: "8",
+      B: "m",
+      C: "0.8",
+      D: "80"
+    },
+    answer: "A"
+  },
+  {
+    question: "Which statement correctly describes fundamental units?",
+    options: {
+      A: "They are always obtained by multiplying other units",
+      B: "They can be derived from speed and acceleration",
+      C: "They are used only for measuring length",
+      D: "They cannot be derived from one another or further resolved into simpler units"
+    },
+    answer: "D"
+  },
+  {
+    question: "What are derived units?",
+    options: {
+      A: "Units that have no relationship with fundamental units",
+      B: "Units expressed in terms of fundamental units",
+      C: "Units used only in the CGS system",
+      D: "Units that cannot be measured"
+    },
+    answer: "B"
+  },
+  {
+    question: "Why is the unit of speed a derived unit?",
+    options: {
+      A: "Because speed is a fundamental quantity",
+      B: "Because it has no unit",
+      C: "Because it is expressed using length and time units",
+      D: "Because it is independent of other quantities"
+    },
+    answer: "C"
+  },
+  {
+    question: "What is the SI unit of speed?",
+    options: {
+      A: "m/s",
+      B: "kg",
+      C: "m²",
+      D: "s/m"
+    },
+    answer: "A"
+  },
+  {
+    question: "What is a system of units?",
+    options: {
+      A: "A method of measuring only mass",
+      B: "A group of physical laws",
+      C: "A collection of measuring instruments",
+      D: "A complete set of units used to measure fundamental and derived quantities"
+    },
+    answer: "D"
+  },
+  {
+    question: "Which fundamental units form the CGS system?",
+    options: {
+      A: "Meter, kilogram, second",
+      B: "Centimeter, gram, second",
+      C: "Foot, pound, second",
+      D: "Kilometer, kilogram, hour"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which fundamental units form the FPS system?",
+    options: {
+      A: "Centimeter, gram, second",
+      B: "Meter, kilogram, second",
+      C: "Foot, pound, second",
+      D: "Meter, gram, minute"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which fundamental units form the MKS system?",
+    options: {
+      A: "Meter, kilogram, second",
+      B: "Centimeter, gram, second",
+      C: "Foot, pound, second",
+      D: "Meter, kilogram, hour"
+    },
+    answer: "A"
+  },
+  {
+    question: "What does SI stand for?",
+    options: {
+      A: "Scientific International",
+      B: "Standard Instruments",
+      C: "System of Investigation",
+      D: "Système International"
+    },
+    answer: "D"
+  },
+  {
+    question: "In which year was the SI system adopted by the General Conference of Weights and Measures?",
+    options: {
+      A: "1950",
+      B: "1960",
+      C: "1970",
+      D: "1980"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which of the following is the SI base unit of electric current?",
+    options: {
+      A: "Kelvin",
+      B: "Candela",
+      C: "Ampere",
+      D: "Mole"
+    },
+    answer: "C"
+  },
+  {
+    question: "What is the SI base unit of luminous intensity?",
+    options: {
+      A: "Candela",
+      B: "Kelvin",
+      C: "Ampere",
+      D: "Radian"
+    },
+    answer: "A"
+  },
+  {
+    question: "What is the SI base unit of amount of substance?",
+    options: {
+      A: "Kilogram",
+      B: "Second",
+      C: "Candela",
+      D: "Mole"
+    },
+    answer: "D"
+  },
+  {
+    question: "Which pair represents the two supplementary SI units listed in the chapter?",
+    options: {
+      A: "Meter and kilogram",
+      B: "Radian and steradian",
+      C: "Kelvin and ampere",
+      D: "Mole and candela"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which rule is correct when writing SI unit symbols?",
+    options: {
+      A: "Every symbol must end with a full stop",
+      B: "All symbols must be written in capital letters",
+      C: "Symbols do not take plural forms",
+      D: "Symbols must always be written in plural form"
+    },
+    answer: "C"
+  },
+  {
+    question: "When does the initial letter of an SI unit symbol become capital?",
+    options: {
+      A: "When the unit is named after a scientist",
+      B: "When the unit is very large",
+      C: "When the unit measures length",
+      D: "When the unit is used in a calculation"
+    },
+    answer: "A"
+  },
+  {
+    question: "What does the prefix kilo represent?",
+    options: {
+      A: "10⁻³",
+      B: "10⁶",
+      C: "10⁻⁶",
+      D: "10³"
+    },
+    answer: "D"
+  },
+  {
+    question: "What is the value represented by the prefix micro?",
+    options: {
+      A: "10⁻³",
+      B: "10⁻⁶",
+      C: "10⁶",
+      D: "10⁹"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which prefix represents 10⁹?",
+    options: {
+      A: "Mega",
+      B: "Tera",
+      C: "Giga",
+      D: "Kilo"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which prefix represents 10⁻³?",
+    options: {
+      A: "Milli",
+      B: "Micro",
+      C: "Centi",
+      D: "Nano"
+    },
+    answer: "A"
+  },
+  {
+    question: "A car travels at 80 km/h for 3 hours. What distance does it travel?",
+    options: {
+      A: "80 km",
+      B: "160 km",
+      C: "200 km",
+      D: "240 km"
+    },
+    answer: "D"
+  },
+  {
+    question: "Convert 240 km into meters.",
+    options: {
+      A: "24,000 m",
+      B: "240,000 m",
+      C: "2,400 m",
+      D: "2,400,000 m"
+    },
+    answer: "B"
+  },
+  {
+    question: "Convert 150 seconds into minutes.",
+    options: {
+      A: "1.5 minutes",
+      B: "3 minutes",
+      C: "2.5 minutes",
+      D: "150 minutes"
+    },
+    answer: "C"
+  },
+  {
+    question: "Convert 500 cm³ into m³.",
+    options: {
+      A: "0.0005 m³",
+      B: "0.005 m³",
+      C: "0.05 m³",
+      D: "0.5 m³"
+    },
+    answer: "A"
+  },
+  {
+    question: "What is the dimension of length?",
+    options: {
+      A: "[M]",
+      B: "[T]",
+      C: "[A]",
+      D: "[L]"
+    },
+    answer: "D"
+  },
+  {
+    question: "What is the dimensional formula of density?",
+    options: {
+      A: "[MLT⁻²]",
+      B: "[ML⁻³]",
+      C: "[ML²T⁻²]",
+      D: "[M⁰L⁰T⁻¹]"
+    },
+    answer: "B"
+  },
+  {
+    question: "What is the dimensional formula of force?",
+    options: {
+      A: "[ML²T⁻²]",
+      B: "[ML⁻¹T⁻²]",
+      C: "[MLT⁻²]",
+      D: "[M⁰LT⁻²]"
+    },
+    answer: "C"
+  },
+  {
+    question: "What is the dimensional formula of kinetic energy?",
+    options: {
+      A: "[ML²T⁻²]",
+      B: "[MLT⁻²]",
+      C: "[ML⁻³]",
+      D: "[M⁰L⁰T⁻¹]"
+    },
+    answer: "A"
+  },
+  {
+    question: "What is the dimensional formula of frequency?",
+    options: {
+      A: "[MLT⁻²]",
+      B: "[ML²T⁻²]",
+      C: "[ML⁻¹T⁻²]",
+      D: "[M⁰L⁰T⁻¹]"
+    },
+    answer: "D"
+  },
+  {
+    question: "What is the dimensional formula of pressure?",
+    options: {
+      A: "[MLT⁻²]",
+      B: "[ML⁻¹T⁻²]",
+      C: "[ML²T⁻²]",
+      D: "[M⁰LT⁻²]"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which pair has the same dimensions?",
+    options: {
+      A: "Force and energy",
+      B: "Pressure and momentum",
+      C: "Momentum and impulse",
+      D: "Density and speed"
+    },
+    answer: "C"
+  },
+  {
+    question: "What is a dimensionless variable?",
+    options: {
+      A: "A physical quantity with no dimensions but variable values",
+      B: "A physical quantity with dimensions and constant values",
+      C: "A physical quantity with dimensions and variable values",
+      D: "A quantity that cannot change"
+    },
+    answer: "A"
+  },
+  {
+    question: "Which of the following is an example of a dimensional constant?",
+    options: {
+      A: "Angle",
+      B: "Strain",
+      C: "π",
+      D: "Gravitational constant"
+    },
+    answer: "D"
+  },
+  {
+    question: "Which of the following is a dimensionless constant?",
+    options: {
+      A: "Planck's constant",
+      B: "π",
+      C: "Gravitational constant",
+      D: "Force"
+    },
+    answer: "B"
+  },
+  {
+    question: "What is dimensional analysis?",
+    options: {
+      A: "The process of measuring the length of an object",
+      B: "The process of converting only mass units",
+      C: "The method of studying physical phenomena on the basis of dimensions",
+      D: "The process of calculating numerical values without units"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which of the following is NOT a main application of dimensional analysis?",
+    options: {
+      A: "Determining the exact numerical value of every physical constant",
+      B: "Converting quantities from one system of units to another",
+      C: "Checking the correctness of physical equations",
+      D: "Deriving relationships between physical quantities"
+    },
+    answer: "A"
+  },
+  {
+    question: "According to the principle of homogeneity of dimensions, when is a physical equation dimensionally correct?",
+    options: {
+      A: "When both sides have the same numerical value only",
+      B: "When all terms have the same units of length",
+      C: "When the equation contains no constants",
+      D: "When the dimensions of all terms on both sides are the same"
+    },
+    answer: "D"
+  },
+  {
+    question: "What is accuracy in measurement?",
+    options: {
+      A: "The closeness of repeated measurements to each other",
+      B: "The closeness of a measurement to the true value",
+      C: "The smallest unit of an instrument",
+      D: "The number of measurements taken"
+    },
+    answer: "B"
+  },
+  {
+    question: "What is precision in measurement?",
+    options: {
+      A: "The closeness of a measurement to the true value only",
+      B: "The ability to eliminate all experimental errors",
+      C: "The resolution of measurement and the closeness of repeated values to each other",
+      D: "The size of the measured object"
+    },
+    answer: "C"
+  },
+  {
+    question: "What happens to precision when the least count of a measuring instrument becomes smaller?",
+    options: {
+      A: "Precision increases",
+      B: "Precision decreases",
+      C: "Accuracy always becomes zero",
+      D: "The measurement becomes impossible"
+    },
+    answer: "A"
+  },
+  {
+    question: "A metal has a true mass of 0.520 g. Student C obtains measurements of 0.521 g, 0.520 g, and 0.520 g. How would these measurements be described?",
+    options: {
+      A: "Neither accurate nor precise",
+      B: "Accurate but not precise",
+      C: "Precise but not accurate",
+      D: "Both accurate and precise"
+    },
+    answer: "D"
+  },
+  {
+    question: "Which symbol represents the SI unit of luminous intensity?",
+    options: {
+      A: "lm",
+      B: "cd",
+      C: "lx",
+      D: "K"
+    },
+    answer: "B"
+  },
+  {
+    question: "What is the SI unit of the amount of substance?",
+    options: {
+      A: "Mole (mol)",
+      B: "Gram (g)",
+      C: "Kelvin (K)",
+      D: "Candela (cd)"
+    },
+    answer: "A"
+  },
+  {
+    question: "Which pair represents the two supplementary units mentioned in the chapter?",
+    options: {
+      A: "Meter and kilogram",
+      B: "Newton and joule",
+      C: "Radian and steradian",
+      D: "Ampere and kelvin"
+    },
+    answer: "C"
+  },
+  {
+    question: "What is the dimensional formula of pressure?",
+    options: {
+      A: "[M L T⁻²]",
+      B: "[M L² T⁻²]",
+      C: "[M L⁻¹ T⁻²]",
+      D: "[M L T⁻¹]"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which of the following is a dimensionless constant?",
+    options: {
+      A: "Gravitational constant",
+      B: "Planck's constant",
+      C: "Force",
+      D: "π (pi)"
+    },
+    answer: "D"
+  },
+  {
+    question: "According to the principle of homogeneity, what must be true for a physical equation to be dimensionally correct?",
+    options: {
+      A: "All terms must have the same numerical value",
+      B: "The dimensions on both sides must be the same",
+      C: "Every term must have a unit",
+      D: "All quantities must be dimensionless"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which statement about SI unit symbols is correct?",
+    options: {
+      A: "They always end with a full stop",
+      B: "They become plural when measuring multiple units",
+      C: "They are generally written in lowercase, except symbols named after scientists",
+      D: "They must always begin with a capital letter"
+    },
+    answer: "C"
+  }
+];
+
+
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!studentId) {
+        alert("Session expired or missing student ID. Please log in from the hub.");
+        window.location.href = "../index.html";
+        return;
+      }
+
+      document.getElementById('quizTitleHeader').textContent = `Quiz: ${quizId}`;
+      document.getElementById('leaderboardBtn').href = `leaderboard.html?quiz=${quizId}`;
+
+      if (isReviewMode) {
+        document.getElementById('completionBanner').style.display = 'block';
+        document.getElementById('modeIndicator').textContent = 'REVIEW MODE';
+        document.getElementById('checkBtn').style.display = 'none';
+      }
+
+      // Find first unanswered or unchecked question if resuming
+      if (!isReviewMode) {
+        for (let i = 0; i < questions.length; i++) {
+          if (!checkedStatus[i]) {
+            currentQuestionIndex = i;
+            break;
+          }
+        }
+      }
+
+      loadQuestion(currentQuestionIndex);
+      updateProgressScore();
+    });
+
+    window.loadQuestion = function(index) {
+      if (questions.length === 0) {
+        document.getElementById('questionText').textContent = "No questions available.";
+        return;
+      }
+
+      const q = questions[index];
+      document.getElementById('progressIndicator').textContent = `Question ${index + 1} of ${questions.length}`;
+      document.getElementById('questionText').textContent = q.question;
+
+      const optionsList = document.getElementById('optionsList');
+      optionsList.innerHTML = '';
+
+      const selectedKey = userAnswers[index];
+      const isChecked = checkedStatus[index] === true;
+
+      for (const [key, value] of Object.entries(q.options)) {
+        const label = document.createElement('label');
+        label.className = 'option-label';
+        if (isChecked || isReviewMode) label.classList.add('locked');
+
+        let extraClass = '';
+        if (isChecked || isReviewMode) {
+          if (key === q.answer) {
+            extraClass = 'correct'; // Highlight correct choice green
+          } else if (key === selectedKey) {
+            extraClass = 'incorrect'; // Highlight user's wrong choice red
+          }
+        }
+        if (extraClass) label.classList.add(extraClass);
+
+        const isRadioChecked = selectedKey === key ? 'checked' : '';
+        label.innerHTML = `
+          <input type="radio" name="option" value="${key}" ${isRadioChecked} ${isChecked || isReviewMode ? 'disabled' : ''} onclick="selectAnswer('${key}')">
+          <span><strong>${key}.</strong> ${value}</span>
+        `;
+        optionsList.appendChild(label);
+      }
+
+      // Button controls state management
+      document.getElementById('prevBtn').disabled = (index === 0);
+      
+      const checkBtn = document.getElementById('checkBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const leaderboardBtn = document.getElementById('leaderboardBtn');
+
+      if (!isReviewMode) {
+        checkBtn.disabled = !selectedKey || isChecked;
+        nextBtn.disabled = !isChecked;
+      } else {
+        nextBtn.disabled = (index === questions.length - 1);
+      }
+
+      // Show leaderboard button if all questions are checked or if in review mode
+      const allChecked = Object.keys(checkedStatus).length === questions.length;
+      if (allChecked || isReviewMode) {
+        leaderboardBtn.style.display = 'inline-block';
+      } else {
+        leaderboardBtn.style.display = 'none';
+      }
+    };
+
+    window.selectAnswer = function(key) {
+      if (isReviewMode || checkedStatus[currentQuestionIndex]) return;
+
+      userAnswers[currentQuestionIndex] = key;
+      localStorage.setItem(`quiz_${quizId}_answers`, JSON.stringify(userAnswers));
+
+      // Enable the check button once an answer is chosen
+      document.getElementById('checkBtn').disabled = false;
+    };
+
+    window.checkAnswer = function() {
+      if (!userAnswers[currentQuestionIndex] || checkedStatus[currentQuestionIndex]) return;
+
+      checkedStatus[currentQuestionIndex] = true;
+      localStorage.setItem(`quiz_${quizId}_checked`, JSON.stringify(checkedStatus));
+
+      loadQuestion(currentQuestionIndex);
+      updateProgressScore();
+    };
+
+    window.nextQuestion = function() {
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        loadQuestion(currentQuestionIndex);
+      }
+    };
+
+    window.prevQuestion = function() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        loadQuestion(currentQuestionIndex);
+      }
+    };
+
+    function calculateResults() {
+      let truths = 0;
+      let falses = 0;
+      let checkedCount = 0;
+
+      questions.forEach((q, idx) => {
+        if (checkedStatus[idx]) {
+          checkedCount++;
+          if (userAnswers[idx] === q.answer) {
+            truths++;
+          } else {
+            falses++;
+          }
+        }
+      });
+
+      const ratio = falses === 0 ? truths.toFixed(2) : (truths / falses).toFixed(2);
+      const isComplete = checkedCount === questions.length;
+      return { truths, falses, ratio, isComplete };
+    }
+
+    function updateProgressScore() {
+      if (!studentId || isReviewMode) return;
+
+      const { truths, falses, ratio, isComplete } = calculateResults();
+      
+      if (isComplete) {
+        localStorage.setItem(`quiz_${quizId}_completed`, 'true');
+      }
+
+      const leaderboardRef = ref(db, `quizzes/${quizId}/leaderboard/${studentId}`);
+      set(leaderboardRef, {
+        "student-name": studentName,
+        "student-group": studentGroup,
+        "truths": truths,
+        "falses": falses,
+        "tf-ratio": ratio,
+        "timestamp": Date.now()
+      }).catch(err => console.error("Error syncing score:", err));
+    }
+  </script>
+</body>
+</html>
