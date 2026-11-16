@@ -212,8 +212,11 @@
                 <!-- Keyboard Keys Viewport -->
                 <div class="p-2.5 overflow-y-auto max-h-[220px]">
                     
-                    <!-- Tab 1: English QWERTY Keyboard (Default) -->
+                    <!-- Tab 1: English QWERTY Keyboard with Numbers Row (Default) -->
                     <div id="tab-abc" class="kbd-panel space-y-1.5 max-w-3xl mx-auto">
+                        <div class="grid grid-cols-10 gap-1">
+                            <button class="key-btn" data-key="1">1</button><button class="key-btn" data-key="2">2</button><button class="key-btn" data-key="3">3</button><button class="key-btn" data-key="4">4</button><button class="key-btn" data-key="5">5</button><button class="key-btn" data-key="6">6</button><button class="key-btn" data-key="7">7</button><button class="key-btn" data-key="8">8</button><button class="key-btn" data-key="9">9</button><button class="key-btn" data-key="0">0</button>
+                        </div>
                         <div class="grid grid-cols-10 gap-1">
                             <button class="key-btn" data-key="q">q</button><button class="key-btn" data-key="w">w</button><button class="key-btn" data-key="e">e</button><button class="key-btn" data-key="r">r</button><button class="key-btn" data-key="t">t</button><button class="key-btn" data-key="y">y</button><button class="key-btn" data-key="u">u</button><button class="key-btn" data-key="i">i</button><button class="key-btn" data-key="o">o</button><button class="key-btn" data-key="p">p</button>
                         </div>
@@ -239,90 +242,89 @@
                         <button class="key-btn" data-key="₊">₊</button><button class="key-btn" data-key="₋">₋</button><button class="key-btn" data-key="ₙ">ₙ</button><button class="key-btn" data-key="₌">=</button><button class="key-btn" data-key="₍">₍</button><button class="key-btn" data-key="₎">₎</button><button class="key-btn" data-key="ₓ">ₓ</button><button class="key-btn" data-key="ᵢ">ᵢ</button><button class="key-btn" data-key="ₐ">ₐ</button><button class="key-btn" data-key="ₑ">ₑ</button>
                     </div>
 
-  <!-- Tab 4: Math Symbols (Expanded & Comprehensive) -->
-<div id="tab-symbols" class="kbd-panel hidden grid grid-cols-8 sm:grid-cols-10 gap-1.5 max-w-3xl mx-auto">
-    <!-- Basic Arithmetic & Comparison -->
-    <button class="key-btn" data-key="+">+</button>
-    <button class="key-btn" data-key="−">−</button>
-    <button class="key-btn" data-key="×">×</button>
-    <button class="key-btn" data-key="÷">÷</button>
-    <button class="key-btn" data-key="·">·</button>
-    <button class="key-btn" data-key="=">=</button>
-    <button class="key-btn" data-key="≠">≠</button>
-    <button class="key-btn" data-key="≈">≈</button>
-    <button class="key-btn" data-key="±">±</button>
-    <button class="key-btn" data-key="∓">∓</button>
-    
-    <button class="key-btn" data-key="<">&lt;</button>
-    <button class="key-btn" data-key=">">&gt;</button>
-    <button class="key-btn" data-key="≤">≤</button>
-    <button class="key-btn" data-key="≥">≥</button>
-    <button class="key-btn" data-key="≮">≮</button>
-    <button class="key-btn" data-key="≯">≯</button>
-    <button class="key-btn" data-key="≡">≡</button>
-    <button class="key-btn" data-key="≢">≢</button>
-    <button class="key-btn" data-key="≅">≅</button>
-    <button class="key-btn" data-key="≃">≃</button>
+                    <!-- Tab 4: Math Symbols (Expanded & Comprehensive) -->
+                    <div id="tab-symbols" class="kbd-panel hidden grid grid-cols-8 sm:grid-cols-10 gap-1.5 max-w-3xl mx-auto">
+                        <!-- Basic Arithmetic & Comparison -->
+                        <button class="key-btn" data-key="+">+</button>
+                        <button class="key-btn" data-key="−">−</button>
+                        <button class="key-btn" data-key="×">×</button>
+                        <button class="key-btn" data-key="÷">÷</button>
+                        <button class="key-btn" data-key="·">·</button>
+                        <button class="key-btn" data-key="=">=</button>
+                        <button class="key-btn" data-key="≠">≠</button>
+                        <button class="key-btn" data-key="≈">≈</button>
+                        <button class="key-btn" data-key="±">±</button>
+                        <button class="key-btn" data-key="∓">∓</button>
+                        
+                        <button class="key-btn" data-key="<">&lt;</button>
+                        <button class="key-btn" data-key=">">&gt;</button>
+                        <button class="key-btn" data-key="≤">≤</button>
+                        <button class="key-btn" data-key="≥">≥</button>
+                        <button class="key-btn" data-key="≮">≮</button>
+                        <button class="key-btn" data-key="≯">≯</button>
+                        <button class="key-btn" data-key="≡">≡</button>
+                        <button class="key-btn" data-key="≢">≢</button>
+                        <button class="key-btn" data-key="≅">≅</button>
+                        <button class="key-btn" data-key="≃">≃</button>
 
-    <!-- Roots, Calculus & Analysis -->
-    <button class="key-btn" data-key="√">√</button>
-    <button class="key-btn" data-key="∛">∛</button>
-    <button class="key-btn" data-key="∜">∜</button>
-    <button class="key-btn" data-key="∞">∞</button>
-    <button class="key-btn" data-key="∫">∫</button>
-    <button class="key-btn" data-key="∬">∬</button>
-    <button class="key-btn" data-key="∭">∭</button>
-    <button class="key-btn" data-key="∮">∮</button>
-    <button class="key-btn" data-key="∑">∑</button>
-    <button class="key-btn" data-key="∏">∏</button>
+                        <!-- Roots, Calculus & Analysis -->
+                        <button class="key-btn" data-key="√">√</button>
+                        <button class="key-btn" data-key="∛">∛</button>
+                        <button class="key-btn" data-key="∜">∜</button>
+                        <button class="key-btn" data-key="∞">∞</button>
+                        <button class="key-btn" data-key="∫">∫</button>
+                        <button class="key-btn" data-key="∬">∬</button>
+                        <button class="key-btn" data-key="∭">∭</button>
+                        <button class="key-btn" data-key="∮">∮</button>
+                        <button class="key-btn" data-key="∑">∑</button>
+                        <button class="key-btn" data-key="∏">∏</button>
 
-    <button class="key-btn" data-key="∂">∂</button>
-    <button class="key-btn" data-key="∇">∇</button>
-    <button class="key-btn" data-key="∝">∝</button>
-    <button class="key-btn" data-key="°">°</button>
-    <button class="key-btn" data-key="′">′</button>
-    <button class="key-btn" data-key="″">″</button>
-    <button class="key-btn" data-key="∴">∴</button>
-    <button class="key-btn" data-key="∵">∵</button>
-    <button class="key-btn" data-key="∼">∼</button>
-    <button class="key-btn" data-key="≁">≁</button>
+                        <button class="key-btn" data-key="∂">∂</button>
+                        <button class="key-btn" data-key="∇">∇</button>
+                        <button class="key-btn" data-key="∝">∝</button>
+                        <button class="key-btn" data-key="°">°</button>
+                        <button class="key-btn" data-key="′">′</button>
+                        <button class="key-btn" data-key="″">″</button>
+                        <button class="key-btn" data-key="∴">∴</button>
+                        <button class="key-btn" data-key="∵">∵</button>
+                        <button class="key-btn" data-key="∼">∼</button>
+                        <button class="key-btn" data-key="≁">≁</button>
 
-    <!-- Set Theory & Logic -->
-    <button class="key-btn" data-key="∈">∈</button>
-    <button class="key-btn" data-key="∉">∉</button>
-    <button class="key-btn" data-key="⊂">⊂</button>
-    <button class="key-btn" data-key="⊃">⊃</button>
-    <button class="key-btn" data-key="⊆">⊆</button>
-    <button class="key-btn" data-key="⊇">⊇</button>
-    <button class="key-btn" data-key="∪">∪</button>
-    <button class="key-btn" data-key="∩">∩</button>
-    <button class="key-btn" data-key="∅">∅</button>
-    <button class="key-btn" data-key="∖">∖</button>
+                        <!-- Set Theory & Logic -->
+                        <button class="key-btn" data-key="∈">∈</button>
+                        <button class="key-btn" data-key="∉">∉</button>
+                        <button class="key-btn" data-key="⊂">⊂</button>
+                        <button class="key-btn" data-key="⊃">⊃</button>
+                        <button class="key-btn" data-key="⊆">⊆</button>
+                        <button class="key-btn" data-key="⊇">⊇</button>
+                        <button class="key-btn" data-key="∪">∪</button>
+                        <button class="key-btn" data-key="∩">∩</button>
+                        <button class="key-btn" data-key="∅">∅</button>
+                        <button class="key-btn" data-key="∖">∖</button>
 
-    <button class="key-btn" data-key="∀">∀</button>
-    <button class="key-btn" data-key="∃">∃</button>
-    <button class="key-btn" data-key="∄">∄</button>
-    <button class="key-btn" data-key="⇒">⇒</button>
-    <button class="key-btn" data-key="⇔">⇔</button>
-    <button class="key-btn" data-key="¬">¬</button>
-    <button class="key-btn" data-key="∧">∧</button>
-    <button class="key-btn" data-key="∨">∨</button>
-    <button class="key-btn" data-key="⊢">⊢</button>
-    <button class="key-btn" data-key="⊨">⊨</button>
+                        <button class="key-btn" data-key="∀">∀</button>
+                        <button class="key-btn" data-key="∃">∃</button>
+                        <button class="key-btn" data-key="∄">∄</button>
+                        <button class="key-btn" data-key="⇒">⇒</button>
+                        <button class="key-btn" data-key="⇔">⇔</button>
+                        <button class="key-btn" data-key="¬">¬</button>
+                        <button class="key-btn" data-key="∧">∧</button>
+                        <button class="key-btn" data-key="∨">∨</button>
+                        <button class="key-btn" data-key="⊢">⊢</button>
+                        <button class="key-btn" data-key="⊨">⊨</button>
 
-    <!-- Geometry & Advanced Relations -->
-    <button class="key-btn" data-key="⊥">⊥</button>
-    <button class="key-btn" data-key="∥">∥</button>
-    <button class="key-btn" data-key="∦">∦</button>
-    <button class="key-btn" data-key="∠">∠</button>
-    <button class="key-btn" data-key="∡">∡</button>
-    <button class="key-btn" data-key="⊙">⊙</button>
-    <button class="key-btn" data-key="⌂">⌂</button>
-    <button class="key-btn" data-key="Ø">Ø</button>
-    <button class="key-btn" data-key="ℵ">ℵ</button>
-    <button class="key-btn" data-key="ℜ">ℜ</button>
-</div>
-
+                        <!-- Geometry & Advanced Relations -->
+                        <button class="key-btn" data-key="⊥">⊥</button>
+                        <button class="key-btn" data-key="∥">∥</button>
+                        <button class="key-btn" data-key="∦">∦</button>
+                        <button class="key-btn" data-key="∠">∠</button>
+                        <button class="key-btn" data-key="∡">∡</button>
+                        <button class="key-btn" data-key="⊙">⊙</button>
+                        <button class="key-btn" data-key="⌂">⌂</button>
+                        <button class="key-btn" data-key="Ø">Ø</button>
+                        <button class="key-btn" data-key="ℵ">ℵ</button>
+                        <button class="key-btn" data-key="ℜ">ℜ</button>
+                    </div>
 
                     <!-- Tab 5: Greek -->
                     <div id="tab-greek" class="kbd-panel hidden grid grid-cols-8 sm:grid-cols-10 gap-1.5 max-w-3xl mx-auto">
@@ -392,7 +394,7 @@
                         isUpperCase = !isUpperCase;
                         document.querySelectorAll('#tab-abc .key-btn').forEach(b => {
                             const k = b.getAttribute('data-key');
-                            if (k && k.length === 1 && k !== 'A') {
+                            if (k && k.length === 1 && k !== 'A' && isNaN(k)) {
                                 b.setAttribute('data-key', isUpperCase ? k.toUpperCase() : k.toLowerCase());
                                 b.innerText = isUpperCase ? k.toUpperCase() : k.toLowerCase();
                             }
