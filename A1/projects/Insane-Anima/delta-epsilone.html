@@ -1,1 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizing Limits: ε-δ & Absolute Value for f(x) = 2x</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #090d16;
+            color: #f8fafc;
+            overflow: hidden;
+            user-select: none;
+        }
+        .math-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom subtle scrollbar if needed */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen w-screen bg-[#090d16]">
 
+    <!-- Top Header / Title Bar -->
+    <header class="flex flex-wrap items-center justify-between px-4 py-2.5 bg-slate-900/90 border-b border-slate-800 shrink-0 z-10">
+        <div class="flex items-center space-x-3">
+            <div class="w-3 h-3 rounded-full bg-sky-400 shadow-[0_0_10px_#38bdf8]"></div>
+            <h1 class="text-base sm:text-lg font-bold tracking-tight text-slate-100">
+                The <span class="text-emerald-400">ε</span>-<span class="text-amber-400">δ</span> Definition of a Limit &amp; Absolute Value
+            </h1>
+            <span class="hidden md:inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 math-font">
+                f(x) = 2x
+            </span>
+        </div>
+
+        <!-- Legend Pills for Classroom Clarity -->
+        <div class="flex items-center space-x-2 sm:space-x-4 text-xs sm:text-sm font-medium mt-1 sm:mt-0">
+            <div class="flex items-center space-x-1.5 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700/60">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                <span class="text-amber-300 math-font font-bold">x₀, δ</span>
+                <span class="hidden lg:inline text-slate-400">(Input &amp; Delta)</span>
+            </div>
+            <div class="flex items-center space-x-1.5 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700/60">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                <span class="text-emerald-300 math-font font-bold">L, ε</span>
+                <span class="hidden lg:inline text-slate-400">(Limit &amp; Epsilon)</span>
+            </div>
+            <div class="flex items-center space-x-1.5 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700/60">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                <span class="text-rose-300 math-font font-bold">x, f(x)</span>
+                <span class="hidden lg:inline text-slate-400">(Moving Point)</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Canvas Container -->
+    <main class="relative flex-1 w-full overflow-hidden bg-[#0f172a]" id="canvas-container">
+        <canvas id="mathCanvas"></canvas>
+
+        <!-- Floating Formula Card (Top Left of Canvas) -->
+        <div id="formula-hud" class="absolute top-4 left-4 bg-slate-900/90 backdrop-blur-md border border-slate-700/70 rounded-xl p-3.5 sm:p-4 shadow-2xl max-w-xs sm:max-w-md transition-all duration-300 pointer-events-none">
+            <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1" id="scene-badge">
+                Scene 1 of 6 • The Function
+            </div>
+            <div class="text-base sm:text-xl font-bold text-white math-font tracking-tight" id="hud-equation">
+                lim<sub>x → 2</sub> (2x) = 4
+            </div>
+            <div class="mt-2 text-xs sm:text-sm text-slate-300 space-y-1 math-font" id="hud-details">
+                <div>Target Input: <span class="text-amber-400 font-bold">x₀ = 2</span></div>
+                <div>Target Limit: <span class="text-emerald-400 font-bold">L = 4</span></div>
+            </div>
+        </div>
+
+        <!-- Live Values Readout (Top Right of Canvas - visible when active) -->
+        <div id="live-hud" class="hidden sm:block absolute top-4 right-4 bg-slate-900/90 backdrop-blur-md border border-slate-700/70 rounded-xl p-3.5 shadow-2xl text-xs sm:text-sm math-font space-y-1.5 pointer-events-none min-w-[210px]">
+            <div class="text-xs uppercase tracking-wider text-slate-400 font-sans font-semibold border-b border-slate-800 pb-1 mb-1">
+                Live Distance Check
+            </div>
+            <div class="flex justify-between">
+                <span class="text-slate-400">x:</span>
+                <span id="val-x" class="text-rose-400 font-bold">2.00</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-slate-400">|x - x₀|:</span>
+                <span id="val-dx" class="text-amber-400 font-bold">0.00</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-slate-400">f(x) = 2x:</span>
+                <span id="val-fx" class="text-rose-400 font-bold">4.00</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-slate-400">|f(x) - L|:</span>
+                <span id="val-dy" class="text-emerald-400 font-bold">0.00</span>
+            </div>
+        </div>
+
+        <!-- Synchronized Subtitle Banner (Bottom Center of Canvas) -->
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 w-[94%] sm:w-[85%] max-w-4xl pointer-events-none">
+            <div class="bg-slate-950/90 backdrop-blur-md border border-slate-700/80 rounded-2xl px-5 py-3.5 sm:px-7 sm:py-4 shadow-[0_10px_40px_rgba(0,0,0,0.75)] text-center transition-all duration-300">
+                <p id="subtitle-main" class="text-base sm:text-xl md:text-2xl font-medium text-white leading-snug">
+                    Loading classroom animation...
+                </p>
+                <p id="subtitle-sub" class="text-xs sm:text-sm md:text-base text-slate-300 mt-1.5 font-normal">
+                    Press Play or use the chapter bar below to explore.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Playback & Chapter Controls -->
+    <footer class="bg-slate-900 border-t border-slate-800 px-4 py-2.5 shrink-0 z-10">
+        <!-- Chapter Progress Bar -->
+        <div class="max-w-6xl mx-auto mb-2">
+            <div class="grid grid-cols-6 gap-1.5" id="chapter-bar">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center space-x-2">
+                <!-- Restart Button -->
+                <button id="btn-restart" title="Restart Animation" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition active:scale-95 flex items-center space-x-1 text-xs sm:text-sm font-medium">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    <span class="hidden sm:inline">Restart</span>
+                </button>
+
+                <!-- Previous Scene -->
+                <button id="btn-prev" title="Previous Step" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition active:scale-95">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+
+                <!-- Play / Pause Button -->
+                <button id="btn-play" class="px-4 py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold transition active:scale-95 flex items-center space-x-1.5 text-xs sm:text-sm shadow-lg shadow-sky-500/20">
+                    <svg id="icon-pause" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
+                    <svg id="icon-play" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <span id="text-play">Pause</span>
+                </button>
+
+                <!-- Next Scene -->
+                <button id="btn-next" title="Next Step" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition active:scale-95">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+
+            <!-- Current Scene Title Indicator -->
+            <div class="text-xs sm:text-sm text-slate-300 font-medium truncate max-w-[200px] sm:max-w-md" id="footer-scene-title">
+                1. The Function f(x) = 2x &amp; Target (x₀, L)
+            </div>
+
+            <!-- Speed Toggle -->
+            <div class="flex items-center space-x-2">
+                <span class="text-xs text-slate-400 hidden sm:inline">Speed:</span>
+                <button id="btn-speed" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold math-font border border-slate-700 transition">
+                    1.0x
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        /**
+         * ============================================================================
+         * EDUCATIONAL MATH ANIMATION: EPSILON-DELTA & ABSOLUTE VALUE FOR f(x) = 2x
+         * ============================================================================
+         * Designed for high-visibility classroom projection.
+         * Explains:
+         *  - x₀ ("x-naught"): The target input value on the x-axis (x₀ = 2)
+         *  - L: The expected limit output value on the y-axis (L = 4)
+         *  - |x - x₀|: Absolute value as horizontal distance from x₀
+         *  - |f(x) - L|: Absolute value as vertical distance from L
+         *  - ε ("epsilon"): Vertical tolerance band around L
+         *  - δ ("delta"): Horizontal input trap around x₀ (where δ = ε / 2)
+         */
+
+        const canvas = document.getElementById('mathCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('canvas-container');
+
+        // UI Elements
+        const subtitleMain = document.getElementById('subtitle-main');
+        const subtitleSub = document.getElementById('subtitle-sub');
+        const sceneBadge = document.getElementById('scene-badge');
+        const hudEquation = document.getElementById('hud-equation');
+        const hudDetails = document.getElementById('hud-details');
+        const liveHud = document.getElementById('live-hud');
+        const footerSceneTitle = document.getElementById('footer-scene-title');
+        const chapterBar = document.getElementById('chapter-bar');
+
+        const valX = document.getElementById('val-x');
+        const valDx = document.getElementById('val-dx');
+        const valFx = document.getElementById('val-fx');
+        const valDy = document.getElementById('val-dy');
+
+        const btnPlay = document.getElementById('btn-play');
+        const iconPause = document.getElementById('icon-pause');
+        const iconPlay = document.getElementById('icon-play');
+        const textPlay = document.getElementById('text-play');
+        const btnRestart = document.getElementById('btn-restart');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const btnSpeed = document.getElementById('btn-speed');
+
+        // Color Palette (High Contrast for Classroom)
+        const COLORS = {
+            bg: '#0f172a',
+            gridMajor: '#1e293b',
+            gridMinor: '#151f32',
+            axis: '#64748b',
+            axisText: '#94a3b8',
+            funcLine: '#38bdf8',      // Sky blue for f(x) = 2x
+            xNot: '#f59e0b',          // Amber for x₀ and δ
+            xNotFill: 'rgba(245, 158, 11, 0.16)',
+            limitL: '#10b981',        // Emerald for L and ε
+            limitLFill: 'rgba(16, 185, 129, 0.16)',
+            pointX: '#f43f5e',        // Rose for moving test point x
+            white: '#f8fafc',
+            muted: '#94a3b8'
+        };
+
+        // Mathematical Constants for our demonstration
+        const X0 = 2.0;
+        const L = 4.0;
+        const f = (x) => 2 * x;
+
+        // Storyboard Chapters / Scenes
+        const SCENES = [
+            {
+                id: 0,
+                shortTitle: "1. Function & Target",
+                title: "1. The Function f(x) = 2x & Target (x₀, L)",
+                duration: 14, // seconds
+                cues: [
+                    {
+                        t: 0.0,
+                        main: "Consider the simple linear function <span class='text-sky-400 font-bold'>f(x) = 2x</span>.",
+                        sub: "Every input x on the horizontal axis is doubled to give an output y on the vertical axis."
+                    },
+                    {
+                        t: 0.35,
+                        main: "Pick a target input <span class='text-amber-400 font-bold'>x₀ = 2</span> (pronounced <em>\"x-naught\"</em>).",
+                        sub: "x₀ is simply the specific x-value we are approaching."
+                    },
+                    {
+                        t: 0.68,
+                        main: "As x approaches <span class='text-amber-400 font-bold'>x₀ = 2</span>, f(x) approaches <span class='text-emerald-400 font-bold'>L = 4</span>.",
+                        sub: "L is the Limit—the expected output height on the y-axis."
+                    }
+                ]
+            },
+            {
+                id: 1,
+                shortTitle: "2. Absolute Value",
+                title: "2. Absolute Value Means Distance",
+                duration: 16,
+                cues: [
+                    {
+                        t: 0.0,
+                        main: "Why do limit definitions use <span class='text-amber-300 font-bold'>absolute value</span> bars like <span class='math-font text-amber-400'>|x − x₀|</span>?",
+                        sub: "In math, |a − b| simply means the physical distance between a and b (always positive!)."
+                    },
+                    {
+                        t: 0.45,
+                        main: "<span class='math-font text-amber-400 font-bold'>|x − x₀|</span> is the horizontal distance between <span class='text-rose-400'>x</span> and <span class='text-amber-400'>x₀</span>.",
+                        sub: "Whether x is to the left or right of 2, the distance |x − 2| is positive."
+                    },
+                    {
+                        t: 0.75,
+                        main: "<span class='math-font text-emerald-400 font-bold'>|f(x) − L|</span> is the vertical distance between <span class='text-rose-400'>f(x)</span> and <span class='text-emerald-400'>L</span>.",
+                        sub: "Notice that because f(x) = 2x has a slope of 2, the vertical distance is always twice the horizontal distance!"
+                    }
+                ]
+            },
+            {
+                id: 2,
+                shortTitle: "3. Epsilon (ε)",
+                title: "3. Epsilon (ε): The Vertical Error Tolerance",
+                duration: 15,
+                cues: [
+                    {
+                        t: 0.0,
+                        main: "Now meet <span class='text-emerald-400 font-bold'>ε (epsilon)</span> — a tiny positive number.",
+                        sub: "Think of ε as your vertical error tolerance around the limit L = 4."
+                    },
+                    {
+                        t: 0.4,
+                        main: "The inequality <span class='math-font text-emerald-400 font-bold'>|f(x) − L| &lt; ε</span> creates a horizontal target zone.",
+                        sub: "It means: \"Keep the output f(x) within ε units above or below L = 4.\""
+                    },
+                    {
+                        t: 0.75,
+                        main: "Here, with <span class='math-font text-emerald-400 font-bold'>ε = 1.0</span>, f(x) must stay between <span class='text-emerald-300 font-bold'>3.0 and 5.0</span>.",
+                        sub: "How close must x be to x₀ = 2 so that f(x) lands inside this green zone?"
+                    }
+                ]
+            },
+            {
+                id: 3,
+                shortTitle: "4. Delta (δ)",
+                title: "4. Delta (δ): Finding the Safe Input Zone",
+                duration: 16,
+                cues: [
+                    {
+                        t: 0.0,
+                        main: "To trap f(x) inside the green <span class='text-emerald-400 font-bold'>ε-band</span>, we project down to the x-axis.",
+                        sub: "Where the green band hits the line f(x) = 2x, it defines a safe zone on the x-axis."
+                    },
+                    {
+                        t: 0.42,
+                        main: "This horizontal radius around x₀ is called <span class='text-amber-400 font-bold'>δ (delta)</span>.",
+                        sub: "The inequality <span class='math-font text-amber-400 font-bold'>|x − x₀| &lt; δ</span> means x is within δ units of x₀."
+                    },
+                    {
+                        t: 0.75,
+                        main: "Since f(x) = 2x stretches distances by 2, we choose <span class='math-font text-amber-400 font-bold'>δ = ε / 2</span>.",
+                        sub: "With ε = 1.0, we get δ = 0.5 (so x stays between 1.5 and 2.5)."
+                    }
+                ]
+            },
+            {
+                id: 4,
+                shortTitle: "5. The Limit Proof",
+                title: "5. The Limit in Action: Shrinking ε and δ",
+                duration: 18,
+                cues: [
+                    {
+                        t: 0.0,
+                        main: "Whenever <span class='text-rose-400 font-bold'>x</span> stays inside the <span class='text-amber-400 font-bold'>δ-zone</span>, <span class='text-rose-400 font-bold'>f(x)</span> is guaranteed to stay inside the <span class='text-emerald-400 font-bold'>ε-zone</span>!",
+                        sub: "If |x − 2| < δ, then |2x − 4| < ε is 100% guaranteed."
+                    },
+                    {
+                        t: 0.48,
+                        main: "What if someone demands a tighter tolerance? Let's shrink <span class='text-emerald-400 font-bold'>ε from 1.0 down to 0.4</span>!",
+                        sub: "Watch how δ automatically shrinks to ε/2 = 0.2 to keep f(x) trapped!"
+                    },
+                    {
+                        t: 0.80,
+                        main: "No matter how small <span class='text-emerald-400 font-bold'>ε</span> gets, <span class='text-amber-400 font-bold'>δ = ε / 2</span> always works!",
+                        sub: "That is the exact proof that lim (x → 2) 2x = 4."
+                    }
+                ]
+            },
+            {
+                id: 5,
+                shortTitle: "6. Full Summary",
+                title: "6. Summary: Putting All 4 Pieces Together",
+                duration: 14,
+                cues: [
+                    {
+                        t: 0.0,
+                        main: "<span class='text-amber-400 font-bold'>x₀</span> = target input, <span class='text-emerald-400 font-bold'>L</span> = target limit, <span class='text-emerald-400 font-bold'>ε</span> = vertical tolerance, <span class='text-amber-400 font-bold'>δ</span> = horizontal tolerance.",
+                        sub: "Absolute value turns inequalities into simple distances on the number lines."
+                    },
+                    {
+                        t: 0.5,
+                        main: "<span class='math-font text-base sm:text-xl text-white font-bold'>0 &lt; <span class='text-amber-400'>|x − x₀| &lt; δ</span> &nbsp;⇒&nbsp; <span class='text-emerald-400'>|f(x) − L| &lt; ε</span></span>",
+                        sub: "\"If x is within δ of x₀, then f(x) is within ε of L.\" Animation complete — press Restart or click any chapter!"
+                    }
+                ]
+            }
+        ];
+
+        // Playback State
+        let currentSceneIndex = 0;
+        let sceneElapsed = 0;
+        let isPlaying = true;
+        let playbackSpeed = 1.0;
+        let lastTimestamp = null;
+
+        // Coordinate System State (computed on resize)
+        let width = 0;
+        let height = 0;
+        let dpr = 1;
+        let originX = 0;
+        let originY = 0;
+        let scale = 60; // pixels per 1 math unit
+
+        // Build Chapter Progress Bar UI
+        function initChapterBar() {
+            chapterBar.innerHTML = '';
+            SCENES.forEach((scene, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'group flex flex-col text-left focus:outline-none';
+                btn.onclick = () => jumpToScene(idx);
+                btn.innerHTML = `
+                    <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mb-1">
+                        <div id="prog-${idx}" class="h-full bg-sky-400 w-0 transition-all duration-75"></div>
+                    </div>
+                    <span id="chap-label-${idx}" class="text-[10px] sm:text-xs font-medium truncate text-slate-400 group-hover:text-white transition">
+                        ${scene.shortTitle}
+                    </span>
+                `;
+                chapterBar.appendChild(btn);
+            });
+        }
+
+        function jumpToScene(index) {
+            currentSceneIndex = Math.max(0, Math.min(SCENES.length - 1, index));
+            sceneElapsed = 0;
+            updateUI();
+        }
+
+        // Resize Handler for Crisp High-DPI Canvas
+        function resizeCanvas() {
+            const rect = container.getBoundingClientRect();
+            dpr = window.devicePixelRatio || 1;
+            width = rect.width;
+            height = rect.height;
+
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            // Calculate optimal math scale so [x: -1..4.5] and [y: -1..6.5] fit comfortably
+            // Leave room at bottom for subtitles and top for HUD
+            const usableWidth = width * 0.85;
+            const usableHeight = height * 0.68;
+            const scaleX = usableWidth / 5.5;
+            const scaleY = usableHeight / 7.2;
+            scale = Math.max(36, Math.min(scaleX, scaleY, 95));
+
+            // Position origin (0,0) nicely in lower-left quadrant so (2,4) is near center
+            originX = width * 0.32;
+            originY = height * 0.72;
+        }
+
+        // Math to Screen Coordinate Helpers
+        const toScreenX = (x) => originX + x * scale;
+        const toScreenY = (y) => originY - y * scale;
+
+        // Easing Helpers
+        const clamp01 = (v) => Math.max(0, Math.min(1, v));
+        const easeOutCubic = (t) => 1 - Math.pow(1 - clamp01(t), 3);
+        const easeInOutCubic = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        const subProgress = (p, start, end) => clamp01((p - start) / (end - start));
+
+        // Drawing Primitives
+        function drawGridAndAxes() {
+            ctx.save();
+
+            // Minor grid (0.5 units)
+            ctx.strokeStyle = COLORS.gridMinor;
+            ctx.lineWidth = 1;
+            const minX = Math.floor(-originX / scale) - 1;
+            const maxX = Math.ceil((width - originX) / scale) + 1;
+            const minY = Math.floor((originY - height) / scale) - 1;
+            const maxY = Math.ceil(originY / scale) + 1;
+
+            for (let x = minX; x <= maxX; x += 0.5) {
+                const sx = toScreenX(x);
+                ctx.beginPath();
+                ctx.moveTo(sx, 0);
+                ctx.lineTo(sx, height);
+                ctx.stroke();
+            }
+            for (let y = minY; y <= maxY; y += 0.5) {
+                const sy = toScreenY(y);
+                ctx.beginPath();
+                ctx.moveTo(0, sy);
+                ctx.lineTo(width, sy);
+                ctx.stroke();
+            }
+
+            // Major grid (1.0 units)
+            ctx.strokeStyle = COLORS.gridMajor;
+            ctx.lineWidth = 1.2;
+            for (let x = minX; x <= maxX; x += 1) {
+                if (x === 0) continue;
+                const sx = toScreenX(x);
+                ctx.beginPath();
+                ctx.moveTo(sx, 0);
+                ctx.lineTo(sx, height);
+                ctx.stroke();
+            }
+            for (let y = minY; y <= maxY; y += 1) {
+                if (y === 0) continue;
+                const sy = toScreenY(y);
+                ctx.beginPath();
+                ctx.moveTo(0, sy);
+                ctx.lineTo(width, sy);
+                ctx.stroke();
+            }
+
+            // Main X and Y Axes
+            ctx.strokeStyle = COLORS.axis;
+            ctx.lineWidth = 2;
+
+            // X-axis
+            ctx.beginPath();
+            ctx.moveTo(0, originY);
+            ctx.lineTo(width, originY);
+            ctx.stroke();
+
+            // Y-axis
+            ctx.beginPath();
+            ctx.moveTo(originX, 0);
+            ctx.lineTo(originX, height);
+            ctx.stroke();
+
+            // Axis Labels & Numbers
+            ctx.fillStyle = COLORS.axisText;
+            ctx.font = '600 13px "JetBrains Mono", monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+
+            for (let x = minX; x <= maxX; x += 1) {
+                if (x === 0) continue;
+                const sx = toScreenX(x);
+                if (sx > 20 && sx < width - 20) {
+                    ctx.fillText(x.toString(), sx, originY + 8);
+                    // Tick
+                    ctx.beginPath();
+                    ctx.moveTo(sx, originY - 4);
+                    ctx.lineTo(sx, originY + 4);
+                    ctx.stroke();
+                }
+            }
+
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+            for (let y = minY; y <= maxY; y += 1) {
+                if (y === 0) continue;
+                const sy = toScreenY(y);
+                if (sy > 20 && sy < height - 90) {
+                    ctx.fillText(y.toString(), originX - 10, sy);
+                    // Tick
+                    ctx.beginPath();
+                    ctx.moveTo(originX - 4, sy);
+                    ctx.lineTo(originX + 4, sy);
+                    ctx.stroke();
+                }
+            }
+
+            // Origin "0"
+            ctx.fillText('0', originX - 8, originY + 14);
+
+            // Axis Names
+            ctx.fillStyle = '#cbd5e1';
+            ctx.font = 'bold 14px "Inter", sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText('x (Input)', width - 16, originY - 12);
+            ctx.textAlign = 'left';
+            ctx.fillText('y = f(x) (Output)', originX + 12, 22);
+
+            ctx.restore();
+        }
+
+        function drawFunctionLine(drawProgress = 1) {
+            ctx.save();
+            const xStart = -1.2;
+            const xEnd = -1.2 + 5.2 * easeOutCubic(drawProgress);
+
+            ctx.strokeStyle = COLORS.funcLine;
+            ctx.lineWidth = 3.5;
+            ctx.shadowColor = 'rgba(56, 189, 248, 0.45)';
+            ctx.shadowBlur = 12;
+
+            ctx.beginPath();
+            ctx.moveTo(toScreenX(xStart), toScreenY(f(xStart)));
+            ctx.lineTo(toScreenX(xEnd), toScreenY(f(xEnd)));
+            ctx.stroke();
+
+            // Function Label along the line
+            if (drawProgress > 0.7) {
+                const alpha = clamp01((drawProgress - 0.7) / 0.3);
+                ctx.globalAlpha = alpha;
+                ctx.shadowBlur = 0;
+                const labelX = 3.15;
+                const labelY = f(labelX);
+                const sx = toScreenX(labelX);
+                const sy = toScreenY(labelY);
+
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.roundRect(sx + 10, sy - 16, 98, 28, 6);
+                ctx.fill();
+                ctx.strokeStyle = COLORS.funcLine;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                ctx.fillStyle = COLORS.funcLine;
+                ctx.font = 'bold 14px "JetBrains Mono", monospace';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('f(x) = 2x', sx + 18, sy - 2);
+            }
+
+            ctx.restore();
+        }
+
+        function drawDashedLine(x1, y1, x2, y2, color, lineWidth = 2) {
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = lineWidth;
+            ctx.setLineDash([6, 6]);
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawPoint(sx, sy, color, radius = 6, glow = true) {
+            ctx.save();
+            if (glow) {
+                ctx.shadowColor = color;
+                ctx.shadowBlur = 14;
+            }
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(sx, sy, radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(sx, sy, radius * 0.4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawPillBadge(text, sx, sy, bgColor, borderColor, textColor) {
+            ctx.save();
+            ctx.font = 'bold 13px "JetBrains Mono", monospace';
+            const metrics = ctx.measureText(text);
+            const padX = 10;
+            const w = metrics.width + padX * 2;
+            const h = 26;
+
+            ctx.fillStyle = bgColor;
+            ctx.beginPath();
+            ctx.roundRect(sx - w / 2, sy - h / 2, w, h, 7);
+            ctx.fill();
+
+            ctx.strokeStyle = borderColor;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.fillStyle = textColor;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, sx, sy + 0.5);
+            ctx.restore();
+        }
+
+        function drawDistanceBracket(x1, y1, x2, y2, label, color, offset = 18, isVertical = false) {
+            if (Math.hypot(x2 - x1, y2 - y1) < 4) return;
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 2;
+
+            if (!isVertical) {
+                const by = y1 + offset;
+                ctx.beginPath();
+                ctx.moveTo(x1, y1 + 4);
+                ctx.lineTo(x1, by);
+                ctx.lineTo(x2, by);
+                ctx.lineTo(x2, y2 + 4);
+                ctx.stroke();
+
+                drawPillBadge(label, (x1 + x2) / 2, by + 18, '#0f172a', color, color);
+            } else {
+                const bx = x1 - offset;
+                ctx.beginPath();
+                ctx.moveTo(x1 - 4, y1);
+                ctx.lineTo(bx, y1);
+                ctx.lineTo(bx, y2);
+                ctx.lineTo(x2 - 4, y2);
+                ctx.stroke();
+
+                drawPillBadge(label, bx - 48, (y1 + y2) / 2, '#0f172a', color, color);
+            }
+            ctx.restore();
+        }
+
+        function drawTargetX0AndL(alphaX0 = 1, alphaL = 1) {
+            const sx0 = toScreenX(X0);
+            const syL = toScreenY(L);
+
+            if (alphaX0 > 0) {
+                ctx.save();
+                ctx.globalAlpha = alphaX0;
+                drawDashedLine(sx0, originY, sx0, syL, COLORS.xNot, 2);
+                drawPoint(sx0, originY, COLORS.xNot, 6);
+                drawPillBadge('x₀ = 2', sx0, originY + 34, '#1e1b18', COLORS.xNot, COLORS.xNot);
+                ctx.restore();
+            }
+
+            if (alphaL > 0) {
+                ctx.save();
+                ctx.globalAlpha = alphaL;
+                drawDashedLine(sx0, syL, originX, syL, COLORS.limitL, 2);
+                drawPoint(originX, syL, COLORS.limitL, 6);
+                drawPoint(sx0, syL, COLORS.funcLine, 7);
+                drawPillBadge('L = 4', originX - 44, syL, '#0d261e', COLORS.limitL, COLORS.limitL);
+                ctx.restore();
+            }
+        }
+
+        function drawEpsilonBand(eps, alpha = 1) {
+            if (alpha <= 0 || eps <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = alpha;
+
+            const yTop = toScreenY(L + eps);
+            const yBot = toScreenY(L - eps);
+            const bandHeight = yBot - yTop;
+
+            // Shaded horizontal band across graph
+            ctx.fillStyle = COLORS.limitLFill;
+            ctx.fillRect(0, yTop, width, bandHeight);
+
+            // Top & Bottom dashed borders
+            drawDashedLine(0, yTop, width, yTop, COLORS.limitL, 1.8);
+            drawDashedLine(0, yBot, width, yBot, COLORS.limitL, 1.8);
+
+            // Highlight interval on Y-axis
+            ctx.strokeStyle = COLORS.limitL;
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(originX, yTop);
+            ctx.lineTo(originX, yBot);
+            ctx.stroke();
+
+            // Labels for L + ε and L - ε
+            drawPillBadge(`L+ε (${(L + eps).toFixed(2)})`, originX - 66, yTop, '#0f172a', COLORS.limitL, '#6ee7b7');
+            drawPillBadge(`L-ε (${(L - eps).toFixed(2)})`, originX - 66, yBot, '#0f172a', COLORS.limitL, '#6ee7b7');
+
+            ctx.restore();
+        }
+
+        function drawDeltaBand(delta, alpha = 1) {
+            if (alpha <= 0 || delta <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = alpha;
+
+            const xLeft = toScreenX(X0 - delta);
+            const xRight = toScreenX(X0 + delta);
+            const bandWidth = xRight - xLeft;
+
+            // Shaded vertical band
+            ctx.fillStyle = COLORS.xNotFill;
+            ctx.fillRect(xLeft, 0, bandWidth, height);
+
+            // Left & Right dashed borders
+            drawDashedLine(xLeft, 0, xLeft, height, COLORS.xNot, 1.8);
+            drawDashedLine(xRight, 0, xRight, height, COLORS.xNot, 1.8);
+
+            // Highlight interval on X-axis
+            ctx.strokeStyle = COLORS.xNot;
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(xLeft, originY);
+            ctx.lineTo(xRight, originY);
+            ctx.stroke();
+
+            // Labels for x₀ - δ and x₀ + δ
+            drawPillBadge(`x₀-δ`, xLeft, originY + 24, '#0f172a', COLORS.xNot, '#fcd34d');
+            drawPillBadge(`x₀+δ`, xRight, originY + 24, '#0f172a', COLORS.xNot, '#fcd34d');
+
+            ctx.restore();
+        }
+
+        function drawMovingTestPoint(xVal, showBrackets = true) {
+            const yVal = f(xVal);
+            const sx = toScreenX(xVal);
+            const sy = toScreenY(yVal);
+            const sx0 = toScreenX(X0);
+            const syL = toScreenY(L);
+
+            // Projection lines from (x, f(x)) to axes
+            drawDashedLine(sx, originY, sx, sy, COLORS.pointX, 2);
+            drawDashedLine(sx, sy, originX, sy, COLORS.pointX, 2);
+
+            // Points on X-axis, Curve, and Y-axis
+            drawPoint(sx, originY, COLORS.pointX, 6.5);
+            drawPoint(originX, sy, COLORS.pointX, 6.5);
+            drawPoint(sx, sy, COLORS.pointX, 7.5);
+
+            // Labels
+            drawPillBadge(`x = ${xVal.toFixed(2)}`, sx, originY - 22, '#1f1218', COLORS.pointX, '#fda4af');
+            drawPillBadge(`f(x) = ${yVal.toFixed(2)}`, originX + 64, sy, '#1f1218', COLORS.pointX, '#fda4af');
+
+            if (showBrackets) {
+                const dx = Math.abs(xVal - X0);
+                const dy = Math.abs(yVal - L);
+                drawDistanceBracket(sx0, originY, sx, originY, `|x - x₀| = ${dx.toFixed(2)}`, COLORS.xNot, 46, false);
+                drawDistanceBracket(originX, syL, originX, sy, `|f(x) - L| = ${dy.toFixed(2)}`, COLORS.limitL, 26, true);
+            }
+
+            // Update Live HUD
+            valX.textContent = xVal.toFixed(2);
+            valDx.textContent = Math.abs(xVal - X0).toFixed(2);
+            valFx.textContent = yVal.toFixed(2);
+            valDy.textContent = Math.abs(yVal - L).toFixed(2);
+        }
+
+        // Main Render Loop per Scene
+        function renderScene(sceneIdx, p) {
+            ctx.clearRect(0, 0, width, height);
+            drawGridAndAxes();
+
+            if (sceneIdx === 0) {
+                // Scene 1: Function f(x) = 2x, x₀ = 2, L = 4
+                liveHud.classList.add('hidden');
+                const lineP = subProgress(p, 0.0, 0.35);
+                const x0P = easeOutCubic(subProgress(p, 0.35, 0.65));
+                const lP = easeOutCubic(subProgress(p, 0.65, 0.92));
+
+                drawFunctionLine(lineP);
+                drawTargetX0AndL(x0P, lP);
+
+                hudEquation.innerHTML = `lim<sub>x → 2</sub> (2x) = 4`;
+                hudDetails.innerHTML = `
+                    <div>Function: <span class="text-sky-400 font-bold">f(x) = 2x</span></div>
+                    <div>Target Input: <span class="text-amber-400 font-bold">x₀ = 2</span></div>
+                    <div>Target Limit: <span class="text-emerald-400 font-bold">L = 4</span></div>
+                `;
+            }
+            else if (sceneIdx === 1) {
+                // Scene 2: Absolute Value as Distance
+                liveHud.classList.remove('hidden');
+                drawFunctionLine(1);
+                drawTargetX0AndL(1, 1);
+
+                // Oscillate x smoothly around x₀ = 2 (between 1.2 and 2.8)
+                const wave = Math.sin(p * Math.PI * 3.2);
+                const xVal = X0 + 0.75 * wave;
+                drawMovingTestPoint(xVal, true);
+
+                hudEquation.innerHTML = `Distance = Absolute Value`;
+                hudDetails.innerHTML = `
+                    <div class="text-amber-400 font-bold">|x − x₀| = horizontal distance</div>
+                    <div class="text-emerald-400 font-bold">|f(x) − L| = vertical distance</div>
+                    <div class="text-slate-300 text-xs mt-1">Notice: |2x − 4| = 2|x − 2|</div>
+                `;
+            }
+            else if (sceneIdx === 2) {
+                // Scene 3: Introducing Epsilon (ε)
+                liveHud.classList.add('hidden');
+                drawFunctionLine(1);
+                const epsAlpha = easeOutCubic(subProgress(p, 0.05, 0.45));
+                drawEpsilonBand(1.0, epsAlpha);
+                drawTargetX0AndL(1, 1);
+
+                hudEquation.innerHTML = `<span class="text-emerald-400">|f(x) − L| &lt; ε</span>`;
+                hudDetails.innerHTML = `
+                    <div>Tolerance: <span class="text-emerald-400 font-bold">ε = 1.00</span></div>
+                    <div>Allowed y-range: <span class="text-emerald-300 font-bold">(3.00, 5.00)</span></div>
+                    <div class="text-slate-400 text-xs mt-1">Keep f(x) inside the green band!</div>
+                `;
+            }
+            else if (sceneIdx === 3) {
+                // Scene 4: Finding Delta (δ) from Epsilon
+                liveHud.classList.add('hidden');
+                drawFunctionLine(1);
+                drawEpsilonBand(1.0, 1);
+
+                const deltaAlpha = easeOutCubic(subProgress(p, 0.25, 0.65));
+                drawDeltaBand(0.5, deltaAlpha);
+                drawTargetX0AndL(1, 1);
+
+                // Highlight intersection box where δ-band meets ε-band on f(x) = 2x
+                if (deltaAlpha > 0.3) {
+                    ctx.save();
+                    ctx.globalAlpha = deltaAlpha;
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(
+                        toScreenX(X0 - 0.5),
+                        toScreenY(L + 1.0),
+                        toScreenX(X0 + 0.5) - toScreenX(X0 - 0.5),
+                        toScreenY(L - 1.0) - toScreenY(L + 1.0)
+                    );
+                    ctx.restore();
+                }
+
+                hudEquation.innerHTML = `<span class="text-amber-400">|x − x₀| &lt; δ</span> ⇒ <span class="text-emerald-400">|f(x) − L| &lt; ε</span>`;
+                hudDetails.innerHTML = `
+                    <div>Given <span class="text-emerald-400 font-bold">ε = 1.00</span></div>
+                    <div>Choose <span class="text-amber-400 font-bold">δ = ε / 2 = 0.50</span></div>
+                    <div>Safe x-range: <span class="text-amber-300 font-bold">(1.50, 2.50)</span></div>
+                `;
+            }
+            else if (sceneIdx === 4) {
+                // Scene 5: Live Proof & Shrinking ε
+                liveHud.classList.remove('hidden');
+                drawFunctionLine(1);
+
+                // Shrink ε smoothly from 1.0 down to 0.4 between p=0.45 and p=0.75
+                let eps = 1.0;
+                if (p > 0.45) {
+                    const shrinkP = easeInOutCubic(subProgress(p, 0.45, 0.75));
+                    eps = 1.0 - 0.6 * shrinkP; // 1.0 -> 0.4
+                }
+                const delta = eps / 2;
+
+                drawEpsilonBand(eps, 1);
+                drawDeltaBand(delta, 1);
+                drawTargetX0AndL(1, 1);
+
+                // Oscillate x strictly inside (x₀ - δ, x₀ + δ)
+                const xVal = X0 + (delta * 0.85) * Math.sin(p * Math.PI * 5);
+                drawMovingTestPoint(xVal, false);
+
+                hudEquation.innerHTML = `<span class="text-amber-400">|x − 2| &lt; ${delta.toFixed(2)}</span> ⇒ <span class="text-emerald-400">|2x − 4| &lt; ${eps.toFixed(2)}</span>`;
+                hudDetails.innerHTML = `
+                    <div>Current <span class="text-emerald-400 font-bold">ε = ${eps.toFixed(2)}</span></div>
+                    <div>Required <span class="text-amber-400 font-bold">δ = ε / 2 = ${delta.toFixed(2)}</span></div>
+                    <div class="text-emerald-300 text-xs font-bold mt-1">✓ f(x) stays trapped inside L ± ε!</div>
+                `;
+            }
+            else if (sceneIdx === 5) {
+                // Scene 6: Clean Summary View
+                liveHud.classList.add('hidden');
+                drawFunctionLine(1);
+                const eps = 0.8;
+                const delta = 0.4;
+                drawEpsilonBand(eps, 1);
+                drawDeltaBand(delta, 1);
+                drawTargetX0AndL(1, 1);
+
+                // Gentle stationary demonstration point
+                const xVal = X0 + 0.25;
+                drawMovingTestPoint(xVal, true);
+
+                hudEquation.innerHTML = `lim<sub>x → x₀</sub> f(x) = L`;
+                hudDetails.innerHTML = `
+                    <div class="text-amber-400 font-bold">0 &lt; |x − x₀| &lt; δ  (Input Trap)</div>
+                    <div class="text-emerald-400 font-bold">⇒ |f(x) − L| &lt; ε  (Output Guarantee)</div>
+                    <div class="text-sky-300 text-xs mt-1">For f(x) = 2x, δ = ε / 2 always works!</div>
+                `;
+            }
+        }
+
+        // Update Subtitles & Progress Bars
+        function updateUI() {
+            const scene = SCENES[currentSceneIndex];
+            const progress = clamp01(sceneElapsed / scene.duration);
+
+            // Update chapter progress bars
+            SCENES.forEach((s, idx) => {
+                const bar = document.getElementById(`prog-${idx}`);
+                const label = document.getElementById(`chap-label-${idx}`);
+                if (idx < currentSceneIndex) {
+                    bar.style.width = '100%';
+                    label.className = 'text-[10px] sm:text-xs font-medium truncate text-sky-400 transition';
+                } else if (idx === currentSceneIndex) {
+                    bar.style.width = `${progress * 100}%`;
+                    label.className = 'text-[10px] sm:text-xs font-bold truncate text-white transition';
+                } else {
+                    bar.style.width = '0%';
+                    label.className = 'text-[10px] sm:text-xs font-medium truncate text-slate-500 transition';
+                }
+            });
+
+            // Update Header/Footer Badges
+            sceneBadge.textContent = `Scene ${currentSceneIndex + 1} of ${SCENES.length}`;
+            footerSceneTitle.textContent = scene.title;
+
+            // Find active subtitle cue
+            let activeCue = scene.cues[0];
+            for (let i = 0; i < scene.cues.length; i++) {
+                if (progress >= scene.cues[i].t) {
+                    activeCue = scene.cues[i];
+                }
+            }
+
+            if (subtitleMain.innerHTML !== activeCue.main) {
+                subtitleMain.innerHTML = activeCue.main;
+            }
+            if (subtitleSub.innerHTML !== activeCue.sub) {
+                subtitleSub.innerHTML = activeCue.sub;
+            }
+
+            renderScene(currentSceneIndex, progress);
+        }
+
+        // Animation Frame Loop
+        function animate(timestamp) {
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            const dt = (timestamp - lastTimestamp) / 1000;
+            lastTimestamp = timestamp;
+
+            if (isPlaying) {
+                sceneElapsed += dt * playbackSpeed;
+                const currentDuration = SCENES[currentSceneIndex].duration;
+
+                if (sceneElapsed >= currentDuration) {
+                    if (currentSceneIndex < SCENES.length - 1) {
+                        currentSceneIndex++;
+                        sceneElapsed = 0;
+                    } else {
+                        // Finished final scene
+                        sceneElapsed = currentDuration;
+                        isPlaying = false;
+                        syncPlayButton();
+                    }
+                }
+            }
+
+            updateUI();
+            requestAnimationFrame(animate);
+        }
+
+        function syncPlayButton() {
+            if (isPlaying) {
+                iconPause.classList.remove('hidden');
+                iconPlay.classList.add('hidden');
+                textPlay.textContent = 'Pause';
+            } else {
+                iconPause.classList.add('hidden');
+                iconPlay.classList.remove('hidden');
+                textPlay.textContent = 'Play';
+            }
+        }
+
+        // Event Listeners
+        btnPlay.addEventListener('click', () => {
+            if (!isPlaying && currentSceneIndex === SCENES.length - 1 && sceneElapsed >= SCENES[currentSceneIndex].duration) {
+                // Restart if at the very end
+                currentSceneIndex = 0;
+                sceneElapsed = 0;
+            }
+            isPlaying = !isPlaying;
+            syncPlayButton();
+        });
+
+        btnRestart.addEventListener('click', () => {
+            currentSceneIndex = 0;
+            sceneElapsed = 0;
+            isPlaying = true;
+            syncPlayButton();
+            updateUI();
+        });
+
+        btnPrev.addEventListener('click', () => {
+            if (sceneElapsed > 1.5) {
+                sceneElapsed = 0;
+            } else {
+                currentSceneIndex = Math.max(0, currentSceneIndex - 1);
+                sceneElapsed = 0;
+            }
+            updateUI();
+        });
+
+        btnNext.addEventListener('click', () => {
+            if (currentSceneIndex < SCENES.length - 1) {
+                currentSceneIndex++;
+                sceneElapsed = 0;
+            } else {
+                sceneElapsed = SCENES[currentSceneIndex].duration;
+            }
+            updateUI();
+        });
+
+        const speeds = [1.0, 1.25, 1.5, 0.75];
+        let speedIdx = 0;
+        btnSpeed.addEventListener('click', () => {
+            speedIdx = (speedIdx + 1) % speeds.length;
+            playbackSpeed = speeds[speedIdx];
+            btnSpeed.textContent = `${playbackSpeed.toFixed(playbackSpeed % 1 === 0 ? 1 : 2)}x`;
+        });
+
+        // Keyboard shortcuts for classroom presenter remotes / keyboards
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                btnPlay.click();
+            } else if (e.code === 'ArrowRight') {
+                btnNext.click();
+            } else if (e.code === 'ArrowLeft') {
+                btnPrev.click();
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            updateUI();
+        });
+
+        // Initialize on Window Load
+        window.onload = function () {
+            initChapterBar();
+            resizeCanvas();
+            updateUI();
+            requestAnimationFrame(animate);
+        };
+    </script>
+</body>
+</html>
