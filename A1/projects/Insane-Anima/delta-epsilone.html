@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ckb" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualizing Limits: ε-δ & Absolute Value for f(x) = 2x</title>
+    <title>بینینی سنوورەکان: ε-δ و بەهای ڕەها بۆ f(x) = 2x</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Vazirmatn', sans-serif;
             background-color: #090d16;
             color: #f8fafc;
             overflow: hidden;
@@ -16,8 +16,9 @@
         }
         .math-font {
             font-family: 'JetBrains Mono', monospace;
+            direction: ltr;
+            display: inline-block;
         }
-        /* Custom subtle scrollbar if needed */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -39,33 +40,33 @@
 <body class="flex flex-col h-screen w-screen bg-[#090d16]">
 
     <!-- Top Header / Title Bar -->
-    <header class="flex flex-wrap items-center justify-between px-4 py-2.5 bg-slate-900/90 border-b border-slate-800 shrink-0 z-10">
-        <div class="flex items-center space-x-3">
+    <header class="flex flex-wrap items-center justify-between px-4 py-2.5 bg-slate-900/90 border-b border-slate-800 shrink-0 z-10 gap-3">
+        <div class="flex items-center space-x-reverse space-x-3">
             <div class="w-3 h-3 rounded-full bg-sky-400 shadow-[0_0_10px_#38bdf8]"></div>
-            <h1 class="text-base sm:text-lg font-bold tracking-tight text-slate-100">
-                The <span class="text-emerald-400">ε</span>-<span class="text-amber-400">δ</span> Definition of a Limit &amp; Absolute Value
+            <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-slate-100">
+                پێناسەی <span class="text-emerald-400">ε</span>-<span class="text-amber-400">δ</span> بۆ سنوور (Limit) و بەهای ڕەها
             </h1>
-            <span class="hidden md:inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 math-font">
+            <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 math-font">
                 f(x) = 2x
             </span>
         </div>
 
         <!-- Legend Pills for Classroom Clarity -->
-        <div class="flex items-center space-x-2 sm:space-x-4 text-xs sm:text-sm font-medium mt-1 sm:mt-0">
-            <div class="flex items-center space-x-1.5 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700/60">
+        <div class="flex flex-row-reverse items-center gap-2 sm:gap-4 text-xs sm:text-sm font-medium">
+            <div class="flex items-center space-x-reverse space-x-1.5 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700/60">
                 <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
                 <span class="text-amber-300 math-font font-bold">x₀, δ</span>
-                <span class="hidden lg:inline text-slate-400">(Input &amp; Delta)</span>
+                <span class="hidden lg:inline text-slate-400">(دەروازە و دێلتا)</span>
             </div>
-            <div class="flex items-center space-x-1.5 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700/60">
+            <div class="flex items-center space-x-reverse space-x-1.5 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700/60">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
                 <span class="text-emerald-300 math-font font-bold">L, ε</span>
-                <span class="hidden lg:inline text-slate-400">(Limit &amp; Epsilon)</span>
+                <span class="hidden lg:inline text-slate-400">(سنوور و ئێپسایلۆن)</span>
             </div>
-            <div class="flex items-center space-x-1.5 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700/60">
+            <div class="flex items-center space-x-reverse space-x-1.5 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700/60">
                 <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
                 <span class="text-rose-300 math-font font-bold">x, f(x)</span>
-                <span class="hidden lg:inline text-slate-400">(Moving Point)</span>
+                <span class="hidden lg:inline text-slate-400">(خاڵی گۆڕاو)</span>
             </div>
         </div>
     </header>
@@ -74,58 +75,58 @@
     <main class="relative flex-1 w-full overflow-hidden bg-[#0f172a]" id="canvas-container">
         <canvas id="mathCanvas"></canvas>
 
-        <!-- Floating Formula Card (Top Left of Canvas) -->
-        <div id="formula-hud" class="absolute top-4 left-4 bg-slate-900/90 backdrop-blur-md border border-slate-700/70 rounded-xl p-3.5 sm:p-4 shadow-2xl max-w-xs sm:max-w-md transition-all duration-300 pointer-events-none">
-            <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1" id="scene-badge">
-                Scene 1 of 6 • The Function
+        <!-- Floating Formula Card (Top Right in RTL, placed right: 4) -->
+        <div id="formula-hud" class="absolute top-4 right-4 bg-slate-900/90 backdrop-blur-md border border-slate-700/70 rounded-xl p-3.5 sm:p-4 shadow-2xl max-w-xs sm:max-w-md transition-all duration-300 pointer-events-none z-20">
+            <div class="text-xs uppercase tracking-wider text-slate-400 font-bold mb-1" id="scene-badge">
+                دیمەنی ١ لە ٦ • نەخشەکە
             </div>
-            <div class="text-base sm:text-xl font-bold text-white math-font tracking-tight" id="hud-equation">
+            <div class="text-base sm:text-xl font-extrabold text-white math-font tracking-tight mb-2" id="hud-equation">
                 lim<sub>x → 2</sub> (2x) = 4
             </div>
-            <div class="mt-2 text-xs sm:text-sm text-slate-300 space-y-1 math-font" id="hud-details">
-                <div>Target Input: <span class="text-amber-400 font-bold">x₀ = 2</span></div>
-                <div>Target Limit: <span class="text-emerald-400 font-bold">L = 4</span></div>
+            <div class="text-xs sm:text-sm text-slate-300 space-y-1.5" id="hud-details">
+                <div>دەروازەی مەبەست (Target Input): <span class="text-amber-400 font-bold math-font">x₀ = 2</span></div>
+                <div>سنووری مەبەست (Target Limit): <span class="text-emerald-400 font-bold math-font">L = 4</span></div>
             </div>
         </div>
 
-        <!-- Live Values Readout (Top Right of Canvas - visible when active) -->
-        <div id="live-hud" class="hidden sm:block absolute top-4 right-4 bg-slate-900/90 backdrop-blur-md border border-slate-700/70 rounded-xl p-3.5 shadow-2xl text-xs sm:text-sm math-font space-y-1.5 pointer-events-none min-w-[210px]">
-            <div class="text-xs uppercase tracking-wider text-slate-400 font-sans font-semibold border-b border-slate-800 pb-1 mb-1">
-                Live Distance Check
+        <!-- Live Values Readout (Top Left in RTL, placed left: 4) -->
+        <div id="live-hud" class="hidden sm:block absolute top-4 left-4 bg-slate-900/90 backdrop-blur-md border border-slate-700/70 rounded-xl p-3.5 shadow-2xl text-xs sm:text-sm space-y-1.5 pointer-events-none min-w-[210px] z-20">
+            <div class="text-xs uppercase tracking-wider text-slate-400 font-bold border-b border-slate-800 pb-1 mb-1">
+                پشکنینی دوورییە زیندووەکان
             </div>
-            <div class="flex justify-between">
-                <span class="text-slate-400">x:</span>
-                <span id="val-x" class="text-rose-400 font-bold">2.00</span>
+            <div class="flex justify-between items-center">
+                <span class="text-slate-400">بەهای x:</span>
+                <span id="val-x" class="text-rose-400 font-bold math-font">2.00</span>
             </div>
-            <div class="flex justify-between">
-                <span class="text-slate-400">|x - x₀|:</span>
-                <span id="val-dx" class="text-amber-400 font-bold">0.00</span>
+            <div class="flex justify-between items-center">
+                <span class="text-slate-400">دووریی افقی |x - x₀|:</span>
+                <span id="val-dx" class="text-amber-400 font-bold math-font">0.00</span>
             </div>
-            <div class="flex justify-between">
-                <span class="text-slate-400">f(x) = 2x:</span>
-                <span id="val-fx" class="text-rose-400 font-bold">4.00</span>
+            <div class="flex justify-between items-center">
+                <span class="text-slate-400">بەهای f(x) = 2x:</span>
+                <span id="val-fx" class="text-rose-400 font-bold math-font">4.00</span>
             </div>
-            <div class="flex justify-between">
-                <span class="text-slate-400">|f(x) - L|:</span>
-                <span id="val-dy" class="text-emerald-400 font-bold">0.00</span>
+            <div class="flex justify-between items-center">
+                <span class="text-slate-400">دووریی ستوونی |f(x) - L|:</span>
+                <span id="val-dy" class="text-emerald-400 font-bold math-font">0.00</span>
             </div>
         </div>
 
         <!-- Synchronized Subtitle Banner (Bottom Center of Canvas) -->
-        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 w-[94%] sm:w-[85%] max-w-4xl pointer-events-none">
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 w-[94%] sm:w-[85%] max-w-4xl pointer-events-none z-20">
             <div class="bg-slate-950/90 backdrop-blur-md border border-slate-700/80 rounded-2xl px-5 py-3.5 sm:px-7 sm:py-4 shadow-[0_10px_40px_rgba(0,0,0,0.75)] text-center transition-all duration-300">
-                <p id="subtitle-main" class="text-base sm:text-xl md:text-2xl font-medium text-white leading-snug">
-                    Loading classroom animation...
+                <p id="subtitle-main" class="text-base sm:text-lg md:text-xl font-bold text-white leading-relaxed">
+                    ئەنیمەیشنەکە باردەکرێت...
                 </p>
-                <p id="subtitle-sub" class="text-xs sm:text-sm md:text-base text-slate-300 mt-1.5 font-normal">
-                    Press Play or use the chapter bar below to explore.
+                <p id="subtitle-sub" class="text-xs sm:text-sm md:text-base text-slate-300 mt-1.5 font-normal leading-relaxed">
+                    دوگمەی دەستپێکردن دابگرە یان بەشەکانی خوارەوە بەکاربهێنە بۆ گەڕان.
                 </p>
             </div>
         </div>
     </main>
 
     <!-- Bottom Playback & Chapter Controls -->
-    <footer class="bg-slate-900 border-t border-slate-800 px-4 py-2.5 shrink-0 z-10">
+    <footer class="bg-slate-900 border-t border-slate-800 px-4 py-2.5 shrink-0 z-10" dir="ltr">
         <!-- Chapter Progress Bar -->
         <div class="max-w-6xl mx-auto mb-2">
             <div class="grid grid-cols-6 gap-1.5" id="chapter-bar">
@@ -137,37 +138,37 @@
         <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
             <div class="flex items-center space-x-2">
                 <!-- Restart Button -->
-                <button id="btn-restart" title="Restart Animation" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition active:scale-95 flex items-center space-x-1 text-xs sm:text-sm font-medium">
+                <button id="btn-restart" title="دەستپێکردنەوە" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition active:scale-95 flex items-center space-x-1 text-xs sm:text-sm font-medium">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    <span class="hidden sm:inline">Restart</span>
+                    <span class="hidden sm:inline font-bold" style="font-family:'Vazirmatn'">دوبارە</span>
                 </button>
 
                 <!-- Previous Scene -->
-                <button id="btn-prev" title="Previous Step" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition active:scale-95">
+                <button id="btn-prev" title="پێشتر" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition active:scale-95">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                 </button>
 
                 <!-- Play / Pause Button -->
-                <button id="btn-play" class="px-4 py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold transition active:scale-95 flex items-center space-x-1.5 text-xs sm:text-sm shadow-lg shadow-sky-500/20">
+                <button id="btn-play" class="px-4 py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold transition active:scale-95 flex items-center space-x-1.5 text-xs sm:text-sm shadow-lg shadow-sky-500/20">
                     <svg id="icon-pause" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
                     <svg id="icon-play" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    <span id="text-play">Pause</span>
+                    <span id="text-play" style="font-family:'Vazirmatn'">وەستان</span>
                 </button>
 
                 <!-- Next Scene -->
-                <button id="btn-next" title="Next Step" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition active:scale-95">
+                <button id="btn-next" title="دواتر" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition active:scale-95">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </button>
             </div>
 
             <!-- Current Scene Title Indicator -->
-            <div class="text-xs sm:text-sm text-slate-300 font-medium truncate max-w-[200px] sm:max-w-md" id="footer-scene-title">
-                1. The Function f(x) = 2x &amp; Target (x₀, L)
+            <div class="text-xs sm:text-sm text-slate-300 font-bold truncate max-w-[200px] sm:max-w-md" id="footer-scene-title" style="font-family:'Vazirmatn'">
+                ١. نەخشی f(x) = 2x و نیشانەی (x₀, L)
             </div>
 
             <!-- Speed Toggle -->
             <div class="flex items-center space-x-2">
-                <span class="text-xs text-slate-400 hidden sm:inline">Speed:</span>
+                <span class="text-xs text-slate-400 hidden sm:inline" style="font-family:'Vazirmatn'">خێرایی:</span>
                 <button id="btn-speed" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold math-font border border-slate-700 transition">
                     1.0x
                 </button>
@@ -176,20 +177,6 @@
     </footer>
 
     <script>
-        /**
-         * ============================================================================
-         * EDUCATIONAL MATH ANIMATION: EPSILON-DELTA & ABSOLUTE VALUE FOR f(x) = 2x
-         * ============================================================================
-         * Designed for high-visibility classroom projection.
-         * Explains:
-         *  - x₀ ("x-naught"): The target input value on the x-axis (x₀ = 2)
-         *  - L: The expected limit output value on the y-axis (L = 4)
-         *  - |x - x₀|: Absolute value as horizontal distance from x₀
-         *  - |f(x) - L|: Absolute value as vertical distance from L
-         *  - ε ("epsilon"): Vertical tolerance band around L
-         *  - δ ("delta"): Horizontal input trap around x₀ (where δ = ε / 2)
-         */
-
         const canvas = document.getElementById('mathCanvas');
         const ctx = canvas.getContext('2d');
         const container = document.getElementById('canvas-container');
@@ -218,181 +205,176 @@
         const btnNext = document.getElementById('btn-next');
         const btnSpeed = document.getElementById('btn-speed');
 
-        // Color Palette (High Contrast for Classroom)
         const COLORS = {
             bg: '#0f172a',
             gridMajor: '#1e293b',
             gridMinor: '#151f32',
             axis: '#64748b',
             axisText: '#94a3b8',
-            funcLine: '#38bdf8',      // Sky blue for f(x) = 2x
-            xNot: '#f59e0b',          // Amber for x₀ and δ
+            funcLine: '#38bdf8',      
+            xNot: '#f59e0b',          
             xNotFill: 'rgba(245, 158, 11, 0.16)',
-            limitL: '#10b981',        // Emerald for L and ε
+            limitL: '#10b981',        
             limitLFill: 'rgba(16, 185, 129, 0.16)',
-            pointX: '#f43f5e',        // Rose for moving test point x
+            pointX: '#f43f5e',        
             white: '#f8fafc',
             muted: '#94a3b8'
         };
 
-        // Mathematical Constants for our demonstration
         const X0 = 2.0;
         const L = 4.0;
         const f = (x) => 2 * x;
 
-        // Storyboard Chapters / Scenes
+        // Visual Narrative Translated to Fluent Kurdish Sorani
         const SCENES = [
             {
                 id: 0,
-                shortTitle: "1. Function & Target",
-                title: "1. The Function f(x) = 2x & Target (x₀, L)",
-                duration: 14, // seconds
+                shortTitle: "١. نەخش و مەبەست",
+                title: "١. نەخشی f(x) = 2x و خاڵی مەبەست (x₀, L)",
+                duration: 14,
                 cues: [
                     {
                         t: 0.0,
-                        main: "Consider the simple linear function <span class='text-sky-400 font-bold'>f(x) = 2x</span>.",
-                        sub: "Every input x on the horizontal axis is doubled to give an output y on the vertical axis."
+                        main: "سەیری نەخشی هێڵیی سادەی <span class='text-sky-400 font-bold' dir='ltr'>f(x) = 2x</span> بکە.",
+                        sub: "هەر نرخێکی x لەسەر تەوەری ئاسۆیی دوو هێندە دەکرێت بۆ ئەوەی نرخێکی y لەسەر تەوەری ستوونی بەدەست بێت."
                     },
                     {
                         t: 0.35,
-                        main: "Pick a target input <span class='text-amber-400 font-bold'>x₀ = 2</span> (pronounced <em>\"x-naught\"</em>).",
-                        sub: "x₀ is simply the specific x-value we are approaching."
+                        main: "دەروازەیەکی دیاریکراو هەڵدەبژێرین کە <span class='text-amber-400 font-bold' dir='ltr'>x₀ = 2</span> (دەخوێندرێتەوە <em>\"ئێکس نۆت\"</em>).",
+                        sub: "ئەمە ئەو بەهایەیە لەسەر تەوەری ئاسۆیی کە دەمانەوێت لێی نزیک ببینەوە."
                     },
                     {
                         t: 0.68,
-                        main: "As x approaches <span class='text-amber-400 font-bold'>x₀ = 2</span>, f(x) approaches <span class='text-emerald-400 font-bold'>L = 4</span>.",
-                        sub: "L is the Limit—the expected output height on the y-axis."
+                        main: "کاتێک x لە <span class='text-amber-400 font-bold' dir='ltr'>x₀ = 2</span> نزیک دەبێتەوە، f(x) لە <span class='text-emerald-400 font-bold' dir='ltr'>L = 4</span> نزیک دەبێتەوە.",
+                        sub: "بەهای L سنوورەکەیە (Limit) - واتە بەهای پێشبینیکراوی دەرچوونی نەخشەکە لەسەر تەوەری ستوونی."
                     }
                 ]
             },
             {
                 id: 1,
-                shortTitle: "2. Absolute Value",
-                title: "2. Absolute Value Means Distance",
+                shortTitle: "٢. بەهای ڕەها",
+                title: "٢. بەهای ڕەها بە واتای دووری دێت",
                 duration: 16,
                 cues: [
                     {
                         t: 0.0,
-                        main: "Why do limit definitions use <span class='text-amber-300 font-bold'>absolute value</span> bars like <span class='math-font text-amber-400'>|x − x₀|</span>?",
-                        sub: "In math, |a − b| simply means the physical distance between a and b (always positive!)."
+                        main: "بۆچی لە پێناسەی سنوورەکاندا هێمای <span class='text-amber-300 font-bold'>بەهای ڕەها</span> وەک <span class='math-font text-amber-400'>|x − x₀|</span> بەکاردەهێنرێت؟",
+                        sub: "لە بیرکاریدا، |a − b| تەنها بە واتای دووریی فیزیکی نێوان a و b دێت (کە هەمیشە ئەرێنییە!)."
                     },
                     {
                         t: 0.45,
-                        main: "<span class='math-font text-amber-400 font-bold'>|x − x₀|</span> is the horizontal distance between <span class='text-rose-400'>x</span> and <span class='text-amber-400'>x₀</span>.",
-                        sub: "Whether x is to the left or right of 2, the distance |x − 2| is positive."
+                        main: "دەربڕینی <span class='math-font text-amber-400 font-bold'>|x − x₀|</span> دووریی ئاسۆیی نێوان <span class='text-rose-400 font-bold'>x</span> و <span class='text-amber-400 font-bold'>x₀</span> نیشان دەدات.",
+                        sub: "چ x لە لای چەپ بێت یان لە لای ڕاستی ٢ بێت، دوورییەکە هەمیشە ئەرێنی دەبێت."
                     },
                     {
                         t: 0.75,
-                        main: "<span class='math-font text-emerald-400 font-bold'>|f(x) − L|</span> is the vertical distance between <span class='text-rose-400'>f(x)</span> and <span class='text-emerald-400'>L</span>.",
-                        sub: "Notice that because f(x) = 2x has a slope of 2, the vertical distance is always twice the horizontal distance!"
+                        main: "بە هەمان شێوە، <span class='math-font text-emerald-400 font-bold'>|f(x) − L|</span> دووریی ستوونی نێوان <span class='text-rose-400 font-bold'>f(x)</span> و <span class='text-emerald-400 font-bold'>L</span> نیشان دەدات.",
+                        sub: "سەرنج بدە چونکە لێژیی f(x) = 2x یەکسانە بە ٢، دووریی ستوونی هەمیشە دوو هێندەی دووریی ئاسۆییە!"
                     }
                 ]
             },
             {
                 id: 2,
-                shortTitle: "3. Epsilon (ε)",
-                title: "3. Epsilon (ε): The Vertical Error Tolerance",
+                shortTitle: "٣. ئێپسایلۆن (ε)",
+                title: "٣. ئێپسایلۆن (ε): ڕێژەی ڕێگەپێدراوی هەڵەی ستوونی",
                 duration: 15,
                 cues: [
                     {
                         t: 0.0,
-                        main: "Now meet <span class='text-emerald-400 font-bold'>ε (epsilon)</span> — a tiny positive number.",
-                        sub: "Think of ε as your vertical error tolerance around the limit L = 4."
+                        main: "ئێستا با لەگەڵ <span class='text-emerald-400 font-bold'>ε (ئێپسایلۆن)</span> ئاشنا ببین — کە ژمارەیەکی ئەرێنی زۆر بچووکە.",
+                        sub: "ئێپسایلۆن وەک ڕێژەیەکی ڕێگەپێدراوی هەڵە (مەودای دڵنیایی) لە دەوری سنووری مەبەست (L = 4) سەیر بکە."
                     },
                     {
                         t: 0.4,
-                        main: "The inequality <span class='math-font text-emerald-400 font-bold'>|f(x) − L| &lt; ε</span> creates a horizontal target zone.",
-                        sub: "It means: \"Keep the output f(x) within ε units above or below L = 4.\""
+                        main: "نەهاوتابوونی <span class='math-font text-emerald-400 font-bold'>|f(x) − L| &lt; ε</span> ناوچەیەکی ستوونیی ئامانج دروست دەکات.",
+                        sub: "واتە: \"دەبێت ئەنجامی نەخشەکە (f(x)) تەنها بە ئەندازەی ε لە سەروو یان خوارووی L = 4 بمێنێتەوە.\""
                     },
                     {
                         t: 0.75,
-                        main: "Here, with <span class='math-font text-emerald-400 font-bold'>ε = 1.0</span>, f(x) must stay between <span class='text-emerald-300 font-bold'>3.0 and 5.0</span>.",
-                        sub: "How close must x be to x₀ = 2 so that f(x) lands inside this green zone?"
+                        main: "لێرەدا، بە دانانی <span class='math-font text-emerald-400 font-bold'>ε = 1.0</span>، دەبێت f(x) لە نێوان <span class='text-emerald-300 font-bold'>٣.٠ و ٥.٠</span>دا بمێنێتەوە.",
+                        sub: "ئایە پێویستە x چەند نزیك بێت لە x₀ = 2 بۆ ئەوەی f(x) بکەوێتە ناو ئەم ناوچە سەوزە؟"
                     }
                 ]
             },
             {
                 id: 3,
-                shortTitle: "4. Delta (δ)",
-                title: "4. Delta (δ): Finding the Safe Input Zone",
+                shortTitle: "٤. دێلتا (δ)",
+                title: "٤. دێلتا (δ): دۆزینەوەی ناوچەی دەروازەی دڵنیا",
                 duration: 16,
                 cues: [
                     {
                         t: 0.0,
-                        main: "To trap f(x) inside the green <span class='text-emerald-400 font-bold'>ε-band</span>, we project down to the x-axis.",
-                        sub: "Where the green band hits the line f(x) = 2x, it defines a safe zone on the x-axis."
+                        main: "بۆ گرتنی f(x) لە ناو <span class='text-emerald-400 font-bold'>مەودای سەوزی ε</span>، هێڵەکان دەگوازینەوە بۆ سەر تەوەری ئاسۆیی (x).",
+                        sub: "لەو شوێنەی مەودا سەوزەکە لە نەخشی f(x) = 2x دەدات، ناوچەیەکی دڵنیا لەسەر تەوەری ئاسۆیی دروست دەبێت."
                     },
                     {
                         t: 0.42,
-                        main: "This horizontal radius around x₀ is called <span class='text-amber-400 font-bold'>δ (delta)</span>.",
-                        sub: "The inequality <span class='math-font text-amber-400 font-bold'>|x − x₀| &lt; δ</span> means x is within δ units of x₀."
+                        main: "ئەم نیوەتیرە ئاسۆییەی دەوری x₀ پێی دەوترێت <span class='text-amber-400 font-bold'>δ (دێلتا)</span>.",
+                        sub: "نەهاوتابوونی <span class='math-font text-amber-400 font-bold'>|x − x₀| &lt; δ</span> واتە x لە ناو مەودای δ لە دەوری x₀ دایە."
                     },
                     {
                         t: 0.75,
-                        main: "Since f(x) = 2x stretches distances by 2, we choose <span class='math-font text-amber-400 font-bold'>δ = ε / 2</span>.",
-                        sub: "With ε = 1.0, we get δ = 0.5 (so x stays between 1.5 and 2.5)."
+                        main: "چونکە نەخشی f(x) = 2x دوورییەکان دوو هێندە دەکات، ئێمە <span class='math-font text-amber-400 font-bold'>δ = ε / 2</span> هەڵدەبژێرین.",
+                        sub: "کاتێک ε = 1.0 بێت، ئەوا δ = 0.5 دەبێت (واتە x دەبێت لە نێوان ١.٥ و ٢.٥دا بمێنێتەوە)."
                     }
                 ]
             },
             {
                 id: 4,
-                shortTitle: "5. The Limit Proof",
-                title: "5. The Limit in Action: Shrinking ε and δ",
+                shortTitle: "٥. بەدواداچوونی سنوور",
+                title: "٥. سنوورەکە لە کرداردا: بچووککردنەوەی ε و δ",
                 duration: 18,
                 cues: [
                     {
                         t: 0.0,
-                        main: "Whenever <span class='text-rose-400 font-bold'>x</span> stays inside the <span class='text-amber-400 font-bold'>δ-zone</span>, <span class='text-rose-400 font-bold'>f(x)</span> is guaranteed to stay inside the <span class='text-emerald-400 font-bold'>ε-zone</span>!",
-                        sub: "If |x − 2| < δ, then |2x − 4| < ε is 100% guaranteed."
+                        main: "هەر کاتێک <span class='text-rose-400 font-bold'>x</span> لە ناو <span class='text-amber-400 font-bold'>ناوچەی δ</span>دا بمێنێتەوە، گەرەنتییە کە <span class='text-rose-400 font-bold'>f(x)</span> لە ناو <span class='text-emerald-400 font-bold'>ناوچەی ε</span>دا دەبێت!",
+                        sub: "ئەگەر |x − 2| < δ بێت، ئەوا گەرەنتی تەواو هەیە کە |2x − 4| < ε دەبێت."
                     },
                     {
                         t: 0.48,
-                        main: "What if someone demands a tighter tolerance? Let's shrink <span class='text-emerald-400 font-bold'>ε from 1.0 down to 0.4</span>!",
-                        sub: "Watch how δ automatically shrinks to ε/2 = 0.2 to keep f(x) trapped!"
+                        main: "ئەی ئەگەر کەسێک داوای وردەکاری زیاتری کرد؟ با <span class='text-emerald-400 font-bold'>ε لە ١.٠ەوە کەم بکەینەوە بۆ ٠.٤</span>!",
+                        sub: "تەماشا بکە چۆن δ بە شێوەیەکی خۆکار کەم دەبێتەوە بۆ ε/2 = 0.2 بۆ ئەوەی f(x) لە ناو مەوداکەدا بەند بکات!"
                     },
                     {
                         t: 0.80,
-                        main: "No matter how small <span class='text-emerald-400 font-bold'>ε</span> gets, <span class='text-amber-400 font-bold'>δ = ε / 2</span> always works!",
-                        sub: "That is the exact proof that lim (x → 2) 2x = 4."
+                        main: "گرنگ نییە چەندە <span class='text-emerald-400 font-bold'>ε</span> بچووک بکرێتەوە، هەمیشە <span class='text-amber-400 font-bold'>δ = ε / 2</span> کار دەکات!",
+                        sub: "ئەمە ڕێک ئەو سەلماندنەیە کە نیشانی دەدات سنووری نەخشەکە لە کاتی نزیك بوونەوە لە ٢ یەکسانە بە ٤."
                     }
                 ]
             },
             {
                 id: 5,
-                shortTitle: "6. Full Summary",
-                title: "6. Summary: Putting All 4 Pieces Together",
+                shortTitle: "٦. کورتەی گشتی",
+                title: "٦. کورتە: کۆکردنەوەی هەموو چەمکەکان",
                 duration: 14,
                 cues: [
                     {
                         t: 0.0,
-                        main: "<span class='text-amber-400 font-bold'>x₀</span> = target input, <span class='text-emerald-400 font-bold'>L</span> = target limit, <span class='text-emerald-400 font-bold'>ε</span> = vertical tolerance, <span class='text-amber-400 font-bold'>δ</span> = horizontal tolerance.",
-                        sub: "Absolute value turns inequalities into simple distances on the number lines."
+                        main: "<span class='text-amber-400 font-bold'>x₀</span> = دەروازەی مەبەست، <span class='text-emerald-400 font-bold'>L</span> = سنوور، <span class='text-emerald-400 font-bold'>ε</span> = مەودای ستوونی، <span class='text-amber-400 font-bold'>δ</span> = مەودای ئاسۆیی.",
+                        sub: "بەهای ڕەها نەهاوتابوونەکان دەگۆڕێت بۆ دوورییەکی سادە و بینراو لەسەر تەوەرەکان."
                     },
                     {
                         t: 0.5,
                         main: "<span class='math-font text-base sm:text-xl text-white font-bold'>0 &lt; <span class='text-amber-400'>|x − x₀| &lt; δ</span> &nbsp;⇒&nbsp; <span class='text-emerald-400'>|f(x) − L| &lt; ε</span></span>",
-                        sub: "\"If x is within δ of x₀, then f(x) is within ε of L.\" Animation complete — press Restart or click any chapter!"
+                        sub: "\"ئەگەر x لە ناو مەودای δ لە x₀ بێت، ئەوا f(x) لە ناو مەودای ε لە L دەبێت.\" ئەنیمەیشنەکە کۆتایی هات."
                     }
                 ]
             }
         ];
 
-        // Playback State
         let currentSceneIndex = 0;
         let sceneElapsed = 0;
         let isPlaying = true;
         let playbackSpeed = 1.0;
         let lastTimestamp = null;
 
-        // Coordinate System State (computed on resize)
         let width = 0;
         let height = 0;
         let dpr = 1;
         let originX = 0;
         let originY = 0;
-        let scale = 60; // pixels per 1 math unit
+        let scale = 60; 
 
-        // Build Chapter Progress Bar UI
         function initChapterBar() {
             chapterBar.innerHTML = '';
             SCENES.forEach((scene, idx) => {
@@ -403,7 +385,7 @@
                     <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mb-1">
                         <div id="prog-${idx}" class="h-full bg-sky-400 w-0 transition-all duration-75"></div>
                     </div>
-                    <span id="chap-label-${idx}" class="text-[10px] sm:text-xs font-medium truncate text-slate-400 group-hover:text-white transition">
+                    <span id="chap-label-${idx}" class="text-[10px] sm:text-xs font-bold truncate text-slate-400 group-hover:text-white transition" style="font-family:'Vazirmatn'">
                         ${scene.shortTitle}
                     </span>
                 `;
@@ -417,7 +399,6 @@
             updateUI();
         }
 
-        // Resize Handler for Crisp High-DPI Canvas
         function resizeCanvas() {
             const rect = container.getBoundingClientRect();
             dpr = window.devicePixelRatio || 1;
@@ -428,34 +409,28 @@
             canvas.height = height * dpr;
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-            // Calculate optimal math scale so [x: -1..4.5] and [y: -1..6.5] fit comfortably
-            // Leave room at bottom for subtitles and top for HUD
             const usableWidth = width * 0.85;
             const usableHeight = height * 0.68;
             const scaleX = usableWidth / 5.5;
             const scaleY = usableHeight / 7.2;
             scale = Math.max(36, Math.min(scaleX, scaleY, 95));
 
-            // Position origin (0,0) nicely in lower-left quadrant so (2,4) is near center
-            originX = width * 0.32;
+            originX = width * 0.35; // Moved slightly to better center with Kurdish captions
             originY = height * 0.72;
         }
 
-        // Math to Screen Coordinate Helpers
         const toScreenX = (x) => originX + x * scale;
         const toScreenY = (y) => originY - y * scale;
 
-        // Easing Helpers
         const clamp01 = (v) => Math.max(0, Math.min(1, v));
         const easeOutCubic = (t) => 1 - Math.pow(1 - clamp01(t), 3);
         const easeInOutCubic = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
         const subProgress = (p, start, end) => clamp01((p - start) / (end - start));
 
-        // Drawing Primitives
         function drawGridAndAxes() {
             ctx.save();
 
-            // Minor grid (0.5 units)
+            // Minor Grid
             ctx.strokeStyle = COLORS.gridMinor;
             ctx.lineWidth = 1;
             const minX = Math.floor(-originX / scale) - 1;
@@ -478,7 +453,7 @@
                 ctx.stroke();
             }
 
-            // Major grid (1.0 units)
+            // Major Grid
             ctx.strokeStyle = COLORS.gridMajor;
             ctx.lineWidth = 1.2;
             for (let x = minX; x <= maxX; x += 1) {
@@ -498,23 +473,21 @@
                 ctx.stroke();
             }
 
-            // Main X and Y Axes
+            // Axes
             ctx.strokeStyle = COLORS.axis;
             ctx.lineWidth = 2;
 
-            // X-axis
             ctx.beginPath();
             ctx.moveTo(0, originY);
             ctx.lineTo(width, originY);
             ctx.stroke();
 
-            // Y-axis
             ctx.beginPath();
             ctx.moveTo(originX, 0);
             ctx.lineTo(originX, height);
             ctx.stroke();
 
-            // Axis Labels & Numbers
+            // Labels and Numbers
             ctx.fillStyle = COLORS.axisText;
             ctx.font = '600 13px "JetBrains Mono", monospace';
             ctx.textAlign = 'center';
@@ -525,7 +498,6 @@
                 const sx = toScreenX(x);
                 if (sx > 20 && sx < width - 20) {
                     ctx.fillText(x.toString(), sx, originY + 8);
-                    // Tick
                     ctx.beginPath();
                     ctx.moveTo(sx, originY - 4);
                     ctx.lineTo(sx, originY + 4);
@@ -540,7 +512,6 @@
                 const sy = toScreenY(y);
                 if (sy > 20 && sy < height - 90) {
                     ctx.fillText(y.toString(), originX - 10, sy);
-                    // Tick
                     ctx.beginPath();
                     ctx.moveTo(originX - 4, sy);
                     ctx.lineTo(originX + 4, sy);
@@ -548,16 +519,15 @@
                 }
             }
 
-            // Origin "0"
             ctx.fillText('0', originX - 8, originY + 14);
 
-            // Axis Names
+            // Axis titles translated to Sorani Kurdish
             ctx.fillStyle = '#cbd5e1';
-            ctx.font = 'bold 14px "Inter", sans-serif';
+            ctx.font = 'bold 13px "Vazirmatn", sans-serif';
             ctx.textAlign = 'right';
-            ctx.fillText('x (Input)', width - 16, originY - 12);
+            ctx.fillText('(دەروازە) x (Input)', width - 16, originY - 14);
             ctx.textAlign = 'left';
-            ctx.fillText('y = f(x) (Output)', originX + 12, 22);
+            ctx.fillText('y = f(x) (دەرهات / Output)', originX + 12, 22);
 
             ctx.restore();
         }
@@ -577,7 +547,6 @@
             ctx.lineTo(toScreenX(xEnd), toScreenY(f(xEnd)));
             ctx.stroke();
 
-            // Function Label along the line
             if (drawProgress > 0.7) {
                 const alpha = clamp01((drawProgress - 0.7) / 0.3);
                 ctx.globalAlpha = alpha;
@@ -635,9 +604,9 @@
             ctx.restore();
         }
 
-        function drawPillBadge(text, sx, sy, bgColor, borderColor, textColor) {
+        function drawPillBadge(text, sx, sy, bgColor, borderColor, textColor, isKurdish = false) {
             ctx.save();
-            ctx.font = 'bold 13px "JetBrains Mono", monospace';
+            ctx.font = isKurdish ? 'bold 11px "Vazirmatn", sans-serif' : 'bold 13px "JetBrains Mono", monospace';
             const metrics = ctx.measureText(text);
             const padX = 10;
             const w = metrics.width + padX * 2;
@@ -723,15 +692,12 @@
             const yBot = toScreenY(L - eps);
             const bandHeight = yBot - yTop;
 
-            // Shaded horizontal band across graph
             ctx.fillStyle = COLORS.limitLFill;
             ctx.fillRect(0, yTop, width, bandHeight);
 
-            // Top & Bottom dashed borders
             drawDashedLine(0, yTop, width, yTop, COLORS.limitL, 1.8);
             drawDashedLine(0, yBot, width, yBot, COLORS.limitL, 1.8);
 
-            // Highlight interval on Y-axis
             ctx.strokeStyle = COLORS.limitL;
             ctx.lineWidth = 5;
             ctx.beginPath();
@@ -739,7 +705,7 @@
             ctx.lineTo(originX, yBot);
             ctx.stroke();
 
-            // Labels for L + ε and L - ε
+            // Localized top & bottom bounding range
             drawPillBadge(`L+ε (${(L + eps).toFixed(2)})`, originX - 66, yTop, '#0f172a', COLORS.limitL, '#6ee7b7');
             drawPillBadge(`L-ε (${(L - eps).toFixed(2)})`, originX - 66, yBot, '#0f172a', COLORS.limitL, '#6ee7b7');
 
@@ -755,15 +721,12 @@
             const xRight = toScreenX(X0 + delta);
             const bandWidth = xRight - xLeft;
 
-            // Shaded vertical band
             ctx.fillStyle = COLORS.xNotFill;
             ctx.fillRect(xLeft, 0, bandWidth, height);
 
-            // Left & Right dashed borders
             drawDashedLine(xLeft, 0, xLeft, height, COLORS.xNot, 1.8);
             drawDashedLine(xRight, 0, xRight, height, COLORS.xNot, 1.8);
 
-            // Highlight interval on X-axis
             ctx.strokeStyle = COLORS.xNot;
             ctx.lineWidth = 5;
             ctx.beginPath();
@@ -771,7 +734,6 @@
             ctx.lineTo(xRight, originY);
             ctx.stroke();
 
-            // Labels for x₀ - δ and x₀ + δ
             drawPillBadge(`x₀-δ`, xLeft, originY + 24, '#0f172a', COLORS.xNot, '#fcd34d');
             drawPillBadge(`x₀+δ`, xRight, originY + 24, '#0f172a', COLORS.xNot, '#fcd34d');
 
@@ -785,16 +747,13 @@
             const sx0 = toScreenX(X0);
             const syL = toScreenY(L);
 
-            // Projection lines from (x, f(x)) to axes
             drawDashedLine(sx, originY, sx, sy, COLORS.pointX, 2);
             drawDashedLine(sx, sy, originX, sy, COLORS.pointX, 2);
 
-            // Points on X-axis, Curve, and Y-axis
             drawPoint(sx, originY, COLORS.pointX, 6.5);
             drawPoint(originX, sy, COLORS.pointX, 6.5);
             drawPoint(sx, sy, COLORS.pointX, 7.5);
 
-            // Labels
             drawPillBadge(`x = ${xVal.toFixed(2)}`, sx, originY - 22, '#1f1218', COLORS.pointX, '#fda4af');
             drawPillBadge(`f(x) = ${yVal.toFixed(2)}`, originX + 64, sy, '#1f1218', COLORS.pointX, '#fda4af');
 
@@ -805,20 +764,18 @@
                 drawDistanceBracket(originX, syL, originX, sy, `|f(x) - L| = ${dy.toFixed(2)}`, COLORS.limitL, 26, true);
             }
 
-            // Update Live HUD
             valX.textContent = xVal.toFixed(2);
             valDx.textContent = Math.abs(xVal - X0).toFixed(2);
             valFx.textContent = yVal.toFixed(2);
             valDy.textContent = Math.abs(yVal - L).toFixed(2);
         }
 
-        // Main Render Loop per Scene
         function renderScene(sceneIdx, p) {
             ctx.clearRect(0, 0, width, height);
             drawGridAndAxes();
 
             if (sceneIdx === 0) {
-                // Scene 1: Function f(x) = 2x, x₀ = 2, L = 4
+                // Scene 1: Function & Targets
                 liveHud.classList.add('hidden');
                 const lineP = subProgress(p, 0.0, 0.35);
                 const x0P = easeOutCubic(subProgress(p, 0.35, 0.65));
@@ -829,31 +786,30 @@
 
                 hudEquation.innerHTML = `lim<sub>x → 2</sub> (2x) = 4`;
                 hudDetails.innerHTML = `
-                    <div>Function: <span class="text-sky-400 font-bold">f(x) = 2x</span></div>
-                    <div>Target Input: <span class="text-amber-400 font-bold">x₀ = 2</span></div>
-                    <div>Target Limit: <span class="text-emerald-400 font-bold">L = 4</span></div>
+                    <div>نەخشی هێڵی: <span class="text-sky-400 font-bold">f(x) = 2x</span></div>
+                    <div>دەروازەی مەبەست: <span class="text-amber-400 font-bold">x₀ = 2</span></div>
+                    <div>سنووری مەبەست (Limit): <span class="text-emerald-400 font-bold">L = 4</span></div>
                 `;
             }
             else if (sceneIdx === 1) {
-                // Scene 2: Absolute Value as Distance
+                // Scene 2: Absolute Value
                 liveHud.classList.remove('hidden');
                 drawFunctionLine(1);
                 drawTargetX0AndL(1, 1);
 
-                // Oscillate x smoothly around x₀ = 2 (between 1.2 and 2.8)
                 const wave = Math.sin(p * Math.PI * 3.2);
                 const xVal = X0 + 0.75 * wave;
                 drawMovingTestPoint(xVal, true);
 
-                hudEquation.innerHTML = `Distance = Absolute Value`;
+                hudEquation.innerHTML = `بەهای ڕەها = دووری فیزیکی`;
                 hudDetails.innerHTML = `
-                    <div class="text-amber-400 font-bold">|x − x₀| = horizontal distance</div>
-                    <div class="text-emerald-400 font-bold">|f(x) − L| = vertical distance</div>
-                    <div class="text-slate-300 text-xs mt-1">Notice: |2x − 4| = 2|x − 2|</div>
+                    <div class="text-amber-400 font-bold">|x − x₀| = دووریی ئاسۆیی لەسەر تەوەر</div>
+                    <div class="text-emerald-400 font-bold">|f(x) − L| = دووریی ستوونی لەسەر تەوەر</div>
+                    <div class="text-slate-400 text-xs mt-1.5" dir="rtl">سەرنج بدە: |2x − 4| = 2|x − 2|</div>
                 `;
             }
             else if (sceneIdx === 2) {
-                // Scene 3: Introducing Epsilon (ε)
+                // Scene 3: Introducing ε
                 liveHud.classList.add('hidden');
                 drawFunctionLine(1);
                 const epsAlpha = easeOutCubic(subProgress(p, 0.05, 0.45));
@@ -862,13 +818,13 @@
 
                 hudEquation.innerHTML = `<span class="text-emerald-400">|f(x) − L| &lt; ε</span>`;
                 hudDetails.innerHTML = `
-                    <div>Tolerance: <span class="text-emerald-400 font-bold">ε = 1.00</span></div>
-                    <div>Allowed y-range: <span class="text-emerald-300 font-bold">(3.00, 5.00)</span></div>
-                    <div class="text-slate-400 text-xs mt-1">Keep f(x) inside the green band!</div>
+                    <div>ڕێژەی هەڵەی ڕێگەپێدراو: <span class="text-emerald-400 font-bold">ε = 1.00</span></div>
+                    <div>مەودای ڕێگەپێدراوی دەرچوو: <span class="text-emerald-300 font-bold">(3.00, 5.00)</span></div>
+                    <div class="text-slate-400 text-xs mt-1.5" dir="rtl">نابێت f(x) لە سنوری ناوچە سەوزەکە بچێتە دەرەوە!</div>
                 `;
             }
             else if (sceneIdx === 3) {
-                // Scene 4: Finding Delta (δ) from Epsilon
+                // Scene 4: Delta
                 liveHud.classList.add('hidden');
                 drawFunctionLine(1);
                 drawEpsilonBand(1.0, 1);
@@ -877,7 +833,6 @@
                 drawDeltaBand(0.5, deltaAlpha);
                 drawTargetX0AndL(1, 1);
 
-                // Highlight intersection box where δ-band meets ε-band on f(x) = 2x
                 if (deltaAlpha > 0.3) {
                     ctx.save();
                     ctx.globalAlpha = deltaAlpha;
@@ -894,21 +849,20 @@
 
                 hudEquation.innerHTML = `<span class="text-amber-400">|x − x₀| &lt; δ</span> ⇒ <span class="text-emerald-400">|f(x) − L| &lt; ε</span>`;
                 hudDetails.innerHTML = `
-                    <div>Given <span class="text-emerald-400 font-bold">ε = 1.00</span></div>
-                    <div>Choose <span class="text-amber-400 font-bold">δ = ε / 2 = 0.50</span></div>
-                    <div>Safe x-range: <span class="text-amber-300 font-bold">(1.50, 2.50)</span></div>
+                    <div>ئەگەر بدریت: <span class="text-emerald-400 font-bold">ε = 1.00</span></div>
+                    <div>هەڵدەبژێرین: <span class="text-amber-400 font-bold">δ = ε / 2 = 0.50</span></div>
+                    <div>مەودای دەروازەی دڵنیا: <span class="text-amber-300 font-bold">(1.50, 2.50)</span></div>
                 `;
             }
             else if (sceneIdx === 4) {
-                // Scene 5: Live Proof & Shrinking ε
+                // Scene 5: Shrinking
                 liveHud.classList.remove('hidden');
                 drawFunctionLine(1);
 
-                // Shrink ε smoothly from 1.0 down to 0.4 between p=0.45 and p=0.75
                 let eps = 1.0;
                 if (p > 0.45) {
                     const shrinkP = easeInOutCubic(subProgress(p, 0.45, 0.75));
-                    eps = 1.0 - 0.6 * shrinkP; // 1.0 -> 0.4
+                    eps = 1.0 - 0.6 * shrinkP; 
                 }
                 const delta = eps / 2;
 
@@ -916,19 +870,18 @@
                 drawDeltaBand(delta, 1);
                 drawTargetX0AndL(1, 1);
 
-                // Oscillate x strictly inside (x₀ - δ, x₀ + δ)
                 const xVal = X0 + (delta * 0.85) * Math.sin(p * Math.PI * 5);
                 drawMovingTestPoint(xVal, false);
 
                 hudEquation.innerHTML = `<span class="text-amber-400">|x − 2| &lt; ${delta.toFixed(2)}</span> ⇒ <span class="text-emerald-400">|2x − 4| &lt; ${eps.toFixed(2)}</span>`;
                 hudDetails.innerHTML = `
-                    <div>Current <span class="text-emerald-400 font-bold">ε = ${eps.toFixed(2)}</span></div>
-                    <div>Required <span class="text-amber-400 font-bold">δ = ε / 2 = ${delta.toFixed(2)}</span></div>
-                    <div class="text-emerald-300 text-xs font-bold mt-1">✓ f(x) stays trapped inside L ± ε!</div>
+                    <div>ئێستای <span class="text-emerald-400 font-bold">ε = ${eps.toFixed(2)}</span></div>
+                    <div>پێویستیی <span class="text-amber-400 font-bold">δ = ε / 2 = ${delta.toFixed(2)}</span></div>
+                    <div class="text-emerald-300 text-xs font-bold mt-1.5" dir="rtl">✓ بەهای f(x) بە بەندکراوی لە ناو سنوورەکەدا دەمێنێتەوە!</div>
                 `;
             }
             else if (sceneIdx === 5) {
-                // Scene 6: Clean Summary View
+                // Scene 6: Conclusion
                 liveHud.classList.add('hidden');
                 drawFunctionLine(1);
                 const eps = 0.8;
@@ -937,45 +890,40 @@
                 drawDeltaBand(delta, 1);
                 drawTargetX0AndL(1, 1);
 
-                // Gentle stationary demonstration point
                 const xVal = X0 + 0.25;
                 drawMovingTestPoint(xVal, true);
 
                 hudEquation.innerHTML = `lim<sub>x → x₀</sub> f(x) = L`;
                 hudDetails.innerHTML = `
-                    <div class="text-amber-400 font-bold">0 &lt; |x − x₀| &lt; δ  (Input Trap)</div>
-                    <div class="text-emerald-400 font-bold">⇒ |f(x) − L| &lt; ε  (Output Guarantee)</div>
-                    <div class="text-sky-300 text-xs mt-1">For f(x) = 2x, δ = ε / 2 always works!</div>
+                    <div class="text-amber-400 font-bold">0 &lt; |x − x₀| &lt; δ  (تەڵەی دەروازە)</div>
+                    <div class="text-emerald-400 font-bold">⇒ |f(x) − L| &lt; ε  (گەرەنتیی دەرچوو)</div>
+                    <div class="text-sky-300 text-xs mt-1.5" dir="rtl">بۆ نەخشی f(x) = 2x، هەمیشە δ = ε / 2 دەست دەدات!</div>
                 `;
             }
         }
 
-        // Update Subtitles & Progress Bars
         function updateUI() {
             const scene = SCENES[currentSceneIndex];
             const progress = clamp01(sceneElapsed / scene.duration);
 
-            // Update chapter progress bars
             SCENES.forEach((s, idx) => {
                 const bar = document.getElementById(`prog-${idx}`);
                 const label = document.getElementById(`chap-label-${idx}`);
                 if (idx < currentSceneIndex) {
                     bar.style.width = '100%';
-                    label.className = 'text-[10px] sm:text-xs font-medium truncate text-sky-400 transition';
+                    label.className = 'text-[10px] sm:text-xs font-bold truncate text-sky-400 transition';
                 } else if (idx === currentSceneIndex) {
                     bar.style.width = `${progress * 100}%`;
-                    label.className = 'text-[10px] sm:text-xs font-bold truncate text-white transition';
+                    label.className = 'text-[10px] sm:text-xs font-black truncate text-white transition';
                 } else {
                     bar.style.width = '0%';
-                    label.className = 'text-[10px] sm:text-xs font-medium truncate text-slate-500 transition';
+                    label.className = 'text-[10px] sm:text-xs font-bold truncate text-slate-500 transition';
                 }
             });
 
-            // Update Header/Footer Badges
-            sceneBadge.textContent = `Scene ${currentSceneIndex + 1} of ${SCENES.length}`;
+            sceneBadge.textContent = `دیمەنی ${currentSceneIndex + 1} لە ${SCENES.length}`;
             footerSceneTitle.textContent = scene.title;
 
-            // Find active subtitle cue
             let activeCue = scene.cues[0];
             for (let i = 0; i < scene.cues.length; i++) {
                 if (progress >= scene.cues[i].t) {
@@ -993,7 +941,6 @@
             renderScene(currentSceneIndex, progress);
         }
 
-        // Animation Frame Loop
         function animate(timestamp) {
             if (!lastTimestamp) lastTimestamp = timestamp;
             const dt = (timestamp - lastTimestamp) / 1000;
@@ -1008,7 +955,6 @@
                         currentSceneIndex++;
                         sceneElapsed = 0;
                     } else {
-                        // Finished final scene
                         sceneElapsed = currentDuration;
                         isPlaying = false;
                         syncPlayButton();
@@ -1024,18 +970,16 @@
             if (isPlaying) {
                 iconPause.classList.remove('hidden');
                 iconPlay.classList.add('hidden');
-                textPlay.textContent = 'Pause';
+                textPlay.textContent = 'وەستان';
             } else {
                 iconPause.classList.add('hidden');
                 iconPlay.classList.remove('hidden');
-                textPlay.textContent = 'Play';
+                textPlay.textContent = 'دەستپێکردن';
             }
         }
 
-        // Event Listeners
         btnPlay.addEventListener('click', () => {
             if (!isPlaying && currentSceneIndex === SCENES.length - 1 && sceneElapsed >= SCENES[currentSceneIndex].duration) {
-                // Restart if at the very end
                 currentSceneIndex = 0;
                 sceneElapsed = 0;
             }
@@ -1079,7 +1023,6 @@
             btnSpeed.textContent = `${playbackSpeed.toFixed(playbackSpeed % 1 === 0 ? 1 : 2)}x`;
         });
 
-        // Keyboard shortcuts for classroom presenter remotes / keyboards
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space') {
                 e.preventDefault();
@@ -1096,7 +1039,6 @@
             updateUI();
         });
 
-        // Initialize on Window Load
         window.onload = function () {
             initChapterBar();
             resizeCanvas();
