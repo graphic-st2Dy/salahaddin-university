@@ -279,7 +279,7 @@
     
 // Calculus I — Chapter Two: Limits and Continuity
 // 50 multiple-choice questions, based only on the chapter PDF.
-// "answer" is the letter of the correct option, e.g. "(A)".
+// "answer" is the letter of the correct option, e.g. "A".
 
 const questions = [
   // ----- Intuition and the first example: y = 2x − 1 near x₀ = 4 -----
@@ -291,7 +291,7 @@ const questions = [
       C: "|y − 7| < 2",
       D: "|x − 4| < 7"
     },
-    answer: "(C)"
+    answer: "C"
   },
   {
     question: "For y = 2x − 1, the expression |y − 7| written in terms of x is:",
@@ -301,7 +301,7 @@ const questions = [
       C: "|2x + 8|",
       D: "|x − 4|"
     },
-    answer: "(A)"
+    answer: "A"
   },
   {
     question: "Find the missing step: |2x − 8| < 2 ⇒ −2 < 2x − 8 < 2 ⇒ ( ? ) ⇒ 3 < x < 5",
@@ -311,7 +311,7 @@ const questions = [
       C: "6 < x < 10",
       D: "6 < 2x < 10"
     },
-    answer: "(D)"
+    answer: "D"
   },
   {
     question: "What does the first example conclude?",
@@ -321,7 +321,7 @@ const questions = [
       C: "Keeping x within 1 unit of x₀ = 7 keeps y within 2 units of y₀ = 4",
       D: "Keeping x within 3 units of x₀ = 4 keeps y within 2 units of y₀ = 7"
     },
-    answer: "(B)"
+    answer: "B"
   },
 
   // ----- The precise (ε–δ) definition of a limit -----
@@ -333,7 +333,7 @@ const questions = [
       C: "x gets close to L when f(x) gets close to x₀",
       D: "f(x) equals L for every x near x₀"
     },
-    answer: "(A)"
+    answer: "A"
   },
   {
     question: "Which statement is the correct ε–δ definition of lim x→x₀ f(x) = L?",
@@ -343,7 +343,7 @@ const questions = [
       C: "For every ε > 0 there exists δ > 0 such that 0 < |x − x₀| < δ ⇒ |f(x) − L| < ε",
       D: "For every ε > 0 there exists δ > 0 such that 0 < |x − x₀| < δ ⇒ |f(x) − L| > ε"
     },
-    answer: "(C)"
+    answer: "C"
   },
   {
     question: "In the ε–δ definition, ε and δ play different roles. Which description is correct?",
@@ -353,7 +353,7 @@ const questions = [
       C: "Both ε and δ measure the distance between x and x₀",
       D: "Both ε and δ measure the distance between f(x) and L"
     },
-    answer: "(B)"
+    answer: "B"
   },
   {
     question: "Why does the definition use 0 < |x − x₀| < δ instead of just |x − x₀| < δ?",
@@ -363,7 +363,7 @@ const questions = [
       C: "Because δ must always be smaller than ε",
       D: "Because the value of f at x₀ itself does not matter, so x = x₀ is excluded"
     },
-    answer: "(D)"
+    answer: "D"
   },
   {
     question: "Figure 2 shows the relation between δ and ε. Which statement matches the picture?",
@@ -373,7 +373,7 @@ const questions = [
       C: "For all x ≠ x₀ in (x₀ − ε, x₀ + ε), f(x) lies in (L − δ, L + δ)",
       D: "f(x) = L for every x in (x₀ − δ, x₀ + δ)"
     },
-    answer: "(A)"
+    answer: "A"
   },
   {
     question: "The definition does not ask for a “best” δ. If some δ > 0 works for a given ε, which statement is true?",
@@ -383,7 +383,7 @@ const questions = [
       C: "Every smaller positive δ also works",
       D: "δ must then be equal to ε"
     },
-    answer: "(C)"
+    answer: "C"
   },
 
   // ----- Example: lim x→1 (5x − 3) = 2 -----
@@ -395,7 +395,7 @@ const questions = [
       C: "0 < |x − 1| < ε ⇒ |(5x − 3) − 2| < δ",
       D: "0 < |x − 1| < δ ⇒ |(5x − 3) − 1| < ε"
     },
-    answer: "(B)"
+    answer: "B"
   },
   {
     question: "Find the missing step: |(5x − 3) − 2| < ε ⇒ |5x − 5| < ε ⇒ ( ? ) ⇒ |x − 1| < ε/5",
@@ -405,7 +405,7 @@ const questions = [
       C: "5|x| − 1 < ε",
       D: "5|x − 1| < ε"
     },
-    answer: "(D)"
+    answer: "D"
   },
   {
     question: "Which δ does the example choose to prove lim x→1 (5x − 3) = 2?",
@@ -415,7 +415,7 @@ const questions = [
       C: "δ = ε/3",
       D: "δ = ε/2"
     },
-    answer: "(A)"
+    answer: "A"
   },
   {
     question: "In Figure 3 (the graph of y = 5x − 3), keeping f(x) between 2 − ε and 2 + ε corresponds to keeping x between:",
@@ -425,7 +425,7 @@ const questions = [
       C: "1 − 5ε and 1 + 5ε",
       D: "2 − ε/5 and 2 + ε/5"
     },
-    answer: "(B)"
+    answer: "B"
   },
   {
     question: "Which of these values of δ also works for every ε > 0 in the example lim x→1 (5x − 3) = 2?",
@@ -435,7 +435,7 @@ const questions = [
       C: "δ = ε/10",
       D: "δ = 10ε"
     },
-    answer: "(C)"
+    answer: "C"
   },
 
   // ----- Example: lim x→5 √(x − 1) = 2 with ε = 1 -----
@@ -447,7 +447,7 @@ const questions = [
       C: "Find the value of the limit first, then take δ equal to L",
       D: "Solve |√(x − 1) − 2| < 1 for an interval around 5, then fit (5 − δ, 5 + δ) inside it"
     },
-    answer: "(D)"
+    answer: "D"
   },
   {
     question: "Find the missing step: −1 < √(x − 1) − 2 < 1 ⇒ ( ? ) ⇒ 1 < x − 1 < 9",
@@ -457,7 +457,7 @@ const questions = [
       C: "1 < √(x − 1) < 3",
       D: "1 < √(x − 1) < 9"
     },
-    answer: "(C)"
+    answer: "C"
   },
   {
     question: "Solving |√(x − 1) − 2| < 1 shows that the inequality holds for all x in the open interval:",
@@ -467,7 +467,7 @@ const questions = [
       C: "(1, 3)",
       D: "(4, 6)"
     },
-    answer: "(A)"
+    answer: "A"
   },
   {
     question: "Why does the solution take δ = 3?",
@@ -477,7 +477,7 @@ const questions = [
       C: "Because the length of the interval (2, 10) is 3",
       D: "Because 3 is the midpoint of the interval (2, 10)"
     },
-    answer: "(B)"
+    answer: "B"
   },
   {
     question: "With δ = 3, the centered interval 5 − δ < x < 5 + δ (see Figure 4) is:",
@@ -487,7 +487,7 @@ const questions = [
       C: "(3, 7)",
       D: "(2, 8)"
     },
-    answer: "(D)"
+    answer: "D"
   },
 
   // ----- Uniqueness of a limit -----
@@ -499,7 +499,7 @@ const questions = [
       C: "A function can have two different limits at the same point a, if they are close",
       D: "If lim x→a f(x) exists, then f(x) = L for every x near a"
     },
-    answer: "(B)"
+    answer: "B"
   },
   {
     question: "The uniqueness proof supposes L₁ ≠ L₂ and chooses ε = ½|L₁ − L₂|. Why is this a legitimate choice of ε?",
@@ -509,7 +509,7 @@ const questions = [
       C: "Because ε must always be equal to ½ in every proof",
       D: "Because L₁ ≠ L₂ makes |L₁ − L₂| a negative number"
     },
-    answer: "(A)"
+    answer: "A"
   },
   {
     question: "After finding δ₁ and δ₂, the uniqueness proof sets δ = min{δ₁, δ₂}. Why the smaller one?",
@@ -519,7 +519,7 @@ const questions = [
       C: "So that both |f(x) − L₁| < ε and |f(x) − L₂| < ε hold",
       D: "So that ε becomes smaller"
     },
-    answer: "(C)"
+    answer: "C"
   },
   {
     question: "Find the missing step (triangle inequality): |L₁ − L₂| = |L₁ − f(x) + f(x) − L₂| ≤ ( ? ) < ε + ε = 2ε = |L₁ − L₂|",
@@ -529,7 +529,7 @@ const questions = [
       C: "|L₁ + L₂|",
       D: "|L₁ − f(x)| + |f(x) − L₂|"
     },
-    answer: "(D)"
+    answer: "D"
   },
   {
     question: "The uniqueness proof reaches |L₁ − L₂| < |L₁ − L₂|, which is impossible. What does this show?",
@@ -539,7 +539,7 @@ const questions = [
       C: "L₁ and L₂ are both equal to 0",
       D: "ε must be equal to 0"
     },
-    answer: "(A)"
+    answer: "A"
   },
 
   // ----- Basic limit theorems -----
@@ -551,7 +551,7 @@ const questions = [
       C: "δ = ε + 1",
       D: "δ = 1/ε"
     },
-    answer: "(B)"
+    answer: "B"
   },
   {
     question: "In the proof that lim x→x₀ k = k (a constant function), any positive number works as δ. Why?",
@@ -561,7 +561,7 @@ const questions = [
       C: "Because |k − k| = 0 is smaller than every ε > 0",
       D: "Because x is always equal to x₀"
     },
-    answer: "(C)"
+    answer: "C"
   },
   {
     question: "Using the limit of a polynomial, find lim x→2 (3x² − x + 4).",
@@ -571,7 +571,7 @@ const questions = [
       C: "18",
       D: "14"
     },
-    answer: "(D)"
+    answer: "D"
   },
   {
     question: "Using the limit of a rational function, find lim x→3 (x² + 1)/(x − 1).",
@@ -581,7 +581,7 @@ const questions = [
       C: "10",
       D: "10/3"
     },
-    answer: "(A)"
+    answer: "A"
   },
   {
     question: "For which of these limits can the rational-function theorem lim P(x)/Q(x) = P(c)/Q(c) be used directly?",
@@ -591,7 +591,7 @@ const questions = [
       C: "lim x→0 (x + 1)/(x² + 1)",
       D: "lim x→3 5/(x − 3)"
     },
-    answer: "(C)"
+    answer: "C"
   },
 
   // ----- If f(x) ≤ g(x), then L ≤ M -----
@@ -603,7 +603,7 @@ const questions = [
       C: "L ≥ M",
       D: "L = M"
     },
-    answer: "(B)"
+    answer: "B"
   },
   {
     question: "The proof of L ≤ M supposes L > M and then takes ε = L − M. Why is this allowed?",
@@ -613,7 +613,7 @@ const questions = [
       C: "Because ε may be zero when the limits exist",
       D: "Because L − M > 0 by the assumption L > M"
     },
-    answer: "(D)"
+    answer: "D"
   },
   {
     question: "Find the missing step: (g(x) − f(x)) − (M − L) < L − M ⇒ ( ? ), which contradicts f(x) ≤ g(x).",
@@ -623,7 +623,7 @@ const questions = [
       C: "g(x) < f(x)",
       D: "g(x) − f(x) < M − L"
     },
-    answer: "(C)"
+    answer: "C"
   },
 
   // ----- Limit laws and the proof of the sum rule -----
@@ -635,7 +635,7 @@ const questions = [
       C: "lim x→a [f(x)g(x)] = L₁ + L₂",
       D: "lim x→a ⁿ√f(x) = ⁿ√L₁ for every L₁, even a negative one when n is even"
     },
-    answer: "(A)"
+    answer: "A"
   },
   {
     question: "If lim x→a f(x) = 4 and lim x→a g(x) = 2, then lim x→a [3f(x) − g(x)] equals:",
@@ -645,7 +645,7 @@ const questions = [
       C: "6",
       D: "2"
     },
-    answer: "(B)"
+    answer: "B"
   },
   {
     question: "If lim x→a f(x) = 4 and lim x→a g(x) = 2, then lim x→a [f(x)]²/g(x) equals:",
@@ -655,7 +655,7 @@ const questions = [
       C: "16",
       D: "8"
     },
-    answer: "(D)"
+    answer: "D"
   },
   {
     question: "In the proof that lim [f(x) + g(x)] = L₁ + L₂, we make |f(x) − L₁| < ε/2 and |g(x) − L₂| < ε/2. Why ε/2?",
@@ -665,7 +665,7 @@ const questions = [
       C: "So that δ₁ and δ₂ are equal",
       D: "So that L₁ + L₂ = ε"
     },
-    answer: "(A)"
+    answer: "A"
   },
   {
     question: "Find the missing step: |f(x) + g(x) − (L₁ + L₂)| = |( ? )| ≤ |f(x) − L₁| + |g(x) − L₂|",
@@ -675,7 +675,7 @@ const questions = [
       C: "(f(x) + L₁) + (g(x) + L₂)",
       D: "(f(x) − L₁)(g(x) − L₂)"
     },
-    answer: "(B)"
+    answer: "B"
   },
 
   // ----- When a limit does not exist -----
@@ -687,7 +687,7 @@ const questions = [
       C: "A jump",
       D: "The limit exists and equals 0"
     },
-    answer: "(C)"
+    answer: "C"
   },
   {
     question: "“The values grow arbitrarily large in absolute value as x → 0 and do not approach any real number.” Which behavior is this, and which function shows it?",
@@ -697,7 +697,7 @@ const questions = [
       C: "A jump — g(x) = 1/x",
       D: "Unbounded behavior — g(x) = 1/x"
     },
-    answer: "(D)"
+    answer: "D"
   },
   {
     question: "For g(x) = 1/x (x ≠ 0), the one-sided limits at 0 are:",
@@ -707,7 +707,7 @@ const questions = [
       C: "−∞ from the left and +∞ from the right",
       D: "−1 from the left and 1 from the right"
     },
-    answer: "(C)"
+    answer: "C"
   },
   {
     question: "Let f(x) = 0 for x ≤ 0 and f(x) = sin(1/x) for x > 0. As x → 0⁺, f(x) oscillates between −1 and 1. What can we conclude about lim x→0 f(x)?",
@@ -717,7 +717,7 @@ const questions = [
       C: "It equals 1, because sin is at most 1",
       D: "It equals −1, because sin is at least −1"
     },
-    answer: "(B)"
+    answer: "B"
   },
 
   // ----- The Sandwich Theorem and its examples -----
@@ -729,7 +729,7 @@ const questions = [
       C: "The limit of a polynomial",
       D: "The limit of a rational function"
     },
-    answer: "(A)"
+    answer: "A"
   },
   {
     question: "In the proof of the Sandwich Theorem, for 0 < |x − c| < δ we get L − ε < f(x) ≤ g(x) ≤ h(x) < L + ε. Consequently ( ? ), so |g(x) − L| < ε. What is the missing step?",
@@ -739,7 +739,7 @@ const questions = [
       C: "g(x) < ε",
       D: "−ε < g(x) − L < ε"
     },
-    answer: "(D)"
+    answer: "D"
   },
   {
     question: "Example 1: lim x→0⁺ x² sin(1/√x) equals:",
@@ -749,7 +749,7 @@ const questions = [
       C: "−1",
       D: "It does not exist, because sin(1/√x) oscillates"
     },
-    answer: "(B)"
+    answer: "B"
   },
   {
     question: "In Example 1, why is the limit taken only from the right (x → 0⁺)?",
@@ -759,7 +759,7 @@ const questions = [
       C: "Because the Sandwich Theorem works only from the right",
       D: "Because sin(1/√x) is always positive"
     },
-    answer: "(A)"
+    answer: "A"
   },
   {
     question: "Example 2 (lim x→0 (3 − x² cos(1/x))): from −1 ≤ cos(1/x) ≤ 1, the next step is ( ? ), which leads to 3 − x² ≤ 3 − x² cos(1/x) ≤ 3 + x². What is the missing step?",
@@ -769,7 +769,7 @@ const questions = [
       C: "−x² ≤ −x² cos(1/x) ≤ x²",
       D: "0 ≤ −x² cos(1/x) ≤ x²"
     },
-    answer: "(C)"
+    answer: "C"
   },
 
   // ----- Exercises on limits -----
@@ -781,7 +781,7 @@ const questions = [
       C: "It does not exist, because cos x oscillates",
       D: "0"
     },
-    answer: "(D)"
+    answer: "D"
   },
   {
     question: "If |g(x) − 5| ≤ 3(x − 4)², then lim x→4 g(x) equals:",
@@ -791,7 +791,7 @@ const questions = [
       C: "3",
       D: "4"
     },
-    answer: "(B)"
+    answer: "B"
   },
   {
     question: "Exercise 3 gives 8x + x² ≤ f(x) ≤ sin(3x) + 5x and asks for lim x→0 f(x)/x. For x > 0, dividing every part by x gives which lower bound for f(x)/x?",
@@ -801,7 +801,7 @@ const questions = [
       C: "8 + x",
       D: "8 + x²"
     },
-    answer: "(C)"
+    answer: "C"
   }
 ];
 
