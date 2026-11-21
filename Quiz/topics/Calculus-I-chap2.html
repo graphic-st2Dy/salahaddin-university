@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Session - Math Department</title>
+  
+  <style>
+    :root {
+      --bg-color: #f3f3f3;
+      --card-bg: #ffffff;
+      --accent: #0078d4;
+      --accent-hover: #106ebe;
+      --text-main: #242424;
+      --text-muted: #616161;
+      --border-color: #e0e0e0;
+      --success: #107c10;
+      --success-bg: #dff6dd;
+      --danger: #d13438;
+      --danger-bg: #fde7e9;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      -webkit-user-drag: none;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    header h1 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-back {
+      background: #f0f0f0;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn-back:hover { background: #e5e5e5; }
+
+    main {
+      max-width: 800px;
+      width: 100%;
+      margin: 32px auto;
+      padding: 0 20px;
+      flex: 1;
+    }
+
+    .quiz-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .quiz-progress {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .question-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      background: #fafafa;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .option-label:hover:not(.locked) {
+      background: #f0f0f0;
+      border-color: #b0b0b0;
+    }
+
+    .option-label input {
+      accent-color: var(--accent);
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Feedback Highlights */
+    .option-label.correct {
+      background-color: var(--success-bg) !important;
+      border-color: var(--success) !important;
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .option-label.incorrect {
+      background-color: var(--danger-bg) !important;
+      border-color: var(--danger) !important;
+      color: var(--danger);
+    }
+
+    .option-label.locked {
+      cursor: default;
+    }
+
+    .quiz-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-color);
+      padding-top: 20px;
+      gap: 10px;
+    }
+
+    .btn-nav {
+      padding: 8px 20px;
+      background: #f0f0f0;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-main);
+    }
+    .btn-nav:hover:not(:disabled) { background: #e5e5e5; }
+    .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-check {
+      padding: 8px 20px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-check:hover:not(:disabled) { background: var(--accent-hover); }
+    .btn-check:disabled { background: #a0c4e2; cursor: not-allowed; }
+
+    .btn-submit {
+      padding: 8px 20px;
+      background: var(--success);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn-submit:hover { background: #0e6b0e; }
+
+    .completion-banner {
+      background: #e1dfdd;
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--text-main);
+      display: none;
+    }
+  </style>
+</head>
+<body oncontextmenu="return false;">
+
+  <header>
+    <h1 id="quizTitleHeader">Quiz Session</h1>
+    <div class="nav-links">
+      <a href="../index.html" class="btn-back">Exit to Hub</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="quiz-container">
+      <div id="completionBanner" class="completion-banner">Review Mode: Quiz Completed</div>
+      
+      <div class="quiz-progress">
+        <span id="progressIndicator">Question 1 of 50</span>
+        <span id="modeIndicator" style="color: var(--accent); font-weight: 600;"></span>
+      </div>
+
+      <div id="questionText" class="question-title">Loading questions...</div>
+      
+      <div id="optionsList" class="options-list">
+        <!-- Dynamic options A, B, C, D -->
+      </div>
+
+      <div class="quiz-controls">
+        <button id="prevBtn" class="btn-nav" onclick="prevQuestion()" disabled>Previous</button>
+        <button id="checkBtn" class="btn-check" onclick="checkAnswer()" disabled>Check</button>
+        <button id="nextBtn" class="btn-nav" onclick="nextQuestion()" disabled>Next</button>
+        <a id="leaderboardBtn" href="#" class="btn-submit" style="display: none;">Leaderboard</a>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-YOUR_ACTUAL_API_KEY",
+      authDomain: "cognito-f1f7b.firebaseapp.com",
+      databaseURL: "https://cognito-f1f7b-default-rtdb.firebaseio.com/",
+      projectId: "cognito-f1f7b",
+      storageBucket: "cognito-f1f7b.firebasestorage.app",
+      messagingSenderId: "506661532829",
+      appId: "1:506661532829:web:7a28aa874ba80871691074"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const quizId = urlParams.get('quiz') || 'default_quiz';
+    const isReviewMode = urlParams.get('review') === 'true';
+
+    // Retrieve Student SSO details from localStorage
+    const studentId = localStorage.getItem('student_id');
+    const studentName = localStorage.getItem('student_name');
+    const studentGroup = localStorage.getItem('student_group');
+
+    let currentQuestionIndex = 0;
+    
+    // Load saved user answers & checked status from localStorage
+    let userAnswers = JSON.parse(localStorage.getItem(`quiz_${quizId}_answers`) || '{}');
+    let checkedStatus = JSON.parse(localStorage.getItem(`quiz_${quizId}_checked`) || '{}');
+
+    // Sample question array (expandable up to 50)
+    
+const questions = [
+  {
+    question: "In the opening example for y = 2x − 1 near x₀ = 4, how close must x be to 4 so that y differs from 7 by less than 2 units?",
+    options: {
+      A: "Within 2 units of 4",
+      B: "Within 1 unit of 4",
+      C: "Within 0.5 units of 4",
+      D: "Within 4 units of 4"
+    },
+    answer: "B"
+  },
+  {
+    question: "In the example for y = 2x − 1 near x₀ = 4 with |y − 7| < 2, which open interval of x values satisfies the inequality?",
+    options: {
+      A: "(2, 6)",
+      B: "(6, 10)",
+      C: "(3, 5)",
+      D: "(1, 7)"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which of the following is the precise definition of lim_{x→x₀} f(x) = L given in the chapter?",
+    options: {
+      A: "For every δ > 0, there exists ε > 0 such that for all x, 0 < |f(x) − L| < δ implies |x − x₀| < ε",
+      B: "For every number ε > 0, there exists a corresponding number δ > 0 such that for all x, 0 < |x − x₀| < δ implies |f(x) − L| < ε",
+      C: "For every ε > 0, there exists δ > 0 such that for all x, |x − x₀| < δ implies 0 < |f(x) − L| < ε",
+      D: "There exists ε > 0 such that for every δ > 0 and all x, 0 < |x − x₀| < ε implies |f(x) − L| < δ"
+    },
+    answer: "B"
+  },
+  {
+    question: "In the precise definition of lim_{x→x₀} f(x) = L, where is f(x) assumed to be defined?",
+    options: {
+      A: "On a closed interval [x₀ − δ, x₀ + δ] including x₀",
+      B: "On all of ℝ without any exceptions",
+      C: "On an open interval about x₀, except possibly at x₀ itself",
+      D: "Only for x > x₀"
+    },
+    answer: "C"
+  },
+  {
+    question: "When proving lim_{x→1} (5x − 3) = 2 from the definition, |(5x − 3) − 2| simplifies to which expression?",
+    options: {
+      A: "|5x − 1|",
+      B: "|5x − 5|",
+      C: "|5x + 1|",
+      D: "5|x + 1|"
+    },
+    answer: "B"
+  },
+  {
+    question: "For lim_{x→1} (5x − 3) = 2, which value of δ is derived directly from |5x − 5| < ε?",
+    options: {
+      A: "δ = 5ε",
+      B: "δ = ε / 5",
+      C: "δ = ε / 2",
+      D: "δ = 2ε"
+    },
+    answer: "B"
+  },
+  {
+    question: "According to the note after the proof of lim_{x→1} (5x − 3) = 2, what can be said about any smaller positive number than δ = ε / 5?",
+    options: {
+      A: "It violates the strict inequality |f(x) − 2| < ε",
+      B: "It only works if ε < 1",
+      C: "It will do as well because the definition does not ask for a 'best' positive δ, just one that works",
+      D: "It is invalid unless x ≠ 1 is omitted"
+    },
+    answer: "C"
+  },
+  {
+    question: "For lim_{x→5} √(x − 1) = 2 with ε = 1, solving |√(x − 1) − 2| < 1 yields which open interval for x?",
+    options: {
+      A: "(1, 9)",
+      B: "(2, 10)",
+      C: "(2, 8)",
+      D: "(5, 8)"
+    },
+    answer: "B"
+  },
+  {
+    question: "For lim_{x→5} √(x − 1) = 2 with ε = 1, what value of δ is obtained by measuring the distance from 5 to the nearer endpoint of (2, 10)?",
+    options: {
+      A: "δ = 1",
+      B: "δ = 2",
+      C: "δ = 3",
+      D: "δ = 5"
+    },
+    answer: "C"
+  },
+  {
+    question: "In the proof of Uniqueness of a Limit, if lim_{x→a} f(x) = L₁ and lim_{x→a} f(x) = L₂ with L₁ ≠ L₂, what choice of ε is made?",
+    options: {
+      A: "ε = |L₁ − L₂|",
+      B: "ε = ½ |L₁ − L₂|",
+      C: "ε = 2 |L₁ − L₂|",
+      D: "ε = ½ (L₁ + L₂)"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which of the following is the missing step in the proof of Uniqueness of a Limit right after obtaining δ₁ > 0 and δ₂ > 0?",
+    options: {
+      A: "Set δ = max{δ₁, δ₂}",
+      B: "Set δ = δ₁ · δ₂",
+      C: "Set δ = min{δ₁, δ₂}",
+      D: "Set δ = (δ₁ + δ₂) / 2"
+    },
+    answer: "C"
+  },
+  {
+    question: "In the proof of Uniqueness of a Limit, which chain of inequalities produces the contradiction?",
+    options: {
+      A: "|L₁ − L₂| = |L₁ − f(x) + f(x) − L₂| ≤ |L₁ − f(x)| + |f(x) − L₂| < ε + ε = 2ε = |L₁ − L₂|",
+      B: "|L₁ − L₂| = |L₁ − f(x) − f(x) + L₂| ≤ |L₁ − f(x)| − |f(x) − L₂| < ε",
+      C: "|L₁ − L₂| < |L₁ − f(x)| + |f(x) − L₂| ≤ ε + ε = 2ε",
+      D: "|L₁ − L₂| = |f(x) − L₁| · |f(x) − L₂| < ε²"
+    },
+    answer: "A"
+  },
+  {
+    question: "Which hypothesis on 'a' is explicitly stated in the Uniqueness of a Limit theorem for f : D ⊆ ℝ → ℝ?",
+    options: {
+      A: "a must be an interior point of D",
+      B: "a must belong to D",
+      C: "a is an accumulation point of D",
+      D: "a must be a positive real number"
+    },
+    answer: "C"
+  },
+  {
+    question: "By the basic limit theorem for the identity function f(x) = x, what is lim_{x→x₀} x for every real number x₀?",
+    options: {
+      A: "0",
+      B: "1",
+      C: "x₀",
+      D: "2x₀"
+    },
+    answer: "C"
+  },
+  {
+    question: "In the proof of the constant function limit lim_{x→x₀} k = k, why can any positive number be used for δ?",
+    options: {
+      A: "Because |x − x₀| is always less than 1",
+      B: "Because k − k = 0, so |k − k| < ε holds for every ε > 0",
+      C: "Because k is an accumulation point of ℝ",
+      D: "Because δ must equal k"
+    },
+    answer: "B"
+  },
+  {
+    question: "For a polynomial P(x) = aₙxⁿ + aₙ₋₁xⁿ⁻¹ + ⋯ + a₀ and any real number c, what is lim_{x→c} P(x)?",
+    options: {
+      A: "aₙcⁿ⁻¹",
+      B: "P(c) = aₙcⁿ + aₙ₋₁cⁿ⁻¹ + ⋯ + a₀",
+      C: "n · aₙcⁿ⁻¹",
+      D: "P(0)"
+    },
+    answer: "B"
+  },
+  {
+    question: "Under what condition does the basic limit theorem for a rational function P(x) / Q(x) as x → c give P(c) / Q(c)?",
+    options: {
+      A: "P(c) ≠ 0",
+      B: "Q(c) ≠ 0",
+      C: "deg(P) ≤ deg(Q)",
+      D: "c > 0"
+    },
+    answer: "B"
+  },
+  {
+    question: "Suppose lim_{x→c} f(x) = L and lim_{x→c} g(x) = M, with f(x) ≤ g(x) for all x in an open interval containing c (except possibly c). In proving L ≤ M by contradiction, what is assumed first?",
+    options: {
+      A: "L = M",
+      B: "L < M",
+      C: "L > M",
+      D: "f(x) < g(x) for all x"
+    },
+    answer: "C"
+  },
+  {
+    question: "In the proof that f(x) ≤ g(x) implies L ≤ M, which specific value of ε is chosen when L > M is assumed?",
+    options: {
+      A: "ε = ½(L − M)",
+      B: "ε = L − M",
+      C: "ε = M − L",
+      D: "ε = L + M"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which of the following is the missing step in proving L ≤ M right after obtaining |(g(x) − f(x)) − (M − L)| < L − M for 0 < |x − c| < δ?",
+    options: {
+      A: "Using |a| ≤ a, write (g(x) − f(x)) − (M − L) < L − M, which simplifies to g(x) < f(x)",
+      B: "Using a ≤ |a|, write (g(x) − f(x)) − (M − L) < L − M, which simplifies to g(x) < f(x)",
+      C: "Add L + M to both sides to get g(x) > f(x)",
+      D: "Divide both sides by x − c"
+    },
+    answer: "B"
+  },
+  {
+    question: "In the proof that f(x) ≤ g(x) implies L ≤ M, what does the simplified inequality g(x) < f(x) contradict?",
+    options: {
+      A: "lim_{x→c} g(x) = M",
+      B: "f(x) ≤ g(x)",
+      C: "M − L < 0",
+      D: "δ > 0"
+    },
+    answer: "B"
+  },
+  {
+    question: "Let lim_{x→a} f(x) = L₁ and lim_{x→a} g(x) = L₂. Which of the following is equal to lim_{x→a} [f(x) − g(x)]?",
+    options: {
+      A: "L₂ − L₁",
+      B: "L₁ − L₂",
+      C: "|L₁ − L₂|",
+      D: "(L₁ − L₂)²"
+    },
+    answer: "B"
+  },
+  {
+    question: "Let lim_{x→a} f(x) = L₁ and lim_{x→a} g(x) = L₂. For a constant k, what is lim_{x→a} (k · f(x))?",
+    options: {
+      A: "k + L₁",
+      B: "k · L₁",
+      C: "L₁ / k",
+      D: "k^{L₁}"
+    },
+    answer: "B"
+  },
+  {
+    question: "Let lim_{x→a} f(x) = L₁ and lim_{x→a} g(x) = L₂. What is lim_{x→a} [f(x) · g(x)]?",
+    options: {
+      A: "L₁ + L₂",
+      B: "L₁ · L₂",
+      C: "L₁ / L₂",
+      D: "(L₁ · L₂)²"
+    },
+    answer: "B"
+  },
+  {
+    question: "Under what condition does lim_{x→a} (f(x) / g(x)) equal L₁ / L₂ when lim_{x→a} f(x) = L₁ and lim_{x→a} g(x) = L₂?",
+    options: {
+      A: "L₁ ≠ 0",
+      B: "L₂ ≠ 0",
+      C: "L₁ > 0 and L₂ > 0",
+      D: "g(a) ≠ 0"
+    },
+    answer: "B"
+  },
+  {
+    question: "For a positive integer n and lim_{x→a} f(x) = L₁, what is lim_{x→a} [f(x)]ⁿ?",
+    options: {
+      A: "n · L₁",
+      B: "L₁ⁿ",
+      C: "n · L₁ⁿ⁻¹",
+      D: "(n · L₁)ⁿ"
+    },
+    answer: "B"
+  },
+  {
+    question: "In the limit property for lim_{x→a} ⁿ√(f(x)) = ⁿ√(L₁), what restriction is stated when n is even?",
+    options: {
+      A: "L₁ ≠ 0",
+      B: "L₁ > 0",
+      C: "L₁ < 0",
+      D: "n must be a prime number"
+    },
+    answer: "B"
+  },
+  {
+    question: "Do the limit combination properties for sums, differences, products, quotients, powers, and roots also hold for one-sided limits x → a⁻ and x → a⁺?",
+    options: {
+      A: "Yes, the chapter states these statements are also true for one-sided limits as x → a⁻ or x → a⁺",
+      B: "No, they only hold for two-sided limits",
+      C: "Only for x → a⁺ when a > 0",
+      D: "Only for sums and differences"
+    },
+    answer: "A"
+  },
+  {
+    question: "In Proof 1 for lim_{x→a} [f(x) + g(x)] = L₁ + L₂, if δ₁ gives |f(x) − L₁| < ε/2 and δ₂ gives |g(x) − L₂| < ε/2, which choice of δ is used?",
+    options: {
+      A: "δ = max{δ₁, δ₂}",
+      B: "δ = min{δ₁, δ₂}",
+      C: "δ = ε / 2",
+      D: "δ = δ₁ + δ₂"
+    },
+    answer: "B"
+  },
+  {
+    question: "In Proof 1 for lim_{x→a} [f(x) + g(x)] = L₁ + L₂, how is |f(x) + g(x) − (L₁ + L₂)| bounded once 0 < |x − a| < δ?",
+    options: {
+      A: "|(f(x) − L₁) + (g(x) − L₂)| ≤ |f(x) − L₁| + |g(x) − L₂| < ε/2 + ε/2 = ε",
+      B: "|(f(x) − L₁) + (g(x) − L₂)| < ε/2 · ε/2 = ε²/4",
+      C: "|(f(x) − L₁) − (g(x) − L₂)| ≤ |f(x) − L₁| + |g(x) − L₂| < ε",
+      D: "|f(x) + g(x) − L₁ − L₂| = 0"
+    },
+    answer: "A"
+  },
+  {
+    question: "For the unit step function U(x) defined as 0 for x < 0 and 1 for x ≥ 0, what are lim_{x→0⁻} U(x) and lim_{x→0⁺} U(x)?",
+    options: {
+      A: "lim_{x→0⁻} U(x) = 1 and lim_{x→0⁺} U(x) = 0",
+      B: "lim_{x→0⁻} U(x) = 0 and lim_{x→0⁺} U(x) = 1",
+      C: "Both equal 0",
+      D: "Both equal 1"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which type of limit failure does the unit step function U(x) at x → 0 illustrate in the chapter?",
+    options: {
+      A: "Unbounded behavior",
+      B: "Oscillation",
+      C: "A jump (one-sided limits differ)",
+      D: "Division by zero at a removable point"
+    },
+    answer: "C"
+  },
+  {
+    question: "For g(x) = 1/x (x ≠ 0) and g(0) = 0, what are lim_{x→0⁻} g(x) and lim_{x→0⁺} g(x)?",
+    options: {
+      A: "lim_{x→0⁻} g(x) = +∞ and lim_{x→0⁺} g(x) = −∞",
+      B: "lim_{x→0⁻} g(x) = −∞ and lim_{x→0⁺} g(x) = +∞",
+      C: "Both equal 0",
+      D: "Both equal 1"
+    },
+    answer: "B"
+  },
+  {
+    question: "For f(x) = 0 for x ≤ 0 and f(x) = sin(1/x) for x > 0, why does lim_{x→0} f(x) fail to exist?",
+    options: {
+      A: "Because f(0) is undefined",
+      B: "Because f(x) grows to +∞ as x → 0⁺",
+      C: "Because as x → 0⁺, f(x) oscillates between −1 and 1 without approaching any single number",
+      D: "Because lim_{x→0⁻} f(x) = 1 while lim_{x→0⁺} f(x) = −1"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which of the following is the Sandwich Theorem stated in the chapter?",
+    options: {
+      A: "If f(x) ≤ g(x) ≤ h(x) on an open interval I containing c (except possibly c) and lim_{x→c} f(x) = lim_{x→c} h(x) = L, then lim_{x→c} g(x) = L",
+      B: "If f(x) ≤ g(x) ≤ h(x) for all x ∈ ℝ and lim_{x→c} g(x) = L, then lim_{x→c} f(x) = lim_{x→c} h(x) = L",
+      C: "If f(x) < g(x) < h(x) near c and lim_{x→c} f(x) = L, then lim_{x→c} g(x) = L",
+      D: "If |g(x) − L| ≤ h(x) near c and lim_{x→c} h(x) = L, then lim_{x→c} g(x) = L"
+    },
+    answer: "A"
+  },
+  {
+    question: "In the proof of the Sandwich Theorem, if δ₁ gives L − ε < f(x) < L + ε and δ₂ gives L − ε < h(x) < L + ε, how is δ chosen?",
+    options: {
+      A: "δ = max{δ₁, δ₂}",
+      B: "δ = min{δ₁, δ₂}",
+      C: "δ = |δ₁ − δ₂|",
+      D: "δ = ε"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which of the following is the missing step in the proof of the Sandwich Theorem right after L − ε < f(x) ≤ g(x) ≤ h(x) < L + ε for 0 < |x − c| < δ?",
+    options: {
+      A: "Subtract L to get −ε < g(x) − L < ε, i.e., |g(x) − L| < ε, hence lim_{x→c} g(x) = L by definition",
+      B: "Divide by c to get |g(x)/c − L| < ε",
+      C: "Square all terms to get (g(x) − L)² < ε",
+      D: "Conclude g(x) = f(x) = h(x) for all x ∈ I"
+    },
+    answer: "A"
+  },
+  {
+    question: "In Example 1 for the Sandwich Theorem, why is lim_{x→0⁺} x² sin(1 / √x) taken from the right (x → 0⁺) rather than two-sided?",
+    options: {
+      A: "Because sin(1 / √x) is undefined for x = 1",
+      B: "Because the expression is real-valued only for x > 0",
+      C: "Because x² is negative for x < 0",
+      D: "Because the left-hand limit equals 1"
+    },
+    answer: "B"
+  },
+  {
+    question: "In Example 1 for the Sandwich Theorem, which bounding functions f(x) and h(x) are used for x² sin(1 / √x) when x > 0?",
+    options: {
+      A: "f(x) = −x and h(x) = x",
+      B: "f(x) = −x² and h(x) = x²",
+      C: "f(x) = 0 and h(x) = x²",
+      D: "f(x) = −1 and h(x) = 1"
+    },
+    answer: "B"
+  },
+  {
+    question: "What is the value of lim_{x→0⁺} x² sin(1 / √x) found in Example 1?",
+    options: {
+      A: "−1",
+      B: "0",
+      C: "1",
+      D: "Does not exist"
+    },
+    answer: "B"
+  },
+  {
+    question: "In Example 2 for the Sandwich Theorem, starting from −1 ≤ cos(1/x) ≤ 1 for x ≠ 0, which inequality is obtained for 3 − x² cos(1/x)?",
+    options: {
+      A: "3 − x² ≤ 3 − x² cos(1/x) ≤ 3 + x²",
+      B: "−3 − x² ≤ 3 − x² cos(1/x) ≤ 3 − x²",
+      C: "3 − 2x² ≤ 3 − x² cos(1/x) ≤ 3 + 2x²",
+      D: "−x² ≤ 3 − x² cos(1/x) ≤ x²"
+    },
+    answer: "A"
+  },
+  {
+    question: "What is the value of lim_{x→0} (3 − x² cos(1/x)) in Example 2?",
+    options: {
+      A: "0",
+      B: "1",
+      C: "3",
+      D: "Does not exist"
+    },
+    answer: "C"
+  },
+  {
+    question: "Using the Sandwich Theorem approach from the chapter, what is lim_{x→+∞} cos(x) / (1 + x²) from Exercise 1?",
+    options: {
+      A: "1",
+      B: "−1",
+      C: "0",
+      D: "Does not exist"
+    },
+    answer: "C"
+  },
+  {
+    question: "If |g(x) − 5| ≤ 3(x − 4)² (as in Exercise 2), what is lim_{x→4} g(x)?",
+    options: {
+      A: "3",
+      B: "4",
+      C: "5",
+      D: "12"
+    },
+    answer: "C"
+  },
+  {
+    question: "For lim_{x→2} (4x − 3) = 5 using the definition, what is the largest δ of the form ε / k that guarantees |4x − 8| < ε?",
+    options: {
+      A: "δ = ε / 2",
+      B: "δ = ε / 3",
+      C: "δ = ε / 4",
+      D: "δ = 4ε"
+    },
+    answer: "C"
+  },
+  {
+    question: "In the example for y = 2x − 1 near x₀ = 4 with |y − 7| < 2, what are the lower and upper bounds on y shown in Figure 1?",
+    options: {
+      A: "Lower bound: y = 3; Upper bound: y = 9",
+      B: "Lower bound: y = 5; Upper bound: y = 9",
+      C: "Lower bound: y = 4; Upper bound: y = 7",
+      D: "Lower bound: y = 2; Upper bound: y = 7"
+    },
+    answer: "B"
+  },
+  {
+    question: "When solving |√(x − 1) − 2| < 1 in the limit example at x₀ = 5, which intermediate inequality comes right after 1 < √(x − 1) < 3?",
+    options: {
+      A: "1 < x − 1 < 9",
+      B: "1 < x − 1 < 3",
+      C: "2 < x − 1 < 6",
+      D: "0 < x − 1 < 9"
+    },
+    answer: "A"
+  },
+  {
+    question: "In the proof that f(x) ≤ g(x) near c implies L ≤ M, what limit is found using the limit of a difference property when assuming L > M?",
+    options: {
+      A: "lim_{x→c} (f(x) − g(x)) = L − M",
+      B: "lim_{x→c} (g(x) − f(x)) = M − L",
+      C: "lim_{x→c} (g(x) − f(x)) = L − M",
+      D: "lim_{x→c} (f(x) − g(x)) = M − L"
+    },
+    answer: "B"
+  },
+  {
+    question: "In the proof that f(x) ≤ g(x) near c implies L ≤ M, why is L − M > 0 when supposing L > M?",
+    options: {
+      A: "Because subtracting a smaller number M from a larger number L yields a positive difference",
+      B: "Because g(x) is always positive near c",
+      C: "Because M − L is positive whenever L > M",
+      D: "Because δ is chosen equal to L − M"
+    },
+    answer: "A"
+  },
+  {
+    question: "Given the inequality 8x + x² ≤ f(x) ≤ sin(3x) + 5x from Exercise 3, which inequality is obtained for f(x)/x when x > 0?",
+    options: {
+      A: "8 + x ≤ f(x)/x ≤ (sin(3x))/x + 5",
+      B: "8x + 1 ≤ f(x)/x ≤ sin(3x) + 5",
+      C: "8 + x² ≤ f(x)/x ≤ 3 cos(3x) + 5",
+      D: "8/x + 1 ≤ f(x)/x ≤ (sin(3x))/x² + 5/x"
+    },
+    answer: "A"
+  }
+];
+
+
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!studentId) {
+        alert("Session expired or missing student ID. Please log in from the hub.");
+        window.location.href = "../index.html";
+        return;
+      }
+
+      document.getElementById('quizTitleHeader').textContent = `Quiz: ${quizId}`;
+      document.getElementById('leaderboardBtn').href = `leaderboard.html?quiz=${quizId}`;
+
+      if (isReviewMode) {
+        document.getElementById('completionBanner').style.display = 'block';
+        document.getElementById('modeIndicator').textContent = 'REVIEW MODE';
+        document.getElementById('checkBtn').style.display = 'none';
+      }
+
+      // Find first unanswered or unchecked question if resuming
+      if (!isReviewMode) {
+        for (let i = 0; i < questions.length; i++) {
+          if (!checkedStatus[i]) {
+            currentQuestionIndex = i;
+            break;
+          }
+        }
+      }
+
+      loadQuestion(currentQuestionIndex);
+      updateProgressScore();
+    });
+
+    window.loadQuestion = function(index) {
+      if (questions.length === 0) {
+        document.getElementById('questionText').textContent = "No questions available.";
+        return;
+      }
+
+      const q = questions[index];
+      document.getElementById('progressIndicator').textContent = `Question ${index + 1} of ${questions.length}`;
+      document.getElementById('questionText').textContent = q.question;
+
+      const optionsList = document.getElementById('optionsList');
+      optionsList.innerHTML = '';
+
+      const selectedKey = userAnswers[index];
+      const isChecked = checkedStatus[index] === true;
+
+      for (const [key, value] of Object.entries(q.options)) {
+        const label = document.createElement('label');
+        label.className = 'option-label';
+        if (isChecked || isReviewMode) label.classList.add('locked');
+
+        let extraClass = '';
+        if (isChecked || isReviewMode) {
+          if (key === q.answer) {
+            extraClass = 'correct'; // Highlight correct choice green
+          } else if (key === selectedKey) {
+            extraClass = 'incorrect'; // Highlight user's wrong choice red
+          }
+        }
+        if (extraClass) label.classList.add(extraClass);
+
+        const isRadioChecked = selectedKey === key ? 'checked' : '';
+        label.innerHTML = `
+          <input type="radio" name="option" value="${key}" ${isRadioChecked} ${isChecked || isReviewMode ? 'disabled' : ''} onclick="selectAnswer('${key}')">
+          <span><strong>${key}.</strong> ${value}</span>
+        `;
+        optionsList.appendChild(label);
+      }
+
+      // Button controls state management
+      document.getElementById('prevBtn').disabled = (index === 0);
+      
+      const checkBtn = document.getElementById('checkBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const leaderboardBtn = document.getElementById('leaderboardBtn');
+
+      if (!isReviewMode) {
+        checkBtn.disabled = !selectedKey || isChecked;
+        nextBtn.disabled = !isChecked;
+      } else {
+        nextBtn.disabled = (index === questions.length - 1);
+      }
+
+      // Show leaderboard button if all questions are checked or if in review mode
+      const allChecked = Object.keys(checkedStatus).length === questions.length;
+      if (allChecked || isReviewMode) {
+        leaderboardBtn.style.display = 'inline-block';
+      } else {
+        leaderboardBtn.style.display = 'none';
+      }
+    };
+
+    window.selectAnswer = function(key) {
+      if (isReviewMode || checkedStatus[currentQuestionIndex]) return;
+
+      userAnswers[currentQuestionIndex] = key;
+      localStorage.setItem(`quiz_${quizId}_answers`, JSON.stringify(userAnswers));
+
+      // Enable the check button once an answer is chosen
+      document.getElementById('checkBtn').disabled = false;
+    };
+
+    window.checkAnswer = function() {
+      if (!userAnswers[currentQuestionIndex] || checkedStatus[currentQuestionIndex]) return;
+
+      checkedStatus[currentQuestionIndex] = true;
+      localStorage.setItem(`quiz_${quizId}_checked`, JSON.stringify(checkedStatus));
+
+      loadQuestion(currentQuestionIndex);
+      updateProgressScore();
+    };
+
+    window.nextQuestion = function() {
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        loadQuestion(currentQuestionIndex);
+      }
+    };
+
+    window.prevQuestion = function() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        loadQuestion(currentQuestionIndex);
+      }
+    };
+
+    function calculateResults() {
+      let truths = 0;
+      let falses = 0;
+      let checkedCount = 0;
+
+      questions.forEach((q, idx) => {
+        if (checkedStatus[idx]) {
+          checkedCount++;
+          if (userAnswers[idx] === q.answer) {
+            truths++;
+          } else {
+            falses++;
+          }
+        }
+      });
+
+      const ratio = falses === 0 ? truths.toFixed(2) : (truths / falses).toFixed(2);
+      const isComplete = checkedCount === questions.length;
+      return { truths, falses, ratio, isComplete };
+    }
+
+    function updateProgressScore() {
+      if (!studentId || isReviewMode) return;
+
+      const { truths, falses, ratio, isComplete } = calculateResults();
+      
+      if (isComplete) {
+        localStorage.setItem(`quiz_${quizId}_completed`, 'true');
+      }
+
+      const leaderboardRef = ref(db, `quizzes/${quizId}/leaderboard/${studentId}`);
+      set(leaderboardRef, {
+        "student-name": studentName,
+        "student-group": studentGroup,
+        "truths": truths,
+        "falses": falses,
+        "tf-ratio": ratio,
+        "timestamp": Date.now()
+      }).catch(err => console.error("Error syncing score:", err));
+    }
+  </script>
+</body>
+</html>
