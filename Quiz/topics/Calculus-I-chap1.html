@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Session - Math Department</title>
+  
+  <style>
+    :root {
+      --bg-color: #f3f3f3;
+      --card-bg: #ffffff;
+      --accent: #0078d4;
+      --accent-hover: #106ebe;
+      --text-main: #242424;
+      --text-muted: #616161;
+      --border-color: #e0e0e0;
+      --success: #107c10;
+      --success-bg: #dff6dd;
+      --danger: #d13438;
+      --danger-bg: #fde7e9;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      -webkit-user-drag: none;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    header h1 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-back {
+      background: #f0f0f0;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn-back:hover { background: #e5e5e5; }
+
+    main {
+      max-width: 800px;
+      width: 100%;
+      margin: 32px auto;
+      padding: 0 20px;
+      flex: 1;
+    }
+
+    .quiz-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .quiz-progress {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .question-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      background: #fafafa;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .option-label:hover:not(.locked) {
+      background: #f0f0f0;
+      border-color: #b0b0b0;
+    }
+
+    .option-label input {
+      accent-color: var(--accent);
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Feedback Highlights */
+    .option-label.correct {
+      background-color: var(--success-bg) !important;
+      border-color: var(--success) !important;
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .option-label.incorrect {
+      background-color: var(--danger-bg) !important;
+      border-color: var(--danger) !important;
+      color: var(--danger);
+    }
+
+    .option-label.locked {
+      cursor: default;
+    }
+
+    .quiz-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-color);
+      padding-top: 20px;
+      gap: 10px;
+    }
+
+    .btn-nav {
+      padding: 8px 20px;
+      background: #f0f0f0;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-main);
+    }
+    .btn-nav:hover:not(:disabled) { background: #e5e5e5; }
+    .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-check {
+      padding: 8px 20px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-check:hover:not(:disabled) { background: var(--accent-hover); }
+    .btn-check:disabled { background: #a0c4e2; cursor: not-allowed; }
+
+    .btn-submit {
+      padding: 8px 20px;
+      background: var(--success);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn-submit:hover { background: #0e6b0e; }
+
+    .completion-banner {
+      background: #e1dfdd;
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--text-main);
+      display: none;
+    }
+  </style>
+</head>
+<body oncontextmenu="return false;">
+
+  <header>
+    <h1 id="quizTitleHeader">Quiz Session</h1>
+    <div class="nav-links">
+      <a href="../index.html" class="btn-back">Exit to Hub</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="quiz-container">
+      <div id="completionBanner" class="completion-banner">Review Mode: Quiz Completed</div>
+      
+      <div class="quiz-progress">
+        <span id="progressIndicator">Question 1 of 50</span>
+        <span id="modeIndicator" style="color: var(--accent); font-weight: 600;"></span>
+      </div>
+
+      <div id="questionText" class="question-title">Loading questions...</div>
+      
+      <div id="optionsList" class="options-list">
+        <!-- Dynamic options A, B, C, D -->
+      </div>
+
+      <div class="quiz-controls">
+        <button id="prevBtn" class="btn-nav" onclick="prevQuestion()" disabled>Previous</button>
+        <button id="checkBtn" class="btn-check" onclick="checkAnswer()" disabled>Check</button>
+        <button id="nextBtn" class="btn-nav" onclick="nextQuestion()" disabled>Next</button>
+        <a id="leaderboardBtn" href="#" class="btn-submit" style="display: none;">Leaderboard</a>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-YOUR_ACTUAL_API_KEY",
+      authDomain: "cognito-f1f7b.firebaseapp.com",
+      databaseURL: "https://cognito-f1f7b-default-rtdb.firebaseio.com/",
+      projectId: "cognito-f1f7b",
+      storageBucket: "cognito-f1f7b.firebasestorage.app",
+      messagingSenderId: "506661532829",
+      appId: "1:506661532829:web:7a28aa874ba80871691074"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const quizId = urlParams.get('quiz') || 'default_quiz';
+    const isReviewMode = urlParams.get('review') === 'true';
+
+    // Retrieve Student SSO details from localStorage
+    const studentId = localStorage.getItem('student_id');
+    const studentName = localStorage.getItem('student_name');
+    const studentGroup = localStorage.getItem('student_group');
+
+    let currentQuestionIndex = 0;
+    
+    // Load saved user answers & checked status from localStorage
+    let userAnswers = JSON.parse(localStorage.getItem(`quiz_${quizId}_answers`) || '{}');
+    let checkedStatus = JSON.parse(localStorage.getItem(`quiz_${quizId}_checked`) || '{}');
+
+    // Sample question array (expandable up to 50)
+    
+
+const questions = [
+  // 1. REAL NUMBER SYSTEM
+  {
+    question: "Which of the following correctly describes a rational number?",
+    options: {
+      A: "A number that cannot be expressed as a ratio of two integers.",
+      B: "A number that can be expressed as a ratio of two integers, with a nonzero denominator.",
+      C: "A number whose decimal expansion must be terminating.",
+      D: "A number that belongs only to the set of integers."
+    },
+    answer: "B"
+  },
+  {
+    question: "Which of the following decimal expansions represents an irrational number?",
+    options: {
+      A: "0.750000...",
+      B: "0.333333...",
+      C: "1.414213562...",
+      D: "2.500000..."
+    },
+    answer: "C"
+  },
+  {
+    question: "Which of the following correctly represents the relationship between the number sets?",
+    options: {
+      A: "ℝ ⊂ ℚ ⊂ ℤ ⊂ ℕ",
+      B: "ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ",
+      C: "ℤ ⊂ ℕ ⊂ ℝ ⊂ ℚ",
+      D: "ℚ ⊂ ℕ ⊂ ℤ ⊂ ℝ"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which of the following statements about irrational numbers is correct according to the chapter?",
+    options: {
+      A: "Their decimal expansions are terminating.",
+      B: "They can always be expressed as a ratio of integers.",
+      C: "Their decimal expansions are nonterminating and nonrepeating.",
+      D: "They are all negative real numbers."
+    },
+    answer: "C"
+  },
+  {
+    question: "Which of the following is the correct classification of ∛9?",
+    options: {
+      A: "Natural",
+      B: "Integer",
+      C: "Rational",
+      D: "Irrational"
+    },
+    answer: "D"
+  },
+
+  // 2. INTERVALS AND INEQUALITIES
+  {
+    question: "Which interval represents all real numbers greater than or equal to -3 but strictly less than 5?",
+    options: {
+      A: "(-3, 5)",
+      B: "[-3, 5]",
+      C: "[-3, 5)",
+      D: "(-3, 5]"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which of the following is the correct set description of (-∞, 4]?",
+    options: {
+      A: "{x ∈ ℝ : x < 4}",
+      B: "{x ∈ ℝ : x ≤ 4}",
+      C: "{x ∈ ℝ : x ≥ 4}",
+      D: "{x ∈ ℝ : x > 4}"
+    },
+    answer: "B"
+  },
+  {
+    question: "Why must parentheses (open-intervals) always be used next to -∞ and ∞ in interval notation?",
+    options: {
+      A: "Because infinity is always negative.",
+      B: "Because infinity is not a real-number endpoint.",
+      C: "Because infinity belongs to every interval.",
+      D: "Because parentheses represent closed endpoints."
+    },
+    answer: "B"
+  },
+  {
+    question: "Which of the following is the correct result when multiplying both sides of an inequality by a negative number?",
+    options: {
+      A: "The inequality sign remains unchanged.",
+      B: "The inequality sign must be reversed.",
+      C: "The inequality becomes an equation.",
+      D: "The inequality sign must be removed."
+    },
+    answer: "B"
+  },
+  {
+    question: "If a < b and both a and b are positive, which statement follows from the reciprocal inequality rule?",
+    options: {
+      A: "1/a < 1/b",
+      B: "1/a = 1/b",
+      C: "1/a > 1/b",
+      D: "a/b < 0"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which of the following is the correct solution of 3x + 2 < 5?",
+    options: {
+      A: "x > 1",
+      B: "x < 1",
+      C: "x ≤ 1",
+      D: "x ≥ 1"
+    },
+    answer: "B"
+  },
+  {
+    question: "Solve x² < 25. Which interval represents the solution set?",
+    options: {
+      A: "(-∞, -5) ∪ (5, ∞)",
+      B: "[-5, 5]",
+      C: "(-5, 5)",
+      D: "(-∞, 5)"
+    },
+    answer: "C"
+  },
+  {
+    question: "In solving (x - 5)(x + 5) < 0, which condition produces the valid solution?",
+    options: {
+      A: "x + 5 < 0 and x - 5 < 0",
+      B: "x + 5 > 0 and x - 5 > 0",
+      C: "x + 5 > 0 and x - 5 < 0",
+      D: "x + 5 < 0 and x - 5 > 0"
+    },
+    answer: "C"
+  },
+  {
+    question: "Consider the inequality 6/(x - 1) ≥ 5. Which of the following is its solution set?",
+    options: {
+      A: "(-∞, 1) ∪ [11/5, ∞)",
+      B: "(1, 11/5]",
+      C: "[1, 11/5]",
+      D: "(1, ∞)"
+    },
+    answer: "B"
+  },
+  {
+    question: "In solving 6/(x - 1) ≥ 5, why must x = 1 be excluded before solving?",
+    options: {
+      A: "Because the numerator becomes zero.",
+      B: "Because the denominator becomes zero and the expression is undefined.",
+      C: "Because x must always be positive.",
+      D: "Because the inequality becomes strict."
+    },
+    answer: "B"
+  },
+
+  // 3. ABSOLUTE VALUE
+  {
+    question: "Which of the following is the correct definition of |x|?",
+    options: {
+      A: "x if x < 0, and -x if x ≥ 0.",
+      B: "x if x ≥ 0, and -x if x < 0.",
+      C: "-x for every real number.",
+      D: "x² for every real number."
+    },
+    answer: "B"
+  },
+  {
+    question: "What is the geometric interpretation of |x - y|?",
+    options: {
+      A: "The product of x and y.",
+      B: "The distance between x and y on the real number line.",
+      C: "The sum of x and y.",
+      D: "The midpoint between x and y."
+    },
+    answer: "B"
+  },
+  {
+    question: "Which expression is always nonnegative for every real number x?",
+    options: {
+      A: "x",
+      B: "-x",
+      C: "|x|",
+      D: "x - 1"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which statement correctly completes the identity √(a²) = ?",
+    options: {
+      A: "a for every real a",
+      B: "-a for every real a",
+      C: "|a| for every real a",
+      D: "a² for every real a"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which of the following is the triangle inequality?",
+    options: {
+      A: "|a + b| ≥ |a| + |b|",
+      B: "|a + b| ≤ |a| + |b|",
+      C: "|a - b| = |a| - |b|",
+      D: "|ab| ≤ |a| + |b|"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which statement correctly completes the proof of |x|² = x² when x ≤ 0?",
+    options: {
+      A: "|x| = x, therefore |x|² = x².",
+      B: "|x| = -x, therefore |x|² = (-x)² = x².",
+      C: "|x| = 0, therefore |x|² = x².",
+      D: "|x| = x², therefore |x|² = x²."
+    },
+    answer: "B"
+  },
+  {
+    question: "Which of the following is the correct next step when solving |2x - 3| ≤ 1?",
+    options: {
+      A: "2x - 3 ≤ 1",
+      B: "-1 ≤ 2x - 3 ≤ 1",
+      C: "2x - 3 ≥ 1",
+      D: "-1 ≥ 2x - 3 ≥ 1"
+    },
+    answer: "B"
+  },
+  {
+    question: "Solve |2x - 3| ≤ 1. Which interval is correct?",
+    options: {
+      A: "[1, 2]",
+      B: "(-∞, 1] ∪ [2, ∞)",
+      C: "(1, 2)",
+      D: "[-2, 1]"
+    },
+    answer: "A"
+  },
+  {
+    question: "Which is the correct solution of |x| > 3?",
+    options: {
+      A: "(-3, 3)",
+      B: "[-3, 3]",
+      C: "(-∞, -3) ∪ (3, ∞)",
+      D: "(-∞, 3)"
+    },
+    answer: "C"
+  },
+  {
+    question: "For which values of x is √((x + 5)²) = x + 5 true?",
+    options: {
+      A: "x ≤ -5",
+      B: "x ≥ -5",
+      C: "x = -5 only",
+      D: "For every real x"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which of the following is the correct solution of |x - 3| = 3 - x?",
+    options: {
+      A: "x ≥ 3",
+      B: "x ≤ 3",
+      C: "x > 3",
+      D: "All real numbers"
+    },
+    answer: "B"
+  },
+
+  // 4. FUNCTIONS AND THEIR TYPES
+  {
+    question: "Which of the following best describes the definition of a function?",
+    options: {
+      A: "A rule that assigns at least two outputs to every input.",
+      B: "A rule that assigns a unique element of Y to each element of D.",
+      C: "A relation in which every output has exactly one input.",
+      D: "A rule that assigns only positive numbers to inputs."
+    },
+    answer: "B"
+  },
+  {
+    question: "Which of the following represents the domain of a function?",
+    options: {
+      A: "The set of all possible output values.",
+      B: "The set of all possible input values.",
+      C: "The set of values that are not defined.",
+      D: "The set of all positive values of the function."
+    },
+    answer: "B"
+  },
+  {
+    question: "If f: ℝ → ℝ is defined by f(x) = x², which of the following is its range?",
+    options: {
+      A: "(-∞, ∞)",
+      B: "(-∞, 0]",
+      C: "[0, ∞)",
+      D: "(0, ∞)"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which statement correctly distinguishes the range from the codomain?",
+    options: {
+      A: "The range must always equal the codomain.",
+      B: "The range contains the actual output values, while the codomain is the target set Y.",
+      C: "The codomain contains only the input values.",
+      D: "The range is always the set of all real numbers."
+    },
+    answer: "B"
+  },
+  {
+    question: "Which definition describes an injective function?",
+    options: {
+      A: "Every element of the codomain has at least one preimage.",
+      B: "Distinct inputs always have distinct outputs.",
+      C: "Every input maps to itself.",
+      D: "The range must contain only positive numbers."
+    },
+    answer: "B"
+  },
+  {
+    question: "Which mathematical statement is equivalent to the definition of an injective function?",
+    options: {
+      A: "f(a) = f(b) ⇒ a = b",
+      B: "f(a) = f(b) ⇒ a ≠ b",
+      C: "a = b ⇒ f(a) ≠ f(b)",
+      D: "f(a) ≠ f(b) ⇒ a = b"
+    },
+    answer: "A"
+  },
+  {
+    question: "A function f: A → B is surjective if:",
+    options: {
+      A: "Every element of A maps to itself.",
+      B: "Every element of B is the image of at least one element of A.",
+      C: "Different inputs always produce different outputs.",
+      D: "The domain and codomain must be identical."
+    },
+    answer: "B"
+  },
+  {
+    question: "Which condition must a function satisfy to be bijective?",
+    options: {
+      A: "It must be only injective.",
+      B: "It must be only surjective.",
+      C: "It must be both injective and surjective.",
+      D: "It must be a polynomial function."
+    },
+    answer: "C"
+  },
+  {
+    question: "Which of the following is the identity function on A?",
+    options: {
+      A: "f(x) = x²",
+      B: "f(x) = 0",
+      C: "f(x) = x",
+      D: "f(x) = -x"
+    },
+    answer: "C"
+  },
+  {
+    question: "A nonzero polynomial has degree equal to:",
+    options: {
+      A: "The number of its coefficients.",
+      B: "The smallest exponent in the polynomial.",
+      C: "The highest exponent with a nonzero coefficient.",
+      D: "The sum of all its exponents."
+    },
+    answer: "C"
+  },
+  {
+    question: "What is the degree of the polynomial f(x) = 4x³ - 2x² + 7x - 9?",
+    options: {
+      A: "1",
+      B: "2",
+      C: "3",
+      D: "4"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which statement about the zero polynomial is correct according to the chapter?",
+    options: {
+      A: "Its degree is always zero.",
+      B: "Its degree is one.",
+      C: "It has no degree under the usual convention.",
+      D: "Its degree is negative one."
+    },
+    answer: "C"
+  },
+  {
+    question: "Which of the following is the correct definition of an odd function?",
+    options: {
+      A: "f(-x) = f(x)",
+      B: "f(-x) = -f(x)",
+      C: "f(x) = x²",
+      D: "f(-x) = 0"
+    },
+    answer: "B"
+  },
+  {
+    question: "The graph of an even function is symmetric about which of the following?",
+    options: {
+      A: "The x-axis",
+      B: "The origin",
+      C: "The y-axis",
+      D: "The line y = x"
+    },
+    answer: "C"
+  },
+  {
+    question: "What is the value of the greatest integer function ⌊-1.2⌋?",
+    options: {
+      A: "-1",
+      B: "-2",
+      C: "1",
+      D: "2"
+    },
+    answer: "B"
+  },
+  {
+    question: "If ⌊x⌋ = n, which inequality must x satisfy?",
+    options: {
+      A: "n - 1 < x ≤ n",
+      B: "n ≤ x < n + 1",
+      C: "n < x ≤ n + 1",
+      D: "n ≤ x ≤ n + 1"
+    },
+    answer: "B"
+  },
+  {
+    question: "What is the value of the ceiling function ⌈-1.2⌉?",
+    options: {
+      A: "-2",
+      B: "-1",
+      C: "0",
+      D: "1"
+    },
+    answer: "B"
+  },
+  {
+    question: "If ⌈x⌉ = n, which inequality correctly describes x?",
+    options: {
+      A: "n ≤ x < n + 1",
+      B: "n - 1 < x ≤ n",
+      C: "n - 1 ≤ x < n",
+      D: "n < x ≤ n + 1"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which of the following correctly defines a rational function?",
+    options: {
+      A: "A quotient of two polynomial functions, with a denominator that is not the zero polynomial.",
+      B: "A function containing only square roots.",
+      C: "A function that cannot be expressed using polynomials.",
+      D: "A function whose output is always rational."
+    },
+    answer: "A"
+  },
+  {
+    question: "Which of the following is a transcendental function according to the chapter?",
+    options: {
+      A: "f(x) = x² + 3x",
+      B: "f(x) = (x + 1)/(x - 2)",
+      C: "f(x) = eˣ",
+      D: "f(x) = √x"
+    },
+    answer: "C"
+  },
+
+  // 5. DOMAIN AND RANGE
+  {
+    question: "What is the domain of a polynomial function?",
+    options: {
+      A: "[0, ∞)",
+      B: "(-∞, 0]",
+      C: "ℝ",
+      D: "ℝ \\ {0}"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which condition must be satisfied when finding the domain of f(x) = h(x)/g(x), where h and g are polynomials?",
+    options: {
+      A: "g(x) ≥ 0",
+      B: "g(x) ≤ 0",
+      C: "g(x) ≠ 0",
+      D: "h(x) ≠ 0"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which condition is necessary for the domain of f(x) = √g(x)?",
+    options: {
+      A: "g(x) > 0",
+      B: "g(x) ≥ 0",
+      C: "g(x) ≠ 0",
+      D: "g(x) < 0"
+    },
+    answer: "B"
+  },
+  {
+    question: "What is the necessary domain condition for f(x) = h(x)/√g(x)?",
+    options: {
+      A: "g(x) ≥ 0",
+      B: "g(x) ≠ 0",
+      C: "g(x) > 0",
+      D: "g(x) ≤ 0"
+    },
+    answer: "C"
+  },
+  {
+    question: "For a function of the form f(x) = √(h(x)/g(x)), which conditions must be satisfied?",
+    options: {
+      A: "h(x)/g(x) < 0 and g(x) ≠ 0",
+      B: "h(x)/g(x) ≥ 0 and g(x) ≠ 0",
+      C: "h(x)/g(x) > 0 and g(x) = 0",
+      D: "h(x)/g(x) ≤ 0 and g(x) = 0"
+    },
+    answer: "B"
+  },
+
+  // 6. OPERATIONS AND COMPOSITION
+  {
+    question: "Which of the following correctly represents the addition of two functions?",
+    options: {
+      A: "(f + g)(x) = f(g(x))",
+      B: "(f + g)(x) = f(x) + g(x)",
+      C: "(f + g)(x) = f(x)g(x)",
+      D: "(f + g)(x) = f(x)/g(x)"
+    },
+    answer: "B"
+  },
+  {
+    question: "If f and g are two functions, what is the domain of their sum f + g?",
+    options: {
+      A: "D(f) ∪ D(g)",
+      B: "D(f) ∩ D(g)",
+      C: "D(f) - D(g)",
+      D: "ℝ in every case"
+    },
+    answer: "B"
+  },
+  {
+    question: "When defining the quotient function (f/g)(x), which additional restriction is necessary?",
+    options: {
+      A: "f(x) ≠ 0",
+      B: "g(x) ≠ 0",
+      C: "f(x) = g(x)",
+      D: "g(x) > f(x)"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which of the following correctly describes the composition of two functions f and g?",
+    options: {
+      A: "(f ∘ g)(x) = g(f(x))",
+      B: "(f ∘ g)(x) = f(x) + g(x)",
+      C: "(f ∘ g)(x) = f(g(x))",
+      D: "(f ∘ g)(x) = f(x)g(x)"
+    },
+    answer: "C"
+  },
+  {
+    question: "Why is function composition generally not commutative?",
+    options: {
+      A: "Because f and g must have different domains.",
+      B: "Because (f ∘ g)(x) is generally not equal to (g ∘ f)(x).",
+      C: "Because composition is defined only for polynomial functions.",
+      D: "Because composition always produces a constant function."
+    },
+    answer: "B"
+  },
+  {
+    question: "Let f(x) = √x and g(x) = x + 1. What is (f ∘ g)(x)?",
+    options: {
+      A: "√x + 1",
+      B: "√(x + 1)",
+      C: "x + 1",
+      D: "x² + 1"
+    },
+    answer: "B"
+  },
+  {
+    question: "For f(x) = √x and g(x) = x + 1, what is the domain of (f ∘ g)(x)?",
+    options: {
+      A: "[0, ∞)",
+      B: "(-∞, 1]",
+      C: "[-1, ∞)",
+      D: "(-∞, ∞)"
+    },
+    answer: "C"
+  },
+  {
+    question: "Let f(x) = √x and g(x) = x + 1. Which expression represents (g ∘ f)(x)?",
+    options: {
+      A: "√(x + 1)",
+      B: "√x + 1",
+      C: "x + 1",
+      D: "x² + 1"
+    },
+    answer: "B"
+  },
+  {
+    question: "If f(x) = √x, which of the following represents (f ∘ f)(x)?",
+    options: {
+      A: "√(2x)",
+      B: "√x + √x",
+      C: "⁴√x",
+      D: "x²"
+    },
+    answer: "C"
+  },
+
+  // 7. INVERSE FUNCTIONS AND GRAPH TESTS
+  {
+    question: "Which condition must a function satisfy to have an inverse function?",
+    options: {
+      A: "It must be constant.",
+      B: "It must be one-to-one.",
+      C: "It must be even.",
+      D: "Its domain must be all real numbers."
+    },
+    answer: "B"
+  },
+  {
+    question: "Which of the following correctly describes the inverse function of f?",
+    options: {
+      A: "A function whose domain and range are the same as those of f.",
+      B: "A function whose domain is the range of f and whose range is the domain of f.",
+      C: "A function obtained by multiplying f by -1.",
+      D: "A function that always equals 1/f(x)."
+    },
+    answer: "B"
+  },
+  {
+    question: "Which of the following is the correct first step when finding an inverse function?",
+    options: {
+      A: "Interchange x and y immediately.",
+      B: "Differentiate the original function.",
+      C: "Solve y = f(x) for x in terms of y.",
+      D: "Square both sides of the equation."
+    },
+    answer: "C"
+  },
+  {
+    question: "After solving y = f(x) for x in terms of y, what is the next step in finding the inverse?",
+    options: {
+      A: "Set x = 0.",
+      B: "Interchange x and y.",
+      C: "Multiply both sides by -1.",
+      D: "Find the derivative."
+    },
+    answer: "B"
+  },
+  {
+    question: "Find the inverse of f(x) = x³ + 1.",
+    options: {
+      A: "f⁻¹(x) = ∛(x + 1)",
+      B: "f⁻¹(x) = ∛(x - 1)",
+      C: "f⁻¹(x) = x³ - 1",
+      D: "f⁻¹(x) = (x - 1)³"
+    },
+    answer: "B"
+  },
+  {
+    question: "Which statement correctly distinguishes f⁻¹(x) from 1/f(x)?",
+    options: {
+      A: "They always represent the same function.",
+      B: "f⁻¹(x) represents the inverse function, not the reciprocal of f(x).",
+      C: "f⁻¹(x) represents the square of f(x).",
+      D: "1/f(x) is always the inverse function."
+    },
+    answer: "B"
+  },
+  {
+    question: "Which of the following completes the inverse-function identity when g is the inverse of f?",
+    options: {
+      A: "(g ∘ f)(x) = 0",
+      B: "(g ∘ f)(x) = 1",
+      C: "(g ∘ f)(x) = x",
+      D: "(g ∘ f)(x) = f(x)"
+    },
+    answer: "C"
+  },
+  {
+    question: "Which test determines whether a function is one-to-one by examining its graph?",
+    options: {
+      A: "Vertical Line Test",
+      B: "Horizontal Line Test",
+      C: "Triangle Inequality",
+      D: "Absolute Value Test"
+    },
+    answer: "B"
+  },
+  {
+    question: "According to the Vertical Line Test, when does a curve represent a function y = f(x)?",
+    options: {
+      A: "When every horizontal line intersects it exactly once.",
+      B: "When no vertical line intersects it more than once.",
+      C: "When it is symmetric about the origin.",
+      D: "When it passes through the origin."
+    },
+    answer: "B"
+  },
+  {
+    question: "Why does y = x², with domain ℝ, not have an inverse function?",
+    options: {
+      A: "Because it is not a polynomial.",
+      B: "Because it is not one-to-one.",
+      C: "Because its domain is not real numbers.",
+      D: "Because its range is negative."
+    },
+    answer: "B"
+  },
+  {
+    question: "Which domain restriction makes y = x² one-to-one according to the chapter?",
+    options: {
+      A: "(-∞, 0]",
+      B: "ℝ",
+      C: "[0, ∞)",
+      D: "(-∞, ∞)"
+    },
+    answer: "C"
+  },
+  {
+    question: "If (a, b) belongs to the graph of f, which point belongs to the graph of f⁻¹?",
+    options: {
+      A: "(a, -b)",
+      B: "(-a, b)",
+      C: "(b, a)",
+      D: "(-b, -a)"
+    },
+    answer: "C"
+  },
+  {
+    question: "The graphs of a function and its inverse are reflections of each other about which line?",
+    options: {
+      A: "y = 0",
+      B: "x = 0",
+      C: "y = x",
+      D: "y = -x"
+    },
+    answer: "C"
+  },
+  {
+    question: "Why can the six basic trigonometric functions have inverse functions only after restricting their domains?",
+    options: {
+      A: "Because they are not defined for real numbers.",
+      B: "Because their values repeat periodically, so they are not one-to-one on their full domains.",
+      C: "Because their ranges contain only integers.",
+      D: "Because their graphs do not pass the Vertical Line Test."
+    },
+    answer: "B"
+  }
+];
+
+
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!studentId) {
+        alert("Session expired or missing student ID. Please log in from the hub.");
+        window.location.href = "../index.html";
+        return;
+      }
+
+      document.getElementById('quizTitleHeader').textContent = `Quiz: ${quizId}`;
+      document.getElementById('leaderboardBtn').href = `leaderboard.html?quiz=${quizId}`;
+
+      if (isReviewMode) {
+        document.getElementById('completionBanner').style.display = 'block';
+        document.getElementById('modeIndicator').textContent = 'REVIEW MODE';
+        document.getElementById('checkBtn').style.display = 'none';
+      }
+
+      // Find first unanswered or unchecked question if resuming
+      if (!isReviewMode) {
+        for (let i = 0; i < questions.length; i++) {
+          if (!checkedStatus[i]) {
+            currentQuestionIndex = i;
+            break;
+          }
+        }
+      }
+
+      loadQuestion(currentQuestionIndex);
+      updateProgressScore();
+    });
+
+    window.loadQuestion = function(index) {
+      if (questions.length === 0) {
+        document.getElementById('questionText').textContent = "No questions available.";
+        return;
+      }
+
+      const q = questions[index];
+      document.getElementById('progressIndicator').textContent = `Question ${index + 1} of ${questions.length}`;
+      document.getElementById('questionText').textContent = q.question;
+
+      const optionsList = document.getElementById('optionsList');
+      optionsList.innerHTML = '';
+
+      const selectedKey = userAnswers[index];
+      const isChecked = checkedStatus[index] === true;
+
+      for (const [key, value] of Object.entries(q.options)) {
+        const label = document.createElement('label');
+        label.className = 'option-label';
+        if (isChecked || isReviewMode) label.classList.add('locked');
+
+        let extraClass = '';
+        if (isChecked || isReviewMode) {
+          if (key === q.answer) {
+            extraClass = 'correct'; // Highlight correct choice green
+          } else if (key === selectedKey) {
+            extraClass = 'incorrect'; // Highlight user's wrong choice red
+          }
+        }
+        if (extraClass) label.classList.add(extraClass);
+
+        const isRadioChecked = selectedKey === key ? 'checked' : '';
+        label.innerHTML = `
+          <input type="radio" name="option" value="${key}" ${isRadioChecked} ${isChecked || isReviewMode ? 'disabled' : ''} onclick="selectAnswer('${key}')">
+          <span><strong>${key}.</strong> ${value}</span>
+        `;
+        optionsList.appendChild(label);
+      }
+
+      // Button controls state management
+      document.getElementById('prevBtn').disabled = (index === 0);
+      
+      const checkBtn = document.getElementById('checkBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const leaderboardBtn = document.getElementById('leaderboardBtn');
+
+      if (!isReviewMode) {
+        checkBtn.disabled = !selectedKey || isChecked;
+        nextBtn.disabled = !isChecked;
+      } else {
+        nextBtn.disabled = (index === questions.length - 1);
+      }
+
+      // Show leaderboard button if all questions are checked or if in review mode
+      const allChecked = Object.keys(checkedStatus).length === questions.length;
+      if (allChecked || isReviewMode) {
+        leaderboardBtn.style.display = 'inline-block';
+      } else {
+        leaderboardBtn.style.display = 'none';
+      }
+    };
+
+    window.selectAnswer = function(key) {
+      if (isReviewMode || checkedStatus[currentQuestionIndex]) return;
+
+      userAnswers[currentQuestionIndex] = key;
+      localStorage.setItem(`quiz_${quizId}_answers`, JSON.stringify(userAnswers));
+
+      // Enable the check button once an answer is chosen
+      document.getElementById('checkBtn').disabled = false;
+    };
+
+    window.checkAnswer = function() {
+      if (!userAnswers[currentQuestionIndex] || checkedStatus[currentQuestionIndex]) return;
+
+      checkedStatus[currentQuestionIndex] = true;
+      localStorage.setItem(`quiz_${quizId}_checked`, JSON.stringify(checkedStatus));
+
+      loadQuestion(currentQuestionIndex);
+      updateProgressScore();
+    };
+
+    window.nextQuestion = function() {
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        loadQuestion(currentQuestionIndex);
+      }
+    };
+
+    window.prevQuestion = function() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        loadQuestion(currentQuestionIndex);
+      }
+    };
+
+    function calculateResults() {
+      let truths = 0;
+      let falses = 0;
+      let checkedCount = 0;
+
+      questions.forEach((q, idx) => {
+        if (checkedStatus[idx]) {
+          checkedCount++;
+          if (userAnswers[idx] === q.answer) {
+            truths++;
+          } else {
+            falses++;
+          }
+        }
+      });
+
+      const ratio = falses === 0 ? truths.toFixed(2) : (truths / falses).toFixed(2);
+      const isComplete = checkedCount === questions.length;
+      return { truths, falses, ratio, isComplete };
+    }
+
+    function updateProgressScore() {
+      if (!studentId || isReviewMode) return;
+
+      const { truths, falses, ratio, isComplete } = calculateResults();
+      
+      if (isComplete) {
+        localStorage.setItem(`quiz_${quizId}_completed`, 'true');
+      }
+
+      const leaderboardRef = ref(db, `quizzes/${quizId}/leaderboard/${studentId}`);
+      set(leaderboardRef, {
+        "student-name": studentName,
+        "student-group": studentGroup,
+        "truths": truths,
+        "falses": falses,
+        "tf-ratio": ratio,
+        "timestamp": Date.now()
+      }).catch(err => console.error("Error syncing score:", err));
+    }
+  </script>
+</body>
+</html>
