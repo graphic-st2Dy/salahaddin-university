@@ -279,19 +279,20 @@
     
 
 const questions = [
-  // 1. REAL NUMBER SYSTEM
+  // 1. REAL NUMBERS AND INTERVALS
+
   {
     question: "Which of the following correctly describes a rational number?",
     options: {
       A: "A number that cannot be expressed as a ratio of two integers.",
-      B: "A number that can be expressed as a ratio of two integers, with a nonzero denominator.",
+      B: "A number that can be expressed as a ratio of two integers with a nonzero denominator.",
       C: "A number whose decimal expansion must be terminating.",
       D: "A number that belongs only to the set of integers."
     },
     answer: "B"
   },
   {
-    question: "Which of the following decimal expansions represents an irrational number?",
+    question: "Which decimal expansion represents an irrational number?",
     options: {
       A: "0.750000...",
       B: "0.333333...",
@@ -301,7 +302,7 @@ const questions = [
     answer: "C"
   },
   {
-    question: "Which of the following correctly represents the relationship between the number sets?",
+    question: "Which of the following correctly represents the relationship between number sets?",
     options: {
       A: "ℝ ⊂ ℚ ⊂ ℤ ⊂ ℕ",
       B: "ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ",
@@ -310,28 +311,6 @@ const questions = [
     },
     answer: "B"
   },
-  {
-    question: "Which of the following statements about irrational numbers is correct according to the chapter?",
-    options: {
-      A: "Their decimal expansions are terminating.",
-      B: "They can always be expressed as a ratio of integers.",
-      C: "Their decimal expansions are nonterminating and nonrepeating.",
-      D: "They are all negative real numbers."
-    },
-    answer: "C"
-  },
-  {
-    question: "Which of the following is the correct classification of ∛9?",
-    options: {
-      A: "Natural",
-      B: "Integer",
-      C: "Rational",
-      D: "Irrational"
-    },
-    answer: "D"
-  },
-
-  // 2. INTERVALS AND INEQUALITIES
   {
     question: "Which interval represents all real numbers greater than or equal to -3 but strictly less than 5?",
     options: {
@@ -343,17 +322,7 @@ const questions = [
     answer: "C"
   },
   {
-    question: "Which of the following is the correct set description of (-∞, 4]?",
-    options: {
-      A: "{x ∈ ℝ : x < 4}",
-      B: "{x ∈ ℝ : x ≤ 4}",
-      C: "{x ∈ ℝ : x ≥ 4}",
-      D: "{x ∈ ℝ : x > 4}"
-    },
-    answer: "B"
-  },
-  {
-    question: "Why must parentheses (open-intervals) always be used next to -∞ and ∞ in interval notation?",
+    question: "Why must parentheses be used next to -∞ and ∞ in interval notation?",
     options: {
       A: "Because infinity is always negative.",
       B: "Because infinity is not a real-number endpoint.",
@@ -363,7 +332,20 @@ const questions = [
     answer: "B"
   },
   {
-    question: "Which of the following is the correct result when multiplying both sides of an inequality by a negative number?",
+    question: "If a < b and both numbers are positive, which statement is correct?",
+    options: {
+      A: "1/a < 1/b",
+      B: "1/a = 1/b",
+      C: "1/a > 1/b",
+      D: "a/b < 0"
+    },
+    answer: "C"
+  },
+
+  // 2. INEQUALITIES AND ABSOLUTE VALUE
+
+  {
+    question: "Which rule must be applied when multiplying both sides of an inequality by a negative number?",
     options: {
       A: "The inequality sign remains unchanged.",
       B: "The inequality sign must be reversed.",
@@ -373,27 +355,17 @@ const questions = [
     answer: "B"
   },
   {
-    question: "If a < b and both a and b are positive, which statement follows from the reciprocal inequality rule?",
+    question: "Solve 7 < 2x + 3 < 11. Which interval is correct?",
     options: {
-      A: "1/a < 1/b",
-      B: "1/a = 1/b",
-      C: "1/a > 1/b",
-      D: "a/b < 0"
+      A: "(2, 4)",
+      B: "[2, 4]",
+      C: "(1, 4)",
+      D: "(2, 5)"
     },
-    answer: "C"
+    answer: "A"
   },
   {
-    question: "Which of the following is the correct solution of 3x + 2 < 5?",
-    options: {
-      A: "x > 1",
-      B: "x < 1",
-      C: "x ≤ 1",
-      D: "x ≥ 1"
-    },
-    answer: "B"
-  },
-  {
-    question: "Solve x² < 25. Which interval represents the solution set?",
+    question: "Solve x² < 25. Which interval represents the solution?",
     options: {
       A: "(-∞, -5) ∪ (5, ∞)",
       B: "[-5, 5]",
@@ -405,35 +377,13 @@ const questions = [
   {
     question: "In solving (x - 5)(x + 5) < 0, which condition produces the valid solution?",
     options: {
-      A: "x + 5 < 0 and x - 5 < 0",
-      B: "x + 5 > 0 and x - 5 > 0",
-      C: "x + 5 > 0 and x - 5 < 0",
-      D: "x + 5 < 0 and x - 5 > 0"
+      A: "Both factors are negative.",
+      B: "Both factors are positive.",
+      C: "One factor is positive and the other is negative.",
+      D: "Both factors equal zero."
     },
     answer: "C"
   },
-  {
-    question: "Consider the inequality 6/(x - 1) ≥ 5. Which of the following is its solution set?",
-    options: {
-      A: "(-∞, 1) ∪ [11/5, ∞)",
-      B: "(1, 11/5]",
-      C: "[1, 11/5]",
-      D: "(1, ∞)"
-    },
-    answer: "B"
-  },
-  {
-    question: "In solving 6/(x - 1) ≥ 5, why must x = 1 be excluded before solving?",
-    options: {
-      A: "Because the numerator becomes zero.",
-      B: "Because the denominator becomes zero and the expression is undefined.",
-      C: "Because x must always be positive.",
-      D: "Because the inequality becomes strict."
-    },
-    answer: "B"
-  },
-
-  // 3. ABSOLUTE VALUE
   {
     question: "Which of the following is the correct definition of |x|?",
     options: {
@@ -455,22 +405,12 @@ const questions = [
     answer: "B"
   },
   {
-    question: "Which expression is always nonnegative for every real number x?",
+    question: "Which identity is correct for every real number a?",
     options: {
-      A: "x",
-      B: "-x",
-      C: "|x|",
-      D: "x - 1"
-    },
-    answer: "C"
-  },
-  {
-    question: "Which statement correctly completes the identity √(a²) = ?",
-    options: {
-      A: "a for every real a",
-      B: "-a for every real a",
-      C: "|a| for every real a",
-      D: "a² for every real a"
+      A: "√(a²) = a",
+      B: "√(a²) = -a",
+      C: "√(a²) = |a|",
+      D: "√(a²) = a²"
     },
     answer: "C"
   },
@@ -485,26 +425,6 @@ const questions = [
     answer: "B"
   },
   {
-    question: "Which statement correctly completes the proof of |x|² = x² when x ≤ 0?",
-    options: {
-      A: "|x| = x, therefore |x|² = x².",
-      B: "|x| = -x, therefore |x|² = (-x)² = x².",
-      C: "|x| = 0, therefore |x|² = x².",
-      D: "|x| = x², therefore |x|² = x²."
-    },
-    answer: "B"
-  },
-  {
-    question: "Which of the following is the correct next step when solving |2x - 3| ≤ 1?",
-    options: {
-      A: "2x - 3 ≤ 1",
-      B: "-1 ≤ 2x - 3 ≤ 1",
-      C: "2x - 3 ≥ 1",
-      D: "-1 ≥ 2x - 3 ≥ 1"
-    },
-    answer: "B"
-  },
-  {
     question: "Solve |2x - 3| ≤ 1. Which interval is correct?",
     options: {
       A: "[1, 2]",
@@ -513,16 +433,6 @@ const questions = [
       D: "[-2, 1]"
     },
     answer: "A"
-  },
-  {
-    question: "Which is the correct solution of |x| > 3?",
-    options: {
-      A: "(-3, 3)",
-      B: "[-3, 3]",
-      C: "(-∞, -3) ∪ (3, ∞)",
-      D: "(-∞, 3)"
-    },
-    answer: "C"
   },
   {
     question: "For which values of x is √((x + 5)²) = x + 5 true?",
@@ -534,18 +444,9 @@ const questions = [
     },
     answer: "B"
   },
-  {
-    question: "Which of the following is the correct solution of |x - 3| = 3 - x?",
-    options: {
-      A: "x ≥ 3",
-      B: "x ≤ 3",
-      C: "x > 3",
-      D: "All real numbers"
-    },
-    answer: "B"
-  },
 
-  // 4. FUNCTIONS AND THEIR TYPES
+  // 3. FUNCTIONS AND THEIR TYPES
+
   {
     question: "Which of the following best describes the definition of a function?",
     options: {
@@ -562,12 +463,12 @@ const questions = [
       A: "The set of all possible output values.",
       B: "The set of all possible input values.",
       C: "The set of values that are not defined.",
-      D: "The set of all positive values of the function."
+      D: "The set of all positive values."
     },
     answer: "B"
   },
   {
-    question: "If f: ℝ → ℝ is defined by f(x) = x², which of the following is its range?",
+    question: "If f: ℝ → ℝ is defined by f(x) = x², which is its range?",
     options: {
       A: "(-∞, ∞)",
       B: "(-∞, 0]",
@@ -580,8 +481,8 @@ const questions = [
     question: "Which statement correctly distinguishes the range from the codomain?",
     options: {
       A: "The range must always equal the codomain.",
-      B: "The range contains the actual output values, while the codomain is the target set Y.",
-      C: "The codomain contains only the input values.",
+      B: "The range contains actual output values, while the codomain is the target set.",
+      C: "The codomain contains only input values.",
       D: "The range is always the set of all real numbers."
     },
     answer: "B"
@@ -592,7 +493,7 @@ const questions = [
       A: "Every element of the codomain has at least one preimage.",
       B: "Distinct inputs always have distinct outputs.",
       C: "Every input maps to itself.",
-      D: "The range must contain only positive numbers."
+      D: "The range contains only positive numbers."
     },
     answer: "B"
   },
@@ -627,7 +528,7 @@ const questions = [
     answer: "C"
   },
   {
-    question: "Which of the following is the identity function on A?",
+    question: "Which of the following correctly represents the identity function?",
     options: {
       A: "f(x) = x²",
       B: "f(x) = 0",
@@ -637,17 +538,7 @@ const questions = [
     answer: "C"
   },
   {
-    question: "A nonzero polynomial has degree equal to:",
-    options: {
-      A: "The number of its coefficients.",
-      B: "The smallest exponent in the polynomial.",
-      C: "The highest exponent with a nonzero coefficient.",
-      D: "The sum of all its exponents."
-    },
-    answer: "C"
-  },
-  {
-    question: "What is the degree of the polynomial f(x) = 4x³ - 2x² + 7x - 9?",
+    question: "What is the degree of f(x) = 4x³ - 2x² + 7x - 9?",
     options: {
       A: "1",
       B: "2",
@@ -657,7 +548,7 @@ const questions = [
     answer: "C"
   },
   {
-    question: "Which statement about the zero polynomial is correct according to the chapter?",
+    question: "Which statement about the zero polynomial is correct?",
     options: {
       A: "Its degree is always zero.",
       B: "Its degree is one.",
@@ -667,7 +558,7 @@ const questions = [
     answer: "C"
   },
   {
-    question: "Which of the following is the correct definition of an odd function?",
+    question: "Which statement correctly defines an odd function?",
     options: {
       A: "f(-x) = f(x)",
       B: "f(-x) = -f(x)",
@@ -677,7 +568,7 @@ const questions = [
     answer: "B"
   },
   {
-    question: "The graph of an even function is symmetric about which of the following?",
+    question: "The graph of an even function is symmetric about which axis?",
     options: {
       A: "The x-axis",
       B: "The origin",
@@ -717,19 +608,9 @@ const questions = [
     answer: "B"
   },
   {
-    question: "If ⌈x⌉ = n, which inequality correctly describes x?",
-    options: {
-      A: "n ≤ x < n + 1",
-      B: "n - 1 < x ≤ n",
-      C: "n - 1 ≤ x < n",
-      D: "n < x ≤ n + 1"
-    },
-    answer: "B"
-  },
-  {
     question: "Which of the following correctly defines a rational function?",
     options: {
-      A: "A quotient of two polynomial functions, with a denominator that is not the zero polynomial.",
+      A: "A quotient of two polynomial functions, where the denominator is not the zero polynomial.",
       B: "A function containing only square roots.",
       C: "A function that cannot be expressed using polynomials.",
       D: "A function whose output is always rational."
@@ -737,7 +618,7 @@ const questions = [
     answer: "A"
   },
   {
-    question: "Which of the following is a transcendental function according to the chapter?",
+    question: "Which of the following is a transcendental function?",
     options: {
       A: "f(x) = x² + 3x",
       B: "f(x) = (x + 1)/(x - 2)",
@@ -747,7 +628,8 @@ const questions = [
     answer: "C"
   },
 
-  // 5. DOMAIN AND RANGE
+  // 4. DOMAIN AND RANGE
+
   {
     question: "What is the domain of a polynomial function?",
     options: {
@@ -759,7 +641,7 @@ const questions = [
     answer: "C"
   },
   {
-    question: "Which condition must be satisfied when finding the domain of f(x) = h(x)/g(x), where h and g are polynomials?",
+    question: "Which condition must be satisfied when finding the domain of f(x) = h(x)/g(x)?",
     options: {
       A: "g(x) ≥ 0",
       B: "g(x) ≤ 0",
@@ -789,7 +671,7 @@ const questions = [
     answer: "C"
   },
   {
-    question: "For a function of the form f(x) = √(h(x)/g(x)), which conditions must be satisfied?",
+    question: "For f(x) = √(h(x)/g(x)), which conditions must be satisfied?",
     options: {
       A: "h(x)/g(x) < 0 and g(x) ≠ 0",
       B: "h(x)/g(x) ≥ 0 and g(x) ≠ 0",
@@ -799,7 +681,8 @@ const questions = [
     answer: "B"
   },
 
-  // 6. OPERATIONS AND COMPOSITION
+  // 5. OPERATIONS AND COMPOSITION
+
   {
     question: "Which of the following correctly represents the addition of two functions?",
     options: {
@@ -811,7 +694,7 @@ const questions = [
     answer: "B"
   },
   {
-    question: "If f and g are two functions, what is the domain of their sum f + g?",
+    question: "What is the domain of the sum f + g?",
     options: {
       A: "D(f) ∪ D(g)",
       B: "D(f) ∩ D(g)",
@@ -831,7 +714,7 @@ const questions = [
     answer: "B"
   },
   {
-    question: "Which of the following correctly describes the composition of two functions f and g?",
+    question: "Which of the following correctly describes the composition of two functions?",
     options: {
       A: "(f ∘ g)(x) = g(f(x))",
       B: "(f ∘ g)(x) = f(x) + g(x)",
@@ -845,7 +728,7 @@ const questions = [
     options: {
       A: "Because f and g must have different domains.",
       B: "Because (f ∘ g)(x) is generally not equal to (g ∘ f)(x).",
-      C: "Because composition is defined only for polynomial functions.",
+      C: "Because composition is defined only for polynomials.",
       D: "Because composition always produces a constant function."
     },
     answer: "B"
@@ -871,17 +754,7 @@ const questions = [
     answer: "C"
   },
   {
-    question: "Let f(x) = √x and g(x) = x + 1. Which expression represents (g ∘ f)(x)?",
-    options: {
-      A: "√(x + 1)",
-      B: "√x + 1",
-      C: "x + 1",
-      D: "x² + 1"
-    },
-    answer: "B"
-  },
-  {
-    question: "If f(x) = √x, which of the following represents (f ∘ f)(x)?",
+    question: "If f(x) = √x, which expression represents (f ∘ f)(x)?",
     options: {
       A: "√(2x)",
       B: "√x + √x",
@@ -891,7 +764,8 @@ const questions = [
     answer: "C"
   },
 
-  // 7. INVERSE FUNCTIONS AND GRAPH TESTS
+  // 6. INVERSE FUNCTIONS AND GRAPH TESTS
+
   {
     question: "Which condition must a function satisfy to have an inverse function?",
     options: {
@@ -903,34 +777,24 @@ const questions = [
     answer: "B"
   },
   {
-    question: "Which of the following correctly describes the inverse function of f?",
+    question: "Which statement correctly describes the domain and range of an inverse function?",
     options: {
-      A: "A function whose domain and range are the same as those of f.",
-      B: "A function whose domain is the range of f and whose range is the domain of f.",
-      C: "A function obtained by multiplying f by -1.",
-      D: "A function that always equals 1/f(x)."
+      A: "They remain the same as the original function.",
+      B: "The domain is the original range, and the range is the original domain.",
+      C: "Both must be all real numbers.",
+      D: "The inverse has no domain or range."
     },
     answer: "B"
   },
   {
-    question: "Which of the following is the correct first step when finding an inverse function?",
+    question: "What is the first step when finding an inverse function algebraically?",
     options: {
       A: "Interchange x and y immediately.",
       B: "Differentiate the original function.",
       C: "Solve y = f(x) for x in terms of y.",
-      D: "Square both sides of the equation."
+      D: "Square both sides."
     },
     answer: "C"
-  },
-  {
-    question: "After solving y = f(x) for x in terms of y, what is the next step in finding the inverse?",
-    options: {
-      A: "Set x = 0.",
-      B: "Interchange x and y.",
-      C: "Multiply both sides by -1.",
-      D: "Find the derivative."
-    },
-    answer: "B"
   },
   {
     question: "Find the inverse of f(x) = x³ + 1.",
@@ -946,14 +810,14 @@ const questions = [
     question: "Which statement correctly distinguishes f⁻¹(x) from 1/f(x)?",
     options: {
       A: "They always represent the same function.",
-      B: "f⁻¹(x) represents the inverse function, not the reciprocal of f(x).",
+      B: "f⁻¹(x) represents the inverse function, not the reciprocal.",
       C: "f⁻¹(x) represents the square of f(x).",
       D: "1/f(x) is always the inverse function."
     },
     answer: "B"
   },
   {
-    question: "Which of the following completes the inverse-function identity when g is the inverse of f?",
+    question: "If g is the inverse function of f, which identity is correct?",
     options: {
       A: "(g ∘ f)(x) = 0",
       B: "(g ∘ f)(x) = 1",
@@ -987,13 +851,13 @@ const questions = [
     options: {
       A: "Because it is not a polynomial.",
       B: "Because it is not one-to-one.",
-      C: "Because its domain is not real numbers.",
+      C: "Because its domain is not the real numbers.",
       D: "Because its range is negative."
     },
     answer: "B"
   },
   {
-    question: "Which domain restriction makes y = x² one-to-one according to the chapter?",
+    question: "Which domain restriction makes y = x² one-to-one?",
     options: {
       A: "(-∞, 0]",
       B: "ℝ",
