@@ -284,41 +284,43 @@
   <div class="main-screen">
     <div class="pusher-container">
       
-      <div class="page-title">پەیجی زیادکردنی ئەرکی ماڵەوە (Admin)</div>
+      <div class="page-title">زیادکردنی ئەرکی ماڵەوە</div>
 
       <!-- Assignment Creator Form -->
       <form id="assignmentForm" class="form-panel">
         
         <!-- Subject -->
         <div class="form-group">
-          <label for="subject">ناوی بابەت (Subject)</label>
-          <input type="text" id="subject" required placeholder="ماتماتیک, ئالجبرا..." list="subjectOptions">
+          <label for="subject">ناوی بابەت</label>
+          <input type="text" id="subject" required placeholder="Calculus I" list="subjectOptions">
           <datalist id="subjectOptions">
-            <option value="تفاضل و تکامل (Calculus)"></option>
-            <option value="جەبری دابڕاو (Abstract Algebra)"></option>
-            <option value="جەبری هێڵی (Linear Algebra)"></option>
-            <option value="هاوکێشە دیفڕانشیاڵەکان"></option>
+            <option value="Calculus I"></option>
+            <option value="Foundation"></option>
+            <option value="Physics"></option>
+            <option value="English"></option>
+            <option value="Computer Skills"></option>
+            <option value="Psychology"></option>
           </datalist>
         </div>
 
         <!-- Title -->
         <div class="form-group">
-          <label for="title">سەردێڕی ئەرک (Title)</label>
+          <label for="title">سەردێڕی ئەرک</label>
           <input type="text" id="title" required placeholder="ڕاهێنانی بەشی دووەم...">
         </div>
 
         <!-- Description -->
         <div class="form-group">
-          <label for="description">ڕوونکردنەوە و تێبینی (Description)</label>
+          <label for="description">ڕوونکردنەوە و تێبینی</label>
           <textarea id="description" rows="4" required placeholder="وەڵامی ڕاهێنانی لاپەڕە ٤٥ بکەنەوە..."></textarea>
         </div>
 
         <!-- Mode Switcher (Date Mode / Time Mode) -->
         <div class="form-group">
-          <label>جۆری کاتی بەسەرچوون (Expiration Mode)</label>
+          <label>جۆری کاتی بەسەرچوون</label>
           <div class="mode-switcher">
-            <button type="button" id="btnDateMode" class="mode-btn active">بەپێی بەروار (Date Mode)</button>
-            <button type="button" id="btnTimeMode" class="mode-btn">وانەیەکیتر (Time Mode)</button>
+            <button type="button" id="btnDateMode" class="mode-btn active">بەپێی بەروار</button>
+            <button type="button" id="btnTimeMode" class="mode-btn">وانەیەکیتر</button>
           </div>
 
           <!-- Date Input -->
@@ -334,12 +336,12 @@
 
         <!-- Instructor -->
         <div class="form-group">
-          <label for="instructor">ناوی مامۆستا / شوێنی ڕادەستکردن</label>
-          <input type="text" id="instructor" required placeholder="د. مامۆستا...">
+          <label for="instructor">ناوی خوێندکار</label>
+          <input type="text" id="instructor" required placeholder="ڕادەستکراوە لەلایەن...">
         </div>
 
         <!-- Submit Button -->
-        <button type="submit" class="submit-btn">ناردن بۆ قوتابیان (Push)</button>
+        <button type="submit" class="submit-btn">ناردن بۆ قوتابیان</button>
 
       </form>
 
