@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathematics Department - Student Issues</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f3f2f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: #323130;
+        }
+
+        .container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 440px;
+            padding: 40px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 15px;
+            border: 1px solid #8a8886;
+            border-radius: 2px;
+            background-color: #ffffff;
+            color: #323130;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        input:focus, select:focus {
+            border-color: #0067b8;
+            border-width: 2px;
+            padding: 9px 11px;
+        }
+
+        input[type="email"], select.ltr {
+            direction: ltr;
+            text-align: left;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        select:invalid {
+            color: #605e5c;
+        }
+
+        option {
+            color: #323130;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #ffffff;
+            background-color: #0067b8;
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background-color 0.15s;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #005da6;
+        }
+
+        button:active:not(:disabled) {
+            background-color: #004578;
+        }
+
+        button:disabled {
+            background-color: #c8c6c4;
+            cursor: not-allowed;
+        }
+
+        .status-msg {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .success {
+            color: #107c10;
+        }
+
+        .error {
+            color: #a4262c;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <form id="issueForm">
+        <div class="form-group">
+            <input type="text" id="fullName" placeholder="ناوی سیانیت بنووسە" required>
+        </div>
+
+        <div class="form-group">
+            <select id="year" class="ltr" required>
+                <option value="" disabled selected hidden>Year</option>
+                <option value="1st year">1st year</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <select id="department" class="ltr" required>
+                <option value="" disabled selected hidden>Department</option>
+                <option value="Mathematics">Mathematics</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <select id="group" required>
+                <option value="" disabled selected hidden>گرووپ</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <input type="email" id="email" placeholder="Student Email (@student.su.edu.krd)" required>
+        </div>
+
+        <div class="form-group">
+            <select id="problemType" required>
+                <option value="" disabled selected hidden>جۆری کێشە</option>
+                <option value="ناتوانم داخلی دەروازە بم">ناتوانم داخلی دەروازە بم</option>
+                <option value="ناتوانم داخلی فیدباک بم">ناتوانم داخلی فیدباک بم</option>
+                <option value="هەردوو کێشەم هەیە">هەردوو کێشەم هەیە</option>
+            </select>
+        </div>
+
+        <button type="submit" id="submitBtn">ناردن</button>
+        <div id="statusMsg" class="status-msg"></div>
+    </form>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyB-YOUR_ACTUAL_API_KEY",
+        authDomain: "cognito-f1f7b.firebaseapp.com",
+        databaseURL: "https://cognito-f1f7b-default-rtdb.firebaseio.com/",
+        projectId: "cognito-f1f7b",
+        storageBucket: "cognito-f1f7b.firebasestorage.app",
+        messagingSenderId: "506661532829",
+        appId: "1:506661532829:web:7a28aa874ba80871691074"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const form = document.getElementById('issueForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const statusMsg = document.getElementById('statusMsg');
+
+    // Lock form immediately if this browser already submitted
+    if (localStorage.getItem('math_issue_submitted') === 'true') {
+        lockForm("✓");
+    }
+
+    function lockForm(message) {
+        const inputs = form.querySelectorAll('input, select, button');
+        inputs.forEach(el => el.disabled = true);
+        statusMsg.textContent = message;
+        statusMsg.className = "status-msg success";
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const fullName = document.getElementById('fullName').value.trim();
+        const year = document.getElementById('year').value;
+        const department = document.getElementById('department').value;
+        const group = document.getElementById('group').value;
+        const email = document.getElementById('email').value.trim().toLowerCase();
+        const problemType = document.getElementById('problemType').value;
+
+        // Enforce Salahaddin University student email domain
+        if (!email.endsWith('@student.su.edu.krd')) {
+            statusMsg.textContent = "تەنها ئیمەیڵی زانکۆ بەکاربهێنە (@student.su.edu.krd)";
+            statusMsg.className = "status-msg error";
+            return;
+        }
+
+        submitBtn.disabled = true;
+        statusMsg.textContent = "...";
+        statusMsg.className = "status-msg";
+
+        // Use sanitized email as unique key so each student can only submit once in Firebase
+        const emailKey = email.replace(/\./g, ',');
+        const studentRef = ref(db, `Salahaddin-University/Mathematics-Dipartment/Issue/"${emailKey}`);
+
+        try {
+            const snapshot = await get(studentRef);
+            if (snapshot.exists()) {
+                localStorage.setItem('math_issue_submitted', 'true');
+                lockForm("✓");
+                return;
+            }
+
+            await set(studentRef, {
+                fullName: fullName,
+                year: year,
+                department: department,
+                group: group,
+                email: email,
+                problem: problemType,
+                timestamp: new Date().toISOString()
+            });
+
+            localStorage.setItem('math_issue_submitted', 'true');
+            lockForm("✓");
+        } catch (error) {
+            submitBtn.disabled = false;
+            statusMsg.textContent = "Error";
+            statusMsg.className = "status-msg error";
+        }
+    });
+</script>
+
+</body>
+</html>
