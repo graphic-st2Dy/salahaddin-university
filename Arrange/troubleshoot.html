@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mathematics Department - Submitted Issues (A4 Export)</title>
-    <!-- html2canvas for high-resolution PNG export -->
+    <title>Mathematics Department - Submitted Issues (8 A4 Sheets)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
@@ -16,46 +15,96 @@
 
         body {
             background-color: #e1dfdd;
-            padding: 20px 12px 40px;
+            padding: 20px 12px 60px;
             color: #201f1e;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* Top Action Bar */
-        .toolbar {
+        /* Global Summary Bar */
+        .global-bar {
+            width: 100%;
+            max-width: 794px;
+            background: #ffffff;
+            padding: 12px 18px;
+            margin-bottom: 24px;
+            border-radius: 4px;
+            border-right: 4px solid #0067b8;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .global-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #201f1e;
+        }
+
+        .global-stats {
+            font-size: 13px;
+            color: #605e5c;
+            font-weight: 600;
+        }
+
+        /* Section for each of the 8 classes */
+        .class-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 36px;
+        }
+
+        /* Per-Sheet Toolbar */
+        .sheet-toolbar {
             width: 100%;
             max-width: 794px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #ffffff;
-            padding: 10px 16px;
-            margin-bottom: 16px;
+            padding: 8px 14px;
+            margin-bottom: 10px;
             border-radius: 4px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             gap: 10px;
             flex-wrap: wrap;
         }
 
-        .toolbar-info {
-            font-size: 13px;
-            color: #605e5c;
+        .toolbar-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #0067b8;
+        }
+
+        .toolbar-count {
+            font-size: 12px;
             font-weight: 600;
+            color: #605e5c;
+            background: #f3f2f1;
+            padding: 2px 8px;
+            border-radius: 10px;
         }
 
         .btn-group {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
 
         .btn {
             background-color: #0067b8;
             color: #ffffff;
             border: none;
-            padding: 8px 16px;
-            font-size: 13px;
+            padding: 6px 14px;
+            font-size: 12.5px;
             font-weight: 600;
             border-radius: 3px;
             cursor: pointer;
@@ -81,13 +130,13 @@
             background-color: #edebe9;
         }
 
-        /* Scroll wrapper for small mobile screens */
+        /* Scroll wrapper for mobile viewing */
         .sheet-scroll-container {
             width: 100%;
             overflow-x: auto;
             display: flex;
             justify-content: center;
-            padding-bottom: 10px;
+            padding-bottom: 6px;
         }
 
         /* Exact A4 Dimensions at 96 DPI: 210mm x 297mm = 794px x 1123px */
@@ -95,7 +144,7 @@
             width: 794px;
             min-height: 1123px;
             background-color: #ffffff;
-            padding: 24px 28px;
+            padding: 22px 26px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
             display: flex;
             flex-direction: column;
@@ -105,16 +154,33 @@
         .sheet-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: center;
             border-bottom: 2px solid #0067b8;
             padding-bottom: 8px;
             margin-bottom: 12px;
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .class-code-badge {
+            background-color: #0067b8;
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 800;
+            padding: 4px 14px;
+            border-radius: 3px;
+            letter-spacing: 0.5px;
+            direction: ltr;
+        }
+
         .sheet-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
-            color: #0067b8;
+            color: #201f1e;
         }
 
         .sheet-subtitle {
@@ -122,7 +188,7 @@
             color: #605e5c;
         }
 
-        /* Compact 3-column grid so A4 holds 30–36+ items cleanly */
+        /* Compact 3-column grid so A4 holds 30–36+ items */
         .grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -199,11 +265,11 @@
             word-break: break-word;
         }
 
-        .status {
+        .empty-msg {
             text-align: center;
-            color: #605e5c;
+            color: #8a8886;
             font-size: 13px;
-            margin-top: 40px;
+            margin-top: 60px;
         }
 
         @media print {
@@ -211,8 +277,12 @@
                 background: none;
                 padding: 0;
             }
-            .toolbar {
+            .global-bar, .sheet-toolbar {
                 display: none;
+            }
+            .class-section {
+                margin-bottom: 0;
+                page-break-after: always;
             }
             .a4-sheet {
                 box-shadow: none;
@@ -223,27 +293,13 @@
 </head>
 <body>
 
-<div class="toolbar">
-    <div class="toolbar-info" id="countInfo">Loading issues...</div>
-    <div class="btn-group">
-        <button id="downloadPngBtn" class="btn">Download A4 (PNG)</button>
-        <button id="downloadJpgBtn" class="btn btn-secondary">Download A4 (JPG)</button>
-    </div>
+<div class="global-bar">
+    <div class="global-title">بەشی ماتماتیک — دابەشکاری کێشەکان بەپێی قۆناغ و گرووپ</div>
+    <div class="global-stats" id="globalStats">Loading data...</div>
 </div>
 
-<div class="sheet-scroll-container">
-    <div id="a4Sheet" class="a4-sheet">
-        <div class="sheet-header">
-            <div>
-                <div class="sheet-title">بەشی ماتماتیک — لیستی کێشە تۆمارکراوەکان</div>
-                <div class="sheet-subtitle">Salahaddin University - Mathematics Department</div>
-            </div>
-            <div class="sheet-subtitle" id="sheetMeta"></div>
-        </div>
-        <div id="status" class="status">...</div>
-        <div id="cardsContainer" class="grid"></div>
-    </div>
-</div>
+<!-- Container where the 8 A4 sheets (A1..B4) will be rendered -->
+<div id="sheetsWrapper" style="width: 100%;"></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -263,10 +319,20 @@
     const db = getDatabase(app);
 
     const issuesRef = ref(db, 'Salahaddin-University/Mathematics-Dipartment/Issue');
-    const cardsContainer = document.getElementById('cardsContainer');
-    const statusEl = document.getElementById('status');
-    const countInfoEl = document.getElementById('countInfo');
-    const sheetMetaEl = document.getElementById('sheetMeta');
+    const sheetsWrapper = document.getElementById('sheetsWrapper');
+    const globalStatsEl = document.getElementById('globalStats');
+
+    // The 8 exact layouts requested: A1, B1, A2, B2, A3, B3, A4, B4
+    const LAYOUT_DEFINITIONS = [
+        { id: 'A1', year: 1, group: 'A', label: 'قۆناغی یەکەم - گرووپی A' },
+        { id: 'B1', year: 1, group: 'B', label: 'قۆناغی یەکەم - گرووپی B' },
+        { id: 'A2', year: 2, group: 'A', label: 'قۆناغی دووەم - گرووپی A' },
+        { id: 'B2', year: 2, group: 'B', label: 'قۆناغی دووەم - گرووپی B' },
+        { id: 'A3', year: 3, group: 'A', label: 'قۆناغی سێیەم - گرووپی A' },
+        { id: 'B3', year: 3, group: 'B', label: 'قۆناغی سێیەم - گرووپی B' },
+        { id: 'A4', year: 4, group: 'A', label: 'قۆناغی چوارەم - گرووپی A' },
+        { id: 'B4', year: 4, group: 'B', label: 'قۆناغی چوارەم - گرووپی B' }
+    ];
 
     function escapeHTML(str) {
         if (!str) return "";
@@ -282,73 +348,162 @@
         return String(val || "").trim();
     }
 
-    onValue(issuesRef, (snapshot) => {
-        cardsContainer.innerHTML = "";
+    // Flexible parser to match year strings like "1", "1st", "First Year", "قۆناغی یەکەم", etc.
+    function parseYear(rawYear) {
+        const s = normalizeText(rawYear).toLowerCase();
+        if (s.includes('1') || s.includes('first') || s.includes('یەک')) return 1;
+        if (s.includes('2') || s.includes('second') || s.includes('دوو')) return 2;
+        if (s.includes('3') || s.includes('third') || s.includes('سێ')) return 3;
+        if (s.includes('4') || s.includes('fourth') || s.includes('چوار')) return 4;
+        return null;
+    }
 
-        if (!snapshot.exists()) {
-            statusEl.style.display = "block";
-            statusEl.textContent = "0";
-            countInfoEl.textContent = "Total: 0";
-            return;
+    // Flexible parser to match group strings like "A", "Group A", "A1", "گرووپی A", etc.
+    function parseGroup(rawGroup) {
+        const s = normalizeText(rawGroup).toUpperCase();
+        if (s.includes('B') || s.includes('ب')) return 'B';
+        if (s.includes('A') || s.includes('ئەلیف')) return 'A';
+        return null;
+    }
+
+    // Build the 8 A4 layout sections in the DOM
+    function initLayouts() {
+        sheetsWrapper.innerHTML = "";
+        const todayStr = new Date().toLocaleDateString('en-GB');
+
+        LAYOUT_DEFINITIONS.forEach((def) => {
+            const section = document.createElement('div');
+            section.className = 'class-section';
+            section.innerHTML = `
+                <div class="sheet-toolbar">
+                    <div class="toolbar-label">
+                        <span>Layout: ${def.id}</span>
+                        <span class="toolbar-count" id="count-${def.id}">0 items</span>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" data-sheet="${def.id}" data-format="png">Download ${def.id} (PNG)</button>
+                        <button class="btn btn-secondary" data-sheet="${def.id}" data-format="jpg">Download ${def.id} (JPG)</button>
+                    </div>
+                </div>
+                <div class="sheet-scroll-container">
+                    <div id="sheet-${def.id}" class="a4-sheet">
+                        <div class="sheet-header">
+                            <div class="header-right">
+                                <div class="class-code-badge">${def.id}</div>
+                                <div>
+                                    <div class="sheet-title">بەشی ماتماتیک — ${def.label}</div>
+                                    <div class="sheet-subtitle">Salahaddin University - Mathematics Department</div>
+                                </div>
+                            </div>
+                            <div class="sheet-subtitle" id="meta-${def.id}">Total: 0 | ${todayStr}</div>
+                        </div>
+                        <div id="empty-${def.id}" class="empty-msg">هیچ کێشەیەک بۆ ${def.id} تۆمار نەکراوە (0 items)</div>
+                        <div id="grid-${def.id}" class="grid"></div>
+                    </div>
+                </div>
+            `;
+            sheetsWrapper.appendChild(section);
+        });
+
+        // Attach download event listeners to all 16 buttons
+        document.querySelectorAll('button[data-sheet]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const sheetCode = btn.getAttribute('data-sheet');
+                const format = btn.getAttribute('data-format');
+                exportSheet(sheetCode, format, btn);
+            });
+        });
+    }
+
+    initLayouts();
+
+    onValue(issuesRef, (snapshot) => {
+        const buckets = {
+            A1: [], B1: [],
+            A2: [], B2: [],
+            A3: [], B3: [],
+            A4: [], B4: []
+        };
+        let unmatchedCount = 0;
+
+        if (snapshot.exists()) {
+            const records = Object.values(snapshot.val());
+
+            records.forEach((student) => {
+                const y = parseYear(student.year);
+                const g = parseGroup(student.group);
+                const key = (y && g) ? `${g}${y}` : null;
+
+                if (key && buckets[key]) {
+                    buckets[key].push(student);
+                } else {
+                    unmatchedCount++;
+                }
+            });
+
+            globalStatsEl.textContent = `Total Records: ${records.length}` + (unmatchedCount > 0 ? ` (${unmatchedCount} unclassified)` : '');
+        } else {
+            globalStatsEl.textContent = `Total Records: 0`;
         }
 
-        statusEl.style.display = "none";
-        const data = snapshot.val();
-        const records = Object.values(data);
+        const todayStr = new Date().toLocaleDateString('en-GB');
 
-        // Sort: 1) Group -> 2) Problem Type -> 3) Full Name (Alphabetical)
-        records.sort((a, b) => {
-            const groupCmp = normalizeText(a.group).localeCompare(normalizeText(b.group), undefined, { numeric: true, sensitivity: 'base' });
-            if (groupCmp !== 0) return groupCmp;
+        LAYOUT_DEFINITIONS.forEach((def) => {
+            const list = buckets[def.id];
+            const gridEl = document.getElementById(`grid-${def.id}`);
+            const emptyEl = document.getElementById(`empty-${def.id}`);
+            const countEl = document.getElementById(`count-${def.id}`);
+            const metaEl = document.getElementById(`meta-${def.id}`);
 
-            const problemCmp = normalizeText(a.problem).localeCompare(normalizeText(b.problem), undefined, { sensitivity: 'base' });
-            if (problemCmp !== 0) return problemCmp;
+            // Sort each sheet: 1) Group -> 2) Problem Type -> 3) Name (Alphabetical)
+            list.sort((a, b) => {
+                const groupCmp = normalizeText(a.group).localeCompare(normalizeText(b.group), undefined, { numeric: true, sensitivity: 'base' });
+                if (groupCmp !== 0) return groupCmp;
 
-            return normalizeText(a.fullName).localeCompare(normalizeText(b.fullName), undefined, { sensitivity: 'base' });
-        });
+                const problemCmp = normalizeText(a.problem).localeCompare(normalizeText(b.problem), undefined, { sensitivity: 'base' });
+                if (problemCmp !== 0) return problemCmp;
 
-        countInfoEl.textContent = `Total Issues: ${records.length}`;
-        sheetMetaEl.textContent = `Total: ${records.length} | ${new Date().toLocaleDateString('en-GB')}`;
+                return normalizeText(a.fullName).localeCompare(normalizeText(b.fullName), undefined, { sensitivity: 'base' });
+            });
 
-        records.forEach((student, index) => {
-            const card = document.createElement('div');
-            card.className = 'card';
+            countEl.textContent = `${list.length} items`;
+            metaEl.textContent = `Total: ${list.length} | ${todayStr}`;
+            gridEl.innerHTML = "";
 
-            card.innerHTML = `
-                <div class="card-top">
-                    <span class="student-name" title="${escapeHTML(student.fullName)}">${index + 1}. ${escapeHTML(student.fullName)}</span>
-                    <span class="group-badge">${escapeHTML(student.group)}</span>
-                </div>
-                <div class="meta-line">
-                    <span>${escapeHTML(student.year)}</span>
-                    <span>${escapeHTML(student.department)}</span>
-                </div>
-                <div class="email-line" title="${escapeHTML(student.email)}">${escapeHTML(student.email)}</div>
-                <div class="problem-line">${escapeHTML(student.problem)}</div>
-            `;
-
-            cardsContainer.appendChild(card);
+            if (list.length === 0) {
+                emptyEl.style.display = "block";
+            } else {
+                emptyEl.style.display = "none";
+                list.forEach((student, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div class="card-top">
+                            <span class="student-name" title="${escapeHTML(student.fullName)}">${index + 1}. ${escapeHTML(student.fullName)}</span>
+                            <span class="group-badge">${def.id}</span>
+                        </div>
+                        <div class="meta-line">
+                            <span>${escapeHTML(student.year)}</span>
+                            <span>${escapeHTML(student.department)}</span>
+                        </div>
+                        <div class="email-line" title="${escapeHTML(student.email)}">${escapeHTML(student.email)}</div>
+                        <div class="problem-line">${escapeHTML(student.problem)}</div>
+                    `;
+                    gridEl.appendChild(card);
+                });
+            }
         });
     }, (error) => {
-        statusEl.style.display = "block";
-        statusEl.textContent = "Error";
-        countInfoEl.textContent = "Connection Error";
+        globalStatsEl.textContent = "Error connecting to database";
     });
 
-    // High-resolution A4 image download handler
-    async function exportSheet(format) {
-        const sheet = document.getElementById('a4Sheet');
-        const pngBtn = document.getElementById('downloadPngBtn');
-        const jpgBtn = document.getElementById('downloadJpgBtn');
-
-        pngBtn.disabled = true;
-        jpgBtn.disabled = true;
-        const originalText = format === 'png' ? pngBtn.textContent : jpgBtn.textContent;
-        if (format === 'png') pngBtn.textContent = 'Generating...';
-        else jpgBtn.textContent = 'Generating...';
+    async function exportSheet(sheetCode, format, clickedBtn) {
+        const sheet = document.getElementById(`sheet-${sheetCode}`);
+        const originalText = clickedBtn.textContent;
+        clickedBtn.disabled = true;
+        clickedBtn.textContent = 'Generating...';
 
         try {
-            // scale: 3 renders 794x1123 at 2382x3369 px (~300 DPI A4 print quality)
             const canvas = await html2canvas(sheet, {
                 scale: 3,
                 useCORS: true,
@@ -362,23 +517,18 @@
 
             const link = document.createElement('a');
             const dateStr = new Date().toISOString().slice(0, 10);
-            link.download = `Math-Dept-Issues-A4-${dateStr}.${format}`;
+            link.download = `Math-Dept-${sheetCode}-A4-${dateStr}.${format}`;
             link.href = dataUrl;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         } catch (err) {
-            alert('Failed to generate image: ' + err.message);
+            alert(`Failed to generate ${sheetCode}: ` + err.message);
         } finally {
-            pngBtn.disabled = false;
-            jpgBtn.disabled = false;
-            if (format === 'png') pngBtn.textContent = originalText;
-            else jpgBtn.textContent = originalText;
+            clickedBtn.disabled = false;
+            clickedBtn.textContent = originalText;
         }
     }
-
-    document.getElementById('downloadPngBtn').addEventListener('click', () => exportSheet('png'));
-    document.getElementById('downloadJpgBtn').addEventListener('click', () => exportSheet('jpg'));
 </script>
 
 </body>
