@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mathematics Department - Submitted Issues</title>
+    <title>Mathematics Department - Submitted Issues (A4 Export)</title>
+    <!-- html2canvas for high-resolution PNG export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -13,81 +15,234 @@
         }
 
         body {
-            background-color: #f3f2f1;
-            padding: 32px 20px;
-            color: #323130;
+            background-color: #e1dfdd;
+            padding: 20px 12px 40px;
+            color: #201f1e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .wrapper {
-            max-width: 960px;
-            margin: 0 auto;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 16px;
-        }
-
-        .card {
-            background-color: #ffffff;
-            padding: 24px;
+        /* Top Action Bar */
+        .toolbar {
+            width: 100%;
+            max-width: 794px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            border-radius: 4px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-            border-radius: 2px;
-            border-top: 3px solid #0067b8;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
-        .field {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #edebe9;
-        }
-
-        .field:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        .label {
-            font-size: 12px;
+        .toolbar-info {
+            font-size: 13px;
             color: #605e5c;
             font-weight: 600;
         }
 
-        .value {
-            font-size: 15px;
-            color: #323130;
-            word-break: break-word;
+        .btn-group {
+            display: flex;
+            gap: 8px;
         }
 
-        .ltr {
+        .btn {
+            background-color: #0067b8;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .btn:hover {
+            background-color: #005a9e;
+        }
+
+        .btn:disabled {
+            background-color: #a19f9d;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: #f3f2f1;
+            color: #323130;
+            border: 1px solid #c8c6c4;
+        }
+
+        .btn-secondary:hover {
+            background-color: #edebe9;
+        }
+
+        /* Scroll wrapper for small mobile screens */
+        .sheet-scroll-container {
+            width: 100%;
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+            padding-bottom: 10px;
+        }
+
+        /* Exact A4 Dimensions at 96 DPI: 210mm x 297mm = 794px x 1123px */
+        .a4-sheet {
+            width: 794px;
+            min-height: 1123px;
+            background-color: #ffffff;
+            padding: 24px 28px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid #0067b8;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .sheet-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0067b8;
+        }
+
+        .sheet-subtitle {
+            font-size: 11px;
+            color: #605e5c;
+        }
+
+        /* Compact 3-column grid so A4 holds 30–36+ items cleanly */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            padding: 6px 8px;
+            border: 1px solid #d2d0ce;
+            border-right: 3px solid #0067b8;
+            border-radius: 2px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            font-size: 10.5px;
+            line-height: 1.25;
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 1px solid #edebe9;
+            padding-bottom: 2px;
+            gap: 4px;
+        }
+
+        .student-name {
+            font-weight: 700;
+            font-size: 11px;
+            color: #201f1e;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .group-badge {
+            background-color: #eff6fc;
+            color: #0067b8;
+            border: 1px solid #c7e0f4;
+            padding: 0 4px;
+            border-radius: 2px;
+            font-size: 9.5px;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .meta-line {
+            display: flex;
+            justify-content: space-between;
+            color: #605e5c;
+            font-size: 9.5px;
+        }
+
+        .email-line {
             direction: ltr;
             text-align: left;
+            font-size: 9.5px;
+            color: #323130;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .problem-value {
+        .problem-line {
             color: #a4262c;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 10px;
+            background-color: #fdf3f4;
+            padding: 2px 4px;
+            border-radius: 2px;
+            word-break: break-word;
         }
 
         .status {
             text-align: center;
             color: #605e5c;
-            font-size: 15px;
+            font-size: 13px;
             margin-top: 40px;
+        }
+
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            .toolbar {
+                display: none;
+            }
+            .a4-sheet {
+                box-shadow: none;
+                margin: 0;
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="wrapper">
-    <div id="status" class="status">...</div>
-    <div id="cardsContainer" class="grid"></div>
+<div class="toolbar">
+    <div class="toolbar-info" id="countInfo">Loading issues...</div>
+    <div class="btn-group">
+        <button id="downloadPngBtn" class="btn">Download A4 (PNG)</button>
+        <button id="downloadJpgBtn" class="btn btn-secondary">Download A4 (JPG)</button>
+    </div>
+</div>
+
+<div class="sheet-scroll-container">
+    <div id="a4Sheet" class="a4-sheet">
+        <div class="sheet-header">
+            <div>
+                <div class="sheet-title">بەشی ماتماتیک — لیستی کێشە تۆمارکراوەکان</div>
+                <div class="sheet-subtitle">Salahaddin University - Mathematics Department</div>
+            </div>
+            <div class="sheet-subtitle" id="sheetMeta"></div>
+        </div>
+        <div id="status" class="status">...</div>
+        <div id="cardsContainer" class="grid"></div>
+    </div>
 </div>
 
 <script type="module">
@@ -110,6 +265,8 @@
     const issuesRef = ref(db, 'Salahaddin-University/Mathematics-Dipartment/Issue');
     const cardsContainer = document.getElementById('cardsContainer');
     const statusEl = document.getElementById('status');
+    const countInfoEl = document.getElementById('countInfo');
+    const sheetMetaEl = document.getElementById('sheetMeta');
 
     function escapeHTML(str) {
         if (!str) return "";
@@ -121,12 +278,17 @@
             .replace(/'/g, "&#039;");
     }
 
+    function normalizeText(val) {
+        return String(val || "").trim();
+    }
+
     onValue(issuesRef, (snapshot) => {
         cardsContainer.innerHTML = "";
 
         if (!snapshot.exists()) {
             statusEl.style.display = "block";
             statusEl.textContent = "0";
+            countInfoEl.textContent = "Total: 0";
             return;
         }
 
@@ -134,38 +296,35 @@
         const data = snapshot.val();
         const records = Object.values(data);
 
-        // Sort newest first
-        records.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+        // Sort: 1) Group -> 2) Problem Type -> 3) Full Name (Alphabetical)
+        records.sort((a, b) => {
+            const groupCmp = normalizeText(a.group).localeCompare(normalizeText(b.group), undefined, { numeric: true, sensitivity: 'base' });
+            if (groupCmp !== 0) return groupCmp;
 
-        records.forEach((student) => {
+            const problemCmp = normalizeText(a.problem).localeCompare(normalizeText(b.problem), undefined, { sensitivity: 'base' });
+            if (problemCmp !== 0) return problemCmp;
+
+            return normalizeText(a.fullName).localeCompare(normalizeText(b.fullName), undefined, { sensitivity: 'base' });
+        });
+
+        countInfoEl.textContent = `Total Issues: ${records.length}`;
+        sheetMetaEl.textContent = `Total: ${records.length} | ${new Date().toLocaleDateString('en-GB')}`;
+
+        records.forEach((student, index) => {
             const card = document.createElement('div');
             card.className = 'card';
 
             card.innerHTML = `
-                <div class="field">
-                    <span class="label">ناوی سیانی</span>
-                    <span class="value">${escapeHTML(student.fullName)}</span>
+                <div class="card-top">
+                    <span class="student-name" title="${escapeHTML(student.fullName)}">${index + 1}. ${escapeHTML(student.fullName)}</span>
+                    <span class="group-badge">${escapeHTML(student.group)}</span>
                 </div>
-                <div class="field">
-                    <span class="label ltr">Year</span>
-                    <span class="value ltr">${escapeHTML(student.year)}</span>
+                <div class="meta-line">
+                    <span>${escapeHTML(student.year)}</span>
+                    <span>${escapeHTML(student.department)}</span>
                 </div>
-                <div class="field">
-                    <span class="label ltr">Department</span>
-                    <span class="value ltr">${escapeHTML(student.department)}</span>
-                </div>
-                <div class="field">
-                    <span class="label">گرووپ</span>
-                    <span class="value">${escapeHTML(student.group)}</span>
-                </div>
-                <div class="field">
-                    <span class="label ltr">Email</span>
-                    <span class="value ltr">${escapeHTML(student.email)}</span>
-                </div>
-                <div class="field">
-                    <span class="label">جۆری کێشە</span>
-                    <span class="value problem-value">${escapeHTML(student.problem)}</span>
-                </div>
+                <div class="email-line" title="${escapeHTML(student.email)}">${escapeHTML(student.email)}</div>
+                <div class="problem-line">${escapeHTML(student.problem)}</div>
             `;
 
             cardsContainer.appendChild(card);
@@ -173,7 +332,53 @@
     }, (error) => {
         statusEl.style.display = "block";
         statusEl.textContent = "Error";
+        countInfoEl.textContent = "Connection Error";
     });
+
+    // High-resolution A4 image download handler
+    async function exportSheet(format) {
+        const sheet = document.getElementById('a4Sheet');
+        const pngBtn = document.getElementById('downloadPngBtn');
+        const jpgBtn = document.getElementById('downloadJpgBtn');
+
+        pngBtn.disabled = true;
+        jpgBtn.disabled = true;
+        const originalText = format === 'png' ? pngBtn.textContent : jpgBtn.textContent;
+        if (format === 'png') pngBtn.textContent = 'Generating...';
+        else jpgBtn.textContent = 'Generating...';
+
+        try {
+            // scale: 3 renders 794x1123 at 2382x3369 px (~300 DPI A4 print quality)
+            const canvas = await html2canvas(sheet, {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                width: sheet.offsetWidth,
+                height: sheet.offsetHeight
+            });
+
+            const mimeType = format === 'jpg' ? 'image/jpeg' : 'image/png';
+            const dataUrl = canvas.toDataURL(mimeType, 0.95);
+
+            const link = document.createElement('a');
+            const dateStr = new Date().toISOString().slice(0, 10);
+            link.download = `Math-Dept-Issues-A4-${dateStr}.${format}`;
+            link.href = dataUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (err) {
+            alert('Failed to generate image: ' + err.message);
+        } finally {
+            pngBtn.disabled = false;
+            jpgBtn.disabled = false;
+            if (format === 'png') pngBtn.textContent = originalText;
+            else jpgBtn.textContent = originalText;
+        }
+    }
+
+    document.getElementById('downloadPngBtn').addEventListener('click', () => exportSheet('png'));
+    document.getElementById('downloadJpgBtn').addEventListener('click', () => exportSheet('jpg'));
 </script>
 
 </body>
