@@ -26,9 +26,21 @@
             background-color: #ffffff;
             width: 100%;
             max-width: 440px;
-            padding: 40px;
+            padding: 36px 40px 40px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
             border-radius: 2px;
+        }
+
+        .notice-box {
+            background-color: #eff6fc;
+            border-right: 4px solid #0067b8;
+            color: #201f1e;
+            padding: 12px 14px;
+            margin-bottom: 22px;
+            border-radius: 2px;
+            font-size: 14.5px;
+            font-weight: 600;
+            line-height: 1.5;
         }
 
         .form-group {
@@ -116,6 +128,8 @@
 <body>
 
 <div class="container">
+    <div class="notice-box">تکایە ناوی سیانیت وەکو کارتی نیشتیمانیت بنوسە</div>
+
     <form id="issueForm">
         <div class="form-group">
             <input type="text" id="fullName" placeholder="ناوی سیانیت بنووسە" required>
@@ -125,6 +139,9 @@
             <select id="year" class="ltr" required>
                 <option value="" disabled selected hidden>Year</option>
                 <option value="1st year">1st year</option>
+                <option value="2nd year">2nd year</option>
+                <option value="3rd year">3rd year</option>
+                <option value="4th year">4th year</option>
             </select>
         </div>
 
@@ -183,9 +200,9 @@
     const statusMsg = document.getElementById('statusMsg');
 
     const emailInput = document.getElementById('email');
-emailInput.addEventListener('input', () => {
-    emailInput.value = emailInput.value.replace(/\s+/g, '');
-});
+    emailInput.addEventListener('input', () => {
+        emailInput.value = emailInput.value.replace(/\s+/g, '');
+    });
 
     // Lock form immediately if this browser already submitted
     if (localStorage.getItem('math_issue_submitted') === 'true') {
