@@ -182,6 +182,11 @@
     const submitBtn = document.getElementById('submitBtn');
     const statusMsg = document.getElementById('statusMsg');
 
+    const emailInput = document.getElementById('email');
+emailInput.addEventListener('input', () => {
+    emailInput.value = emailInput.value.replace(/\s+/g, '');
+});
+
     // Lock form immediately if this browser already submitted
     if (localStorage.getItem('math_issue_submitted') === 'true') {
         lockForm("✓");
@@ -217,7 +222,7 @@
 
         // Use sanitized email as unique key so each student can only submit once in Firebase
         const emailKey = email.replace(/\./g, ',');
-        const studentRef = ref(db, `Salahaddin-University/Mathematics-Dipartment/Issue/"${emailKey}`);
+        const studentRef = ref(db, `Salahaddin-University/Mathematics-Dipartment/Issue/${emailKey}`);
 
         try {
             const snapshot = await get(studentRef);
